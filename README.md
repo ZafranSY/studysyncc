@@ -113,5 +113,5 @@ This project is licensed under the MIT License. See the [LICENSE](LICENSE) file 
 ---
 
 ## Contact
-For further inquiries, feel free to contact us at [your.email@domain.com](mailto:your.email@domain.com).
+For further inquiries, feel free to contact us at [your.email@domain.com](mailto:zafranzafran0234@gmail.com).
 
