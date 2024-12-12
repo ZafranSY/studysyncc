@@ -1,6 +1,9 @@
 import { createRouter, createWebHistory } from "vue-router";
 import HomeView from "../views/HomeView.vue";
 
+
+
+
 const routes = [
   {
     path: "/",
@@ -21,6 +24,27 @@ const routes = [
     name: "login",
     component: () => import("../views/LoginPage.vue"),
   },
+
+  {
+    path: "/course-files",
+    name: "CourseFiles",
+    component: () => import("@/views/CourseFileView.vue"),
+  },
+
+  {
+  path: "/course-files/:id",
+  name: "CourseDetails",
+  component: () => import("@/views/CourseDetailsView.vue"),
+
+  navigateToDetails(id) {
+    console.log(`Navigating to details of file ID: ${id}`);
+    this.$router.push(`/course-files/${id}`);
+  }
+  
+},
+
+
+
 ];
 
 const router = createRouter({
