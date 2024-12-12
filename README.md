@@ -76,9 +76,9 @@ StudySync is a web-based platform developed using Vue.js to streamline communica
 
 ## Technologies Used
 - **Frontend Framework:** Vue.js
-- **Backend:** TBD (Specify if applicable)
-- **Database:** TBD (Specify if applicable)
-- **Hosting:** TBD (Specify if applicable)
+- **Backend:** Perl Mojolicous
+- **Database:** MariaDB
+- **Hosting:** TBD
 
 ---
 
