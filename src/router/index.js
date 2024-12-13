@@ -1,9 +1,6 @@
 import { createRouter, createWebHistory } from "vue-router";
 import HomeView from "../views/HomeView.vue";
 
-
-
-
 const routes = [
   {
     path: "/",
@@ -13,9 +10,6 @@ const routes = [
   {
     path: "/about",
     name: "about",
-    // route level code-splitting
-    // this generates a separate chunk (about.[hash].js) for this route
-    // which is lazy-loaded when the route is visited.
     component: () =>
       import(/* webpackChunkName: "about" */ "../views/AboutView.vue"),
   },
@@ -24,7 +18,11 @@ const routes = [
     name: "login",
     component: () => import("../views/LoginPage.vue"),
   },
-
+  {
+    path: "/coursecoordination",
+    name: "coursecoordination",
+    component: () => import("../views/CourseCoordination.vue"), // Lazy loaded
+  },
   {
     path: "/course-files",
     name: "CourseFiles",
@@ -32,19 +30,15 @@ const routes = [
   },
 
   {
-  path: "/course-files/:id",
-  name: "CourseDetails",
-  component: () => import("@/views/CourseDetailsView.vue"),
-
-  navigateToDetails(id) {
-    console.log(`Navigating to details of file ID: ${id}`);
-    this.$router.push(`/course-files/${id}`);
-  }
+    path: "/course-files/:id",
+    name: "CourseDetails",
+    component: () => import("@/views/CourseDetailsView.vue"),
   
-},
-
-
-
+    navigateToDetails(id) {
+      console.log(`Navigating to details of file ID: ${id}`);
+      this.$router.push(`/course-files/${id}`);
+    }
+  },
 ];
 
 const router = createRouter({
