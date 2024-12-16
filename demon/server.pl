@@ -86,5 +86,27 @@ get '/getBySemesterAndCategory' => sub ($c) {
     # Render the results as JSON
     $c->render(json => $results);
 };
+get '/getUpload' => sub ($c)
+{
+     my $link = $c->param('link');
+    my $message = $c->param('message');  # Get the user's message
 
+    if ($link =~ m/^https?:\/\/[a-zA-Z0-9\-\.]+\.[a-zA-Z]{2,3}(\/\S*)?$/) {
+        # Save the link and message to the database
+        my $result = CRUD::addLinkWithMessage($dbh, $link, $message);  # You would define this in your CRUD module
+
+        # Send a success response
+        $c->render(json => { message => "Link and message shared successfully", link => $link, user_message => $message });
+    } else {
+        # Return an error response if the link is invalid
+        $c->render(json => { error => "Invalid URL format" });
+    }
+};
+get'/search' =>($c)
+{
+    my $search = $c->param('search');
+    my $results = CRUD::getSearch($dbh, $search);
+
+    $c->render(json => $results);
+}
 app->start;
