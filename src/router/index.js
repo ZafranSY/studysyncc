@@ -33,6 +33,12 @@ const routes = [
   },
 
   {
+    path: "/course-files",
+    name: "CourseFiles",
+    component: () => import("@/views/CourseFileView.vue"),
+  },
+
+  {
     path: "/course-files/:id",
     name: "CourseDetails",
     component: () => import("@/views/CourseDetailsView.vue"),
