@@ -39,6 +39,7 @@
           :subtitle="semester.subtitle"
           :bgColor="semester.bgColor"
           :link="'/homeview/category'"
+           @click="setSemester(semester.title)"
         />
       </div>
     </div>
@@ -100,6 +101,15 @@ export default {
         console.error("Error fetching categories:", error);
       });
   },
+  methods: {
+    setSemester(semester) {
+        sessionStorage.setItem('semester', JSON.stringify(semester));
+        console.log(`Semester set: ${JSON.stringify(semester)}`);
+        // Optionally, navigate to the next page
+        this.$router.push('/homeview/category');
+        }
+    }
+
 };
 </script>
 
