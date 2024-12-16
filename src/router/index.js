@@ -21,16 +21,12 @@ const routes = [
     component: () => import("../views/LoginPage.vue"),
   },
   {
-    path: "/coursecoordination",
-    name: "coursecoordination",
-    component: () => import("../views/CourseCoordination.vue"), // Lazy loaded
+    path: "/homeview",
+    name: "homeview",
+    component: () => import("../views/HomeView.vue"),
+    meta: { requiresAuth: true } // Lazy loaded
   },
-  {
-    path: "/coursecoordination",
-    name: "coursecoordination",
-    component: () => import("../views/CourseCoordination.vue"), // Lazy loaded
-    meta: { requiresAuth: true }
-  },
+
 
   {
     path: "/course-files",

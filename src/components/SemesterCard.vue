@@ -40,7 +40,7 @@ export default {
 </script>
 
 <style scoped>
-@import url('https://fonts.googleapis.com/css2?family=Indie+Flower&display=swap');
+
 
 .semester-card {
   width: 306px;
