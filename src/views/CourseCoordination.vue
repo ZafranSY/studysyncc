@@ -1,5 +1,6 @@
 <template>
 <<<<<<< HEAD
+<<<<<<< HEAD
   <div class="layout">
     <!-- Sidebar -->
     <NavbarView />
@@ -48,37 +49,56 @@
     <div class="layout">
         <!-- Sidebar -->
         <NavbarView />
+=======
+  <div class="layout">
+    <!-- Sidebar -->
+    <NavbarView />
+>>>>>>> a28b483c70988e9b1abed6926d464989045ea39a
 
-        <!-- Main Content -->
-        <div class="main-content">
-            <!-- Header Section -->
-            <div class="header">
-                <h1 class="page-title">Home</h1>
-                <h2 class="section-title">Course Coordination</h2>
-            </div>
+    <!-- Main Content -->
+    <div class="main-content">
+      <!-- Header Section -->
+      <div class="header">
+        <h1 class="page-title">Home</h1>
+        <h2 class="section-title">Course Coordination</h2>
+      </div>
 
-            <!-- Filter Section -->
-            <div class="filter-section">
-                <!-- Dropdown -->
-                <select v-model="selectedFilter" class="filter-dropdown">
-                    <option value="All">All</option>
-                    <option value="20/21">20/21</option>
-                    <option value="21/22">21/22</option>
-                    <option value="22/23">22/23</option>
-                </select>
+      <!-- Filter Section -->
+      <div class="filter-section">
+        <!-- Dropdown -->
+        <select v-model="selectedFilter" class="filter-dropdown">
+          <option value="All">All</option>
+          <option value="20/21">20/21</option>
+          <option value="21/22">21/22</option>
+          <option value="22/23">22/23</option>
+        </select>
 
-                <!-- Search Box -->
-                <input type="text" v-model="searchQuery" placeholder="Search..." class="filter-input" />
-            </div>
+        <!-- Search Box -->
+        <input
+          type="text"
+          v-model="searchQuery"
+          placeholder="Search..."
+          class="filter-input"
+        />
+      </div>
 
-            <!-- Semester Cards -->
-            <div class="card-grid">
-                <SemesterCard v-for="semester in filteredSemesters" :key="semester.id" :title="semester.title"
-                    :subtitle="semester.subtitle" :bgColor="semester.bgColor" :link="'/semester/' + semester.id" />
-            </div>
-        </div>
+      <!-- Semester Cards -->
+      <div class="card-grid">
+        <SemesterCard
+          v-for="semester in filteredSemesters"
+          :key="semester.id"
+          :title="semester.title"
+          :subtitle="semester.subtitle"
+          :bgColor="semester.bgColor"
+          :link="'/semester/' + semester.id"
+        />
+      </div>
     </div>
+<<<<<<< HEAD
 >>>>>>> 43fdbaaab80a6d12975d0ca0045339a5293af8d2
+=======
+  </div>
+>>>>>>> a28b483c70988e9b1abed6926d464989045ea39a
 </template>
 
 <script>
@@ -87,6 +107,9 @@ import SemesterCard from "@/components/SemesterCard.vue";
 
 export default {
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> a28b483c70988e9b1abed6926d464989045ea39a
   components: { NavbarView, SemesterCard },
   data() {
     return {
@@ -117,6 +140,7 @@ export default {
             .includes(this.searchQuery.toLowerCase());
         return matchesFilter && matchesSearch;
       });
+<<<<<<< HEAD
     },
   },
 =======
@@ -153,11 +177,16 @@ export default {
         },
     },
 >>>>>>> 43fdbaaab80a6d12975d0ca0045339a5293af8d2
+=======
+    },
+  },
+>>>>>>> a28b483c70988e9b1abed6926d464989045ea39a
 };
 </script>
 
 <style scoped>
 .layout {
+<<<<<<< HEAD
 <<<<<<< HEAD
   display: flex;
   height: 100vh;
@@ -234,72 +263,75 @@ export default {
 =======
     display: flex;
     height: 100vh;
+=======
+  display: flex;
+  height: 100vh;
+>>>>>>> a28b483c70988e9b1abed6926d464989045ea39a
 }
 
 .main-content {
-    flex-grow: 1;
-    padding: 20px;
-    margin-left: 260px;
-    background-color: #f9f9f9;
-    overflow-y: auto;
-    display: flex;
-    flex-direction: column;
+  flex-grow: 1;
+  padding: 20px;
+  margin-left: 260px;
+  background-color: #f9f9f9;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
 }
 
 .header {
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-    border-bottom: 2px solid #ddd;
-    /* Subtle underline */
-    padding-bottom: 10px;
-    margin-bottom: 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  border-bottom: 2px solid #ddd; /* Subtle underline */
+  padding-bottom: 10px;
+  margin-bottom: 20px;
 }
 
 .page-title {
-    font-size: 28px;
-    font-weight: 500;
-    margin: 0 0 4px 0;
-    color: #000;
+  font-size: 28px;
+  font-weight: 500;
+  margin: 0 0 4px 0;
+  color: #000;
 }
 
 .section-title {
-    font-size: 18px;
-    font-weight: bold;
-    /* Bold "Course Coordination" */
-    margin: 0;
-    color: #333;
+  font-size: 18px;
+  font-weight: bold; /* Bold "Course Coordination" */
+  margin: 0;
+  color: #333;
 }
 
 .filter-section {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    margin-bottom: 20px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 20px;
 }
 
 .filter-dropdown {
-    padding: 6px 12px;
-    border: 1px solid #ccc;
-    border-radius: 6px;
-    font-size: 14px;
-    background-color: #fff;
-    width: 100px;
-    height: 39px;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  padding: 6px 12px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  font-size: 14px;
+  background-color: #fff;
+  width: 100px;
+  height: 39px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
 }
 
 .filter-input {
-    width: 254px;
-    height: 39px;
-    padding: 6px 12px;
-    border: 1px solid #ccc;
-    border-radius: 6px;
-    font-size: 14px;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  width: 254px;
+  height: 39px;
+  padding: 6px 12px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  font-size: 14px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
 }
 
 .card-grid {
+<<<<<<< HEAD
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(306px, 1fr));
     gap: 34px 37px;
@@ -307,5 +339,13 @@ export default {
     max-width: 1200px;
     margin: 0 auto;
 >>>>>>> 43fdbaaab80a6d12975d0ca0045339a5293af8d2
+=======
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(306px, 1fr));
+  gap: 34px 37px;
+  justify-content: center;
+  max-width: 1200px;
+  margin: 0 auto;
+>>>>>>> a28b483c70988e9b1abed6926d464989045ea39a
 }
 </style>
