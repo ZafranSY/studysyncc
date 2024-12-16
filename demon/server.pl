@@ -102,11 +102,11 @@ get '/getUpload' => sub ($c)
         $c->render(json => { error => "Invalid URL format" });
     }
 };
-get'/search' =>($c)
+get '/search' =>sub ($c)
 {
     my $search = $c->param('search');
     my $results = CRUD::getSearch($dbh, $search);
 
     $c->render(json => $results);
-}
+};
 app->start;
