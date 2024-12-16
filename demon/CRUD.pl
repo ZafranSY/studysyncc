@@ -224,15 +224,15 @@ sub getCategoryBySemester {
 
     return \@categories;
 }
-sub getRefname {
-    my $dbh = shift;  # Get the database handle from the caller
+sub getRefnameByCategory {
+    my ($dbh, $category) = @_;  # Get the database handle and category from the caller
 
-    # SQL query to select the desired columns (ref_name, description, owner)
-    my $sql = 'SELECT ref_name, description, owner FROM gdlinks';
+    # SQL query to select the desired columns (ref_name, description, owner) where the category matches
+    my $sql = 'SELECT ref_name, description, owner FROM gdlinks WHERE category = ?';
     
-    # Prepare the statement and execute it
+    # Prepare the statement and execute it with the provided category
     my $sth = $dbh->prepare($sql) or die 'prepare statement failed: ' . $dbh->errstr();
-    $sth->execute() or die 'execution failed: ' . $dbh->errstr();
+    $sth->execute($category) or die 'execution failed: ' . $dbh->errstr();
     
     # Fetch all results
     my @files;
@@ -247,6 +247,7 @@ sub getRefname {
     # Return the results as an array of hashes
     return \@files;
 }
+
 
 sub getLinks {
     my $dbh = shift(@_);

@@ -115,12 +115,17 @@ get '/getCategoryBySemester' => sub ($c) {
     $c->render(json => $categories);
 };
 ### Example URL: http://localhost:3000/getLinks
-get '/getRefname' => sub ($c) {
-    my $Refname = CRUD::getRefname($dbh);
+# Define a new route to handle the 'getRefnameByCategory' functionality
+get '/getRefnameByCategory' => sub ($c) {
+    my $category = $c->param('category');  # Get the 'category' parameter from the URL
 
-    # Render the links as JSON
-    $c->render(json => $Refname);
+    # Call the CRUD function with the database handle and category
+    my $result = CRUD::getRefnameByCategory($dbh, $category);
+
+    # Return the result as JSON
+    $c->render(json => $result);
 };
+
 ### Example URL: http://localhost:3000/getLinks
 get '/getLinks' => sub ($c) {
     my $links = CRUD::getLinks($dbh);

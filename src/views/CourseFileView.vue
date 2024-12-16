@@ -77,6 +77,7 @@ export default {
     return {
       searchQuery: "",
       files: [], // Initialize an empty array for files
+      categoryTitle: "",
     };
   },
   computed: {
@@ -91,22 +92,48 @@ export default {
   },
   mounted() {
     // Fetch data from the API when the component is mounted
-    fetch("http://localhost/getRefname")
-      .then((response) => response.json())
-      .then((data) => {
-        this.files = data.map((file) => ({
-          id: file.id || file.ref_name, // Ensure each file has a unique id
-          ref_name: file.ref_name,
-          description: file.description,
-          created: "dad", // Assuming 'created' field exists in the data
-          owner: file.owner, // Assuming 'owner' field exists in the data
-        }));
-        console.log(this.files); // Ensure the data is loaded correctly
-      })
-      .catch((error) => {
-        console.error("Error fetching categories:", error);
-      });
+    var sem = sessionStorage.getItem("category");
+    console.log(sem); // Check the value in sessionStorage
+
+    // Parse the stringified category object
+    if (sem) {
+      sem = JSON.parse(sem);
+      console.log(sem); // Check the parsed object
+
+      // Now you can access the title
+      const categoryTitle = sem.title;
+      console.log("Category Title:", categoryTitle);
+
+      // Do something with the title (e.g., display it)
+      // Example: you can assign it to a data property if you want to use it in the template
+      this.categoryTitle = categoryTitle;
+
+      const url =
+        `http://localhost/getRefnameByCategory?category=${encodeURIComponent(
+          categoryTitle
+        )}`.replace(/\s+/g, "-");
+
+      console.log(url);
+
+      fetch(url)
+        .then((response) => response.json())
+        .then((data) => {
+          this.files = data.map((file) => ({
+            id: file.id || file.ref_name, // Ensure each file has a unique id
+            ref_name: file.ref_name,
+            description: file.description,
+            created: "file.created", // This should come from the response
+            owner: file.owner, // Assuming 'owner' field exists in the data
+          }));
+
+          console.log(this.files); // Ensure the data is loaded correctly
+        })
+        .catch((error) => {
+          console.error("Error fetching categories:", error);
+        });
+    }
   },
+
   methods: {
     navigateToDetails(id) {
       // Navigate to the course file details page
@@ -119,6 +146,16 @@ export default {
     searchFiles() {
       // Handle search manually if needed (optional)
       console.log(this.searchQuery);
+    },
+    setCategory(category) {
+      sessionStorage.setItem("category", JSON.stringify(category));
+      const categoryName = category.title.replace(/\s+/g, "-"); // Use title for the URL
+
+      // Log to verify the value
+      console.log(`Category set: ${JSON.stringify(category)}`);
+
+      // Navigate to the desired route with just the category name
+      this.$router.push(`/getRefnameByCategory?category=${categoryName}`);
     },
   },
 };
