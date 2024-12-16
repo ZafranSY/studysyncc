@@ -6,12 +6,14 @@ const routes = [
     path: "/",
     name: "home",
     component: HomeView,
+    meta: { requiresAuth: true }
   },
   {
     path: "/about",
     name: "about",
     component: () =>
       import(/* webpackChunkName: "about" */ "../views/AboutView.vue"),
+    meta: { requiresAuth: true }
   },
   {
     path: "/login",
@@ -22,6 +24,7 @@ const routes = [
     path: "/coursecoordination",
     name: "coursecoordination",
     component: () => import("../views/CourseCoordination.vue"), // Lazy loaded
+    meta: { requiresAuth: true }
   },
 ];
 
@@ -29,5 +32,19 @@ const router = createRouter({
   history: createWebHistory(process.env.BASE_URL),
   routes,
 });
+
+// Navigation Guard
+router.beforeEach((to, from, next) => {
+    const isLoggedIn = localStorage.getItem("utmwebfc_session");
+  
+    if (to.meta.requiresAuth && !isLoggedIn) {
+      // If the route requires authentication and the user is not logged in
+      console.log("Authentication required. Redirecting to login...");
+      next("/login");
+    } else {
+      // Proceed to the next route
+      next();
+    }
+  });
 
 export default router;

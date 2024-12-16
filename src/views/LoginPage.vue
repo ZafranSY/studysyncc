@@ -40,15 +40,15 @@ export default {
         const password = ref('');
         const loggedIn = ref(false);
         const router = useRouter();
-
+        localStorage.removeItem('utmwebfc_session');
         const login = async () => {
             try {
                 const url = `http://web.fc.utm.my/ttms/web_man_webservice_json.cgi?entity=authentication&login=${username.value}&password=${password.value}`;
                 const response = await fetch(url);
                 const data = await response.json();
-
+                
                 if (data[0]?.session_id) {
-                    sessionStorage.setItem('utmwebfc_session', JSON.stringify(data[0]));
+                    localStorage.setItem('utmwebfc_session', JSON.stringify(data[0]));
                     loggedIn.value = true;
                     router.push('/');
                 } else {
