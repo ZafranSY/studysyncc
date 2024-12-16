@@ -1,13 +1,7 @@
 import { createRouter, createWebHistory } from "vue-router";
-import HomeView from "../views/HomeView.vue";
 
 const routes = [
-  {
-    path: "/",
-    name: "home",
-    component: HomeView,
-    meta: { requiresAuth: true }
-  },
+  
   {
     path: "/about",
     name: "about",
@@ -33,7 +27,11 @@ const routes = [
     name: "CourseFiles",
     component: () => import("@/views/CourseFileView.vue"),
   },
-
+  {
+    path: "/category",
+    name: "CategoryView",
+    component: () => import("@/views/CategoryView.vue"),
+  },
   {
     path: "/course-files/:id",
     name: "CourseDetails",
@@ -44,6 +42,7 @@ const routes = [
       this.$router.push(`/course-files/${id}`);
     }
   },
+  
 ];
 
 const router = createRouter({
