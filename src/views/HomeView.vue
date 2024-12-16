@@ -1,27 +1,25 @@
 <template>
-    <div class="navbar">
-        <NavbarView />
-    </div>
-    <div class="home">
-        <!-- <img alt="Vue logo" src="../assets/logo.png" /> -->
-        <router-link to="/">Home</router-link> |
-        <router-link to="/login">Login</router-link>
-    </div>
+  <div class="navbar">
+    <NavbarView />
+  </div>
+  <div class="home">
+    <!-- <img alt="Vue logo" src="../assets/logo.png" /> -->
+    <router-link to="/">Home</router-link> |
+    <router-link to="/login">Login</router-link>
+  </div>
 </template>
 <style>
 .navbar {
-    position: fixed;
+  position: fixed;
 }
-
 .home {
-    font-size: 20px;
-    font-family: "Courier New", Courier, monospace;
+  font-size: 20px;
+  font-family: "Courier New", Courier, monospace;
 }
-
 .home a {
-    font-style: none;
-    margin: 10px 5px;
-    text-decoration: none;
+  font-style: none;
+  margin: 10px 5px;
+  text-decoration: none;
 }
 </style>
 <script>
@@ -29,9 +27,9 @@
 import NavbarView from "@/components/NavBar.vue";
 
 export default {
-    name: "HomeView",
-    components: {
-        NavbarView,
-    },
+  name: "HomeView",
+  components: {
+    NavbarView,
+  },
 };
 </script>
