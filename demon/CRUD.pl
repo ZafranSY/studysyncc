@@ -216,4 +216,25 @@ sub addLinkWithMessage {
     # Return a success status
     return 1;
 }
+
+sub getCategoryBySemester {
+    my ($dbh, $semester) = @_;
+
+    # Prepare the SQL statement to fetch unique categories for the given semester
+    my $sth = $dbh->prepare(
+        'SELECT DISTINCT category FROM gdlinks WHERE sessem = ?'
+    ) or die 'prepare statement failed: ' . $dbh->errstr();
+
+    # Execute the query with the provided semester
+    $sth->execute($semester) or die 'execution failed: ' . $dbh->errstr();
+
+    # Fetch the unique categories
+    my @categories = ();
+    while (my $row = $sth->fetchrow_hashref()) {
+        push @categories, $row->{'category'};
+    }
+
+    return \@categories;
+}
+
 1;

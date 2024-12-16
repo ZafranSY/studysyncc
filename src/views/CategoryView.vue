@@ -70,6 +70,7 @@
     },
     mounted() {
       // Fetch categories from the API when the component is created
+      
       fetch("http://localhost/getCategory")
         .then((response) => response.json())
         .then((data) => {
