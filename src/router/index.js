@@ -1,13 +1,12 @@
 import { createRouter, createWebHistory } from "vue-router";
 
 const routes = [
-  
   {
     path: "/about",
     name: "about",
     component: () =>
       import(/* webpackChunkName: "about" */ "../views/AboutView.vue"),
-    meta: { requiresAuth: true }
+    meta: { requiresAuth: true },
   },
   {
     path: "/login",
@@ -18,9 +17,8 @@ const routes = [
     path: "/homeview",
     name: "homeview",
     component: () => import("../views/HomeView.vue"),
-    meta: { requiresAuth: true } // Lazy loaded
+    meta: { requiresAuth: true }, // Lazy loaded
   },
-
 
   {
     path: "/course-files",
@@ -28,7 +26,7 @@ const routes = [
     component: () => import("@/views/CourseFileView.vue"),
   },
   {
-    path: "/category",
+    path: "/homeview/category",
     name: "CategoryView",
     component: () => import("@/views/CategoryView.vue"),
   },
@@ -36,13 +34,12 @@ const routes = [
     path: "/course-files/:id",
     name: "CourseDetails",
     component: () => import("@/views/CourseDetailsView.vue"),
-  
+
     navigateToDetails(id) {
       console.log(`Navigating to details of file ID: ${id}`);
       this.$router.push(`/course-files/${id}`);
-    }
+    },
   },
-  
 ];
 
 const router = createRouter({
@@ -52,16 +49,16 @@ const router = createRouter({
 
 // Navigation Guard
 router.beforeEach((to, from, next) => {
-    const isLoggedIn = localStorage.getItem("utmwebfc_session");
-  
-    if (to.meta.requiresAuth && !isLoggedIn) {
-      // If the route requires authentication and the user is not logged in
-      console.log("Authentication required. Redirecting to login...");
-      next("/login");
-    } else {
-      // Proceed to the next route
-      next();
-    }
-  });
+  const isLoggedIn = localStorage.getItem("utmwebfc_session");
+
+  if (to.meta.requiresAuth && !isLoggedIn) {
+    // If the route requires authentication and the user is not logged in
+    console.log("Authentication required. Redirecting to login...");
+    next("/login");
+  } else {
+    // Proceed to the next route
+    next();
+  }
+});
 
 export default router;

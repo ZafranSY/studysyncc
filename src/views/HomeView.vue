@@ -38,7 +38,7 @@
           :title="semester.title"
           :subtitle="semester.subtitle"
           :bgColor="semester.bgColor"
-          :link="'/semester/' + semester.id"
+          :link="'/homeview/category'"
         />
       </div>
     </div>
@@ -56,12 +56,12 @@ export default {
       selectedFilter: "All",
       searchQuery: "",
       semesters: [
-        { id: 1, title: "20/21 1", subtitle: "Sem 20211", bgColor: "#4CB5F5" },
-        { id: 2, title: "20/21 2", subtitle: "Sem 20212", bgColor: "#D3D3D3" },
-        { id: 3, title: "21/22 1", subtitle: "Sem 21221", bgColor: "#CC6666" },
-        { id: 4, title: "21/22 2", subtitle: "Sem 21222", bgColor: "#6A5ACD" },
-        { id: 5, title: "22/23 1", subtitle: "Sem 22231", bgColor: "#DDA0DD" },
-        { id: 6, title: "22/23 2", subtitle: "Sem 22232", bgColor: "#8FBC8F" },
+        // { id: 1, title: "20/21 1", subtitle: "Sem 20211", bgColor: "#4CB5F5" },
+        // { id: 2, title: "20/21 2", subtitle: "Sem 20212", bgColor: "#D3D3D3" },
+        // { id: 3, title: "21/22 1", subtitle: "Sem 21221", bgColor: "#CC6666" },
+        // { id: 4, title: "21/22 2", subtitle: "Sem 21222", bgColor: "#6A5ACD" },
+        // { id: 5, title: "22/23 1", subtitle: "Sem 22231", bgColor: "#DDA0DD" },
+        // { id: 6, title: "22/23 2", subtitle: "Sem 22232", bgColor: "#8FBC8F" },
       ],
     };
   },
@@ -81,6 +81,24 @@ export default {
         return matchesFilter && matchesSearch;
       });
     },
+  },
+  mounted() {
+    // Fetch categories from the API when the component is created
+
+    fetch("http://localhost/getSemester")
+      .then((response) => response.json())
+      .then((data) => {
+        // Map fetched categories to the semester structure
+        this.semesters = data.map((semester, index) => ({
+          id: index + 1,
+          title: semester,
+          subtitle: ` ${semester}`, // Adjust as needed
+          // Assign a random color
+        }));
+      })
+      .catch((error) => {
+        console.error("Error fetching categories:", error);
+      });
   },
 };
 </script>
