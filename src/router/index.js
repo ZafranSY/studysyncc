@@ -24,7 +24,6 @@ const routes = [
     path: "/coursecoordination",
     name: "coursecoordination",
     component: () => import("../views/CourseCoordination.vue"), // Lazy loaded
-    meta: { requiresAuth: true }
   },
   {
     path: "/coursecoordination",
@@ -37,14 +36,13 @@ const routes = [
     path: "/course-files",
     name: "CourseFiles",
     component: () => import("@/views/CourseFileView.vue"),
-    meta: { requiresAuth: true }
   },
 
   {
     path: "/course-files/:id",
     name: "CourseDetails",
     component: () => import("@/views/CourseDetailsView.vue"),
-    meta: { requiresAuth: true },
+  
     navigateToDetails(id) {
       console.log(`Navigating to details of file ID: ${id}`);
       this.$router.push(`/course-files/${id}`);
