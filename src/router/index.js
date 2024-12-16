@@ -20,21 +20,17 @@ const routes = [
     name: "login",
     component: () => import("../views/LoginPage.vue"),
   },
-<<<<<<< HEAD
   {
     path: "/coursecoordination",
     name: "coursecoordination",
     component: () => import("../views/CourseCoordination.vue"), // Lazy loaded
   },
-=======
->>>>>>> 43fdbaaab80a6d12975d0ca0045339a5293af8d2
   {
     path: "/coursecoordination",
     name: "coursecoordination",
     component: () => import("../views/CourseCoordination.vue"), // Lazy loaded
     meta: { requiresAuth: true }
   },
-<<<<<<< HEAD
 
   {
     path: "/course-files/:id",
@@ -46,8 +42,6 @@ const routes = [
       this.$router.push(`/course-files/${id}`);
     }
   },
-=======
->>>>>>> 43fdbaaab80a6d12975d0ca0045339a5293af8d2
 ];
 
 const router = createRouter({
