@@ -174,5 +174,46 @@ sub getBySemesterAndCategory {
     # Fetch all matching rows
     return $sth->fetchall_arrayref({});
 }
+sub getUpload{
+    my $dbh = shift(@_);
+     my $sth = $dbh->prepare('SELECT * FROM gdlinks')
+        or die 'prepare statement failed: ' . $dbh->errstr();
 
+    # Execute the query
+    $sth->execute() or die 'execution failed: ' . $dbh->errstr();
+
+    # Fetch all the links
+    return $sth->fetchall_arrayref({});
+
+
+}
+# Function to handle search
+sub getSearch {
+    my ($dbh, $search) = @_;
+
+    # Prepare the SQL query to search for entries that match the search term
+    my $sth = $dbh->prepare(
+        'SELECT * FROM gdlinks WHERE category LIKE ? OR ref_name LIKE ? OR description LIKE ?'
+    ) or die 'prepare statement failed: ' . $dbh->errstr();
+
+    # Execute the query with the search term
+    my $search_term = "%$search%"; # Use wildcards for partial matches
+    $sth->execute($search_term, $search_term, $search_term) or die 'execution failed: ' . $dbh->errstr();
+
+    # Fetch matching rows
+    return $sth->fetchall_arrayref({});
+}
+sub addLinkWithMessage {
+    my ($dbh, $link, $message) = @_;
+
+    # Prepare the SQL statement to insert the link and message into the database
+    my $sth = $dbh->prepare('INSERT INTO gdlinks (link, message) VALUES (?, ?)')
+        or die 'prepare statement failed: ' . $dbh->errstr();
+
+    # Execute the query
+    $sth->execute($link, $message) or die 'execution failed: ' . $dbh->errstr();
+
+    # Return a success status
+    return 1;
+}
 1;
