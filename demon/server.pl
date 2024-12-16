@@ -109,4 +109,16 @@ get '/search' =>sub ($c)
 
     $c->render(json => $results);
 };
+
+### Example URL: http://localhost:3000/getCategoryBySemester?semester=2023/2024-1
+get '/getCategoryBySemester' => sub ($c) {
+    my $semester = $c->param('semester');
+
+    # Call the CRUD function with the database handle and semester parameter
+    my $categories = CRUD::getCategoryBySemester($dbh, $semester);
+
+    # Render the categories as JSON
+    $c->render(json => $categories);
+};
+
 app->start;

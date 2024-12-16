@@ -50,7 +50,7 @@ export default {
                 if (data[0]?.session_id) {
                     localStorage.setItem('utmwebfc_session', JSON.stringify(data[0]));
                     loggedIn.value = true;
-                    router.push('/');
+                    router.push('/homeview');
                 } else {
                     alert('Login failed. Please check your credentials.');
                 }
