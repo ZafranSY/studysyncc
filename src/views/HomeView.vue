@@ -8,7 +8,7 @@
       <!-- Header Section -->
       <div class="header">
         <h1 class="page-title">Home</h1>
-        <h2 class="section-title">Course Coordination</h2>
+        <h2 class="section-title">Semester</h2>
       </div>
 
       <!-- Filter Section -->
