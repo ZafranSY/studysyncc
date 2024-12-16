@@ -1,7 +1,8 @@
 <template>
   <button class="semester-card" @click="handleClick">
     <div class="card-header" :style="{ backgroundColor: bgColor }">
-      <h3 class="title">{{ title }}</h3>
+      <!-- <h3 class="title">{{ title }}</h3> -->
+      <img :src="img" :alt="title" />
     </div>
     <div class="card-footer">
       <p class="subtitle">{{ subtitle }}</p>
@@ -40,8 +41,6 @@ export default {
 </script>
 
 <style scoped>
-
-
 .semester-card {
   width: 306px;
   height: 192px;
@@ -66,7 +65,7 @@ export default {
   display: flex;
   justify-content: center;
   align-items: center;
-  font-family: 'Indie Flower', cursive; /* Indie Flower Font */
+  font-family: "Indie Flower", cursive; /* Indie Flower Font */
   font-size: 60px; /* Updated font size */
   color: white;
   text-align: center;

@@ -21,7 +21,7 @@ const routes = [
   },
 
   {
-    path: "/course-files",
+    path: "/homeview/category/:title",
     name: "CourseFiles",
     component: () => import("@/views/CourseFileView.vue"),
   },

@@ -39,7 +39,8 @@
           :subtitle="semester.subtitle"
           :bgColor="semester.bgColor"
           :link="'/homeview/category'"
-           @click="setSemester(semester.title)"
+          @click="setSemester(semester.title)"
+          img="https://elearning-archive.utm.my/21223/pluginfile.php/1/theme_moove/sliderimage1/1663554195/2021202203.jpg"
         />
       </div>
     </div>
@@ -103,13 +104,12 @@ export default {
   },
   methods: {
     setSemester(semester) {
-        sessionStorage.setItem('semester', JSON.stringify(semester));
-        console.log(`Semester set: ${JSON.stringify(semester)}`);
-        // Optionally, navigate to the next page
-        this.$router.push('/homeview/category');
-        }
-    }
-
+      sessionStorage.setItem("semester", JSON.stringify(semester));
+      console.log(`Semester set: ${JSON.stringify(semester)}`);
+      // Optionally, navigate to the next page
+      this.$router.push("/homeview/category");
+    },
+  },
 };
 </script>
 

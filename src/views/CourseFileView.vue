@@ -23,39 +23,36 @@
         </button>
       </div>
       <div class="details-container">
-          <table class="files-table">
-<thead>
-  <tr>
-    <th>Ref No</th>
-    <th>Description</th>
-    <th>Created</th>
-    <th>Owner</th>
-  </tr>
-</thead>
-<tbody>
-  <tr
-    v-for="file in filteredFiles"
-    :key="file.id"
-    @click="navigateToDetails(file.id)"
-    class="clickable-row"
-  >
-    <td>
-      <img
-     
-:src="require('@/assets/folderimg.png')"
-alt="Folder"
-class="icon"
-/>
-
-
-      {{ file.ref }}
-    </td>
-    <td>{{ file.description }}</td>
-    <td>{{ file.created }}</td>
-    <td>{{ file.owner }}</td>
-  </tr>
-</tbody>
-</table>
+        <table class="files-table">
+          <thead>
+            <tr>
+              <th>Ref No</th>
+              <th>Description</th>
+              <th>Created</th>
+              <th>Owner</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr
+              v-for="file in filteredFiles"
+              :key="file.id"
+              @click="navigateToDetails(file.id)"
+              class="clickable-row"
+            >
+              <td>
+                <img
+                  :src="require('@/assets/folderimg.png')"
+                  alt="Folder"
+                  class="icon"
+                />
+                {{ file.ref_name }}
+              </td>
+              <td>{{ file.description }}</td>
+              <td>{{ file.created }}</td>
+              <td>{{ file.owner }}</td>
+            </tr>
+          </tbody>
+        </table>
 
         <div class="add-button" @click="addNewFile">
           <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
@@ -79,49 +76,50 @@ export default {
   data() {
     return {
       searchQuery: "",
-      files: [
-        {
-          id: 1,
-          ref: "SECJ0001",
-          description: "Computer Science 101",
-          created: "2021-10-31 17:24",
-          owner: "Noriman",
-        },
-        {
-          id: 2,
-          ref: "SECJ0002",
-          description: "Computer Science 503",
-          created: "2021-10-31 17:24",
-          owner: "Tivenesh",
-        },
-        {
-          id: 3,
-          ref: "SECJ0003",
-          description: "Computer Science 404",
-          created: "2021-10-31 17:24",
-          owner: "Abdul",
-        },
-      ],
+      files: [], // Initialize an empty array for files
     };
   },
   computed: {
     filteredFiles() {
-      return !this.searchQuery
+      const searchQueryLower = this.searchQuery.trim().toLowerCase();
+      return !searchQueryLower
         ? this.files
         : this.files.filter((file) =>
-            file.description.toLowerCase().includes(this.searchQuery.toLowerCase())
+            file.description.toLowerCase().includes(searchQueryLower)
           );
     },
   },
-  setup() {
-    const router = useRouter();
-    const navigateToDetails = (id) => {
-      router.push(`/course-files/${id}`);
-    };
-    const addNewFile = () => {
+  mounted() {
+    // Fetch data from the API when the component is mounted
+    fetch("http://localhost/getRefname")
+      .then((response) => response.json())
+      .then((data) => {
+        this.files = data.map((file) => ({
+          id: file.id || file.ref_name, // Ensure each file has a unique id
+          ref_name: file.ref_name,
+          description: file.description,
+          created: "dad", // Assuming 'created' field exists in the data
+          owner: file.owner, // Assuming 'owner' field exists in the data
+        }));
+        console.log(this.files); // Ensure the data is loaded correctly
+      })
+      .catch((error) => {
+        console.error("Error fetching categories:", error);
+      });
+  },
+  methods: {
+    navigateToDetails(id) {
+      // Navigate to the course file details page
+      this.$router.push(`/course-files/${id}`);
+    },
+    addNewFile() {
+      // Placeholder for adding a new file
       alert("Add new file functionality coming soon!");
-    };
-    return { navigateToDetails, addNewFile };
+    },
+    searchFiles() {
+      // Handle search manually if needed (optional)
+      console.log(this.searchQuery);
+    },
   },
 };
 </script>

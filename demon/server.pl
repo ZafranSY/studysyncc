@@ -102,13 +102,7 @@ get '/getUpload' => sub ($c)
         $c->render(json => { error => "Invalid URL format" });
     }
 };
-get '/search' =>sub ($c)
-{
-    my $search = $c->param('search');
-    my $results = CRUD::getSearch($dbh, $search);
 
-    $c->render(json => $results);
-};
 
 ### Example URL: http://localhost:3000/getCategoryBySemester?semester=2023/2024-1
 get '/getCategoryBySemester' => sub ($c) {
@@ -120,5 +114,22 @@ get '/getCategoryBySemester' => sub ($c) {
     # Render the categories as JSON
     $c->render(json => $categories);
 };
+### Example URL: http://localhost:3000/getLinks
+get '/getRefname' => sub ($c) {
+    my $Refname = CRUD::getRefname($dbh);
+
+    # Render the links as JSON
+    $c->render(json => $Refname);
+};
+### Example URL: http://localhost:3000/getLinks
+get '/getLinks' => sub ($c) {
+    my $links = CRUD::getLinks($dbh);
+
+    # Render the links as JSON
+    $c->render(json => $links);
+};
+
+
+
 
 app->start;

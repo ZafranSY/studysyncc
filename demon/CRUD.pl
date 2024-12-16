@@ -174,19 +174,7 @@ sub getBySemesterAndCategory {
     # Fetch all matching rows
     return $sth->fetchall_arrayref({});
 }
-sub getUpload{
-    my $dbh = shift(@_);
-     my $sth = $dbh->prepare('SELECT * FROM gdlinks')
-        or die 'prepare statement failed: ' . $dbh->errstr();
 
-    # Execute the query
-    $sth->execute() or die 'execution failed: ' . $dbh->errstr();
-
-    # Fetch all the links
-    return $sth->fetchall_arrayref({});
-
-
-}
 # Function to handle search
 sub getSearch {
     my ($dbh, $search) = @_;
@@ -203,15 +191,15 @@ sub getSearch {
     # Fetch matching rows
     return $sth->fetchall_arrayref({});
 }
-sub addLinkWithMessage {
-    my ($dbh, $link, $message) = @_;
+sub addLinkWithDesc {
+    my ($dbh, $link, $Desc) = @_;
 
     # Prepare the SQL statement to insert the link and message into the database
     my $sth = $dbh->prepare('INSERT INTO gdlinks (link, message) VALUES (?, ?)')
         or die 'prepare statement failed: ' . $dbh->errstr();
 
     # Execute the query
-    $sth->execute($link, $message) or die 'execution failed: ' . $dbh->errstr();
+    $sth->execute($link, $Desc) or die 'execution failed: ' . $dbh->errstr();
 
     # Return a success status
     return 1;
@@ -236,5 +224,49 @@ sub getCategoryBySemester {
 
     return \@categories;
 }
+sub getRefname {
+    my $dbh = shift;  # Get the database handle from the caller
+
+    # SQL query to select the desired columns (ref_name, description, owner)
+    my $sql = 'SELECT ref_name, description, owner FROM gdlinks';
+    
+    # Prepare the statement and execute it
+    my $sth = $dbh->prepare($sql) or die 'prepare statement failed: ' . $dbh->errstr();
+    $sth->execute() or die 'execution failed: ' . $dbh->errstr();
+    
+    # Fetch all results
+    my @files;
+    while (my $row = $sth->fetchrow_hashref) {
+        push @files, {
+            ref_name    => $row->{ref_name},
+            description => $row->{description},
+            owner       => $row->{owner},
+        };
+    }
+    
+    # Return the results as an array of hashes
+    return \@files;
+}
+
+sub getLinks {
+    my $dbh = shift(@_);
+
+    # Prepare the SQL statement to retrieve all links
+    my $sth = $dbh->prepare('SELECT link FROM gdlinks')
+        or die 'prepare statement failed: ' . $dbh->errstr();
+
+    # Execute the query
+    $sth->execute() or die 'execution failed: ' . $dbh->errstr();
+
+    # Fetch all links
+    my @links = ();
+    while (my $row = $sth->fetchrow_hashref()) {
+        push @links, $row->{'link'};
+    }
+
+    return \@links;
+}
+
+
 
 1;
