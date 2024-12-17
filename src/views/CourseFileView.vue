@@ -5,7 +5,7 @@
       <div class="header-container">
         <div class="header-left">
           <h1>Course File</h1>
-          <h2>Courses SEM 20/21 1</h2>
+          <h2>Courses {{ files[0]?.sessem || "N/A" }}</h2>
         </div>
         <div class="header-right">
           <router-link to="/">Home</router-link> |
@@ -48,7 +48,7 @@
                 {{ file.ref_name }}
               </td>
               <td>{{ file.description }}</td>
-              <td>{{ file.created }}</td>
+              <td>{{ file.sessem }}</td>
               <td>{{ file.owner }}</td>
             </tr>
           </tbody>
@@ -78,6 +78,7 @@ export default {
       searchQuery: "",
       files: [], // Initialize an empty array for files
       categoryTitle: "",
+      sessem: "",
     };
   },
   computed: {
@@ -121,11 +122,14 @@ export default {
           this.files = data.map((file) => ({
             id: file.id || file.ref_name, // Ensure each file has a unique id
             ref_name: file.ref_name,
+            sessem: file.sessem || "N/A",
             description: file.description,
             created: "file.created", // This should come from the response
             owner: file.owner, // Assuming 'owner' field exists in the data
           }));
-
+          // if (data.length > 0) {
+          //   this.sessem = data[0].sessem;
+          // }
           console.log(this.files); // Ensure the data is loaded correctly
         })
         .catch((error) => {
