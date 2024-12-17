@@ -239,6 +239,7 @@ sub getRefnameByCategory {
     while (my $row = $sth->fetchrow_hashref) {
         push @files, {
             ref_name    => $row->{ref_name},
+            sessem => $row->{sessem},
             description => $row->{description},
             owner       => $row->{owner},
         };

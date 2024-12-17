@@ -66,7 +66,7 @@
 
 <script>
 import NavbarView from "@/components/NavBar.vue";
-import { useRouter } from "vue-router";
+//import { useRouter } from "vue-router";
 
 export default {
   name: "CourseFileView",
