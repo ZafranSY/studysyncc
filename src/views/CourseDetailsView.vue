@@ -5,7 +5,7 @@
       <div class="header-container">
         <div class="header-left">
           <h1>Course File</h1>
-          <h2>{{ details.ref }}: {{ details.description }}</h2>
+          <h2>{{ categoryTitle }}: {{ categoryDescription }}</h2>
         </div>
         <div class="header-right">
           <router-link to="/">Home</router-link> |
@@ -43,10 +43,10 @@
                   alt="Folder"
                   class="icon"
                 />
-                {{ file.ref }}
+                {{ file.refName }}
               </td>
-              <td>{{ file.description }}</td>
-              <td>{{ file.created }}</td>
+              <td>{{ file.linkDescription }}</td>
+              <td>{{ file.linkPosted }}</td>
               <td>{{ file.owner }}</td>
               <td>
                 <!-- Updated Go To Button -->
@@ -88,37 +88,17 @@ export default {
       searchQuery: "",
       showModal: false,
       selectedFile: null,
-      details: {
-        id: 1,
-        ref: "SECJ0001",
-        description: "Computer Science 101",
-        created: "2021-10-31 17:24",
-        owner: "Noriman",
-        files: [
-          {
-            id: 1,
-            ref: "Topic1_Intro",
-            description: "Intro to computer science",
-            created: "2021-10-31 17:24",
-            owner: "Noriman",
-          },
-          {
-            id: 2,
-            ref: "Topic2_condition",
-            description: "Conditional statements",
-            created: "2021-10-31 17:24",
-            owner: "Noriman",
-          },
-        ],
-      },
+      files: [], // Store files data fetched from the API
+      categoryTitle: "",
+      categoryDescription: "",
     };
   },
   computed: {
     filteredFiles() {
       return !this.searchQuery
-        ? this.details.files
-        : this.details.files.filter((file) =>
-            file.description
+        ? this.files
+        : this.files.filter((file) =>
+            file.linkDescription
               .toLowerCase()
               .includes(this.searchQuery.toLowerCase())
           );
@@ -127,9 +107,7 @@ export default {
   methods: {
     goToFile(file) {
       console.log("Navigating to file link:", file);
-      // Simulate link navigation; Replace with the actual link field if available
-      const fileLink = file.link || "#";
-      window.open(fileLink, "_blank");
+      window.open(file.linkUrl, "_blank");
     },
     openUploadModal() {
       console.log("Opening upload modal");
@@ -143,6 +121,49 @@ export default {
     searchFiles() {
       console.log("Searching for files with query:", this.searchQuery);
     },
+    setLink_refName(link_refName) {
+      sessionStorage.setItem("link_refName", JSON.stringify(link_refName));
+      console.log(`link_refName set: ${JSON.stringify(link_refName)}`);
+      // Optionally, navigate to the next page
+      this.$router.push("/course-files/SECJ2013-03");
+    },
+  },
+  mounted() {
+    const sem = sessionStorage.getItem("link_refName");
+    console.log(sem); // Check the value in sessionStorage
+
+    if (sem) {
+      // Parse the category data and update the page
+      const parsedSem = JSON.parse(sem);
+      console.log(parsedSem); // Check the parsed object
+      this.link_refName = parsedSem.title; // Extract the category title
+      this.categoryDescription = parsedSem.description; // Extract description
+
+      // Now make the API call based on the category
+      const url = `http://127.0.0.1/getlinkbyRefname?link_refName=${encodeURIComponent(
+        parsedSem
+      )}`;
+
+      console.log(url); // Ensure the URL is formed correctly
+
+      // Fetch the data based on link_refName
+      fetch(url)
+        .then((response) => response.json())
+        .then((data) => {
+          this.files = data.map((file) => ({
+            id: file.link_refName, // Use link_refName for unique id
+            refName: file.link_refName,
+            linkDescription: file.link_description,
+            linkPosted: file.link_posted,
+            linkUrl: file.link_url,
+            owner: file.owner,
+          }));
+          console.log(this.files); // Ensure the data is loaded correctly
+        })
+        .catch((error) => {
+          console.error("Error fetching links:", error);
+        });
+    }
   },
 };
 </script>

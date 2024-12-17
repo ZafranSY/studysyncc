@@ -127,8 +127,9 @@ get '/getRefnameByCategory' => sub ($c) {
 };
 
 ### Example URL: http://localhost:3000/getLinks
-get '/getLinks' => sub ($c) {
-    my $links = CRUD::getLinks($dbh);
+get '/getlinkbyRefname' => sub ($c) {
+     my $ref_name = $c->param('link_refName');
+    my $links = CRUD::getlinkbyRefname($dbh,$ref_name);
 
     # Render the links as JSON
     $c->render(json => $links);

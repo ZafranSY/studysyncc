@@ -36,7 +36,10 @@
             <tr
               v-for="file in filteredFiles"
               :key="file.id"
-              @click="navigateToDetails(file.id)"
+              @click="
+                navigateToDetails(file.id);
+                setLink_refName(file.ref_name);
+              "
               class="clickable-row"
             >
               <td>
@@ -84,11 +87,27 @@ export default {
   computed: {
     filteredFiles() {
       const searchQueryLower = this.searchQuery.trim().toLowerCase();
-      return !searchQueryLower
+
+      // Filter based on search query
+      const filtered = !searchQueryLower
         ? this.files
         : this.files.filter((file) =>
             file.description.toLowerCase().includes(searchQueryLower)
           );
+
+      // Remove duplicates based on ref_name, description, sessem, and owner
+      const uniqueFiles = [];
+      const seen = new Set();
+
+      filtered.forEach((file) => {
+        const uniqueKey = `${file.ref_name}-${file.description}-${file.sessem}-${file.owner}`;
+        if (!seen.has(uniqueKey)) {
+          seen.add(uniqueKey);
+          uniqueFiles.push(file);
+        }
+      });
+
+      return uniqueFiles;
     },
   },
   mounted() {
@@ -151,15 +170,11 @@ export default {
       // Handle search manually if needed (optional)
       console.log(this.searchQuery);
     },
-    setCategory(category) {
-      sessionStorage.setItem("category", JSON.stringify(category));
-      const categoryName = category.title.replace(/\s+/g, "-"); // Use title for the URL
-
-      // Log to verify the value
-      console.log(`Category set: ${JSON.stringify(category)}`);
-
-      // Navigate to the desired route with just the category name
-      this.$router.push(`/getRefnameByCategory?category=${categoryName}`);
+    setLink_refName(link_refName) {
+      sessionStorage.setItem("link_refName", JSON.stringify(link_refName));
+      console.log(`link_refName set: ${JSON.stringify(link_refName)}`);
+      // Optionally, navigate to the next page
+      this.$router.push("/course-files/SECJ2013-03");
     },
   },
 };

@@ -250,23 +250,30 @@ sub getRefnameByCategory {
 }
 
 
-sub getLinks {
-    my $dbh = shift(@_);
+sub getlinkbyRefname {
+    my ($dbh, $category) = @_;  # Get the database handle and category from the caller
 
-    # Prepare the SQL statement to retrieve all links
-    my $sth = $dbh->prepare('SELECT link FROM gdlinks')
-        or die 'prepare statement failed: ' . $dbh->errstr();
-
-    # Execute the query
-    $sth->execute() or die 'execution failed: ' . $dbh->errstr();
-
-    # Fetch all links
-    my @links = ();
-    while (my $row = $sth->fetchrow_hashref()) {
-        push @links, $row->{'link'};
+    # SQL query to select the desired columns (ref_name, description, owner) where the category matches
+    my $sql = 'SELECT link_refName, link_description, link_posted, owner, link_url FROM link_details WHERE link_refName = ?';
+    
+    # Prepare the statement and execute it with the provided category
+    my $sth = $dbh->prepare($sql) or die 'prepare statement failed: ' . $dbh->errstr();
+    $sth->execute($category) or die 'execution failed: ' . $dbh->errstr();
+    
+    # Fetch all results
+    my @files;
+    while (my $row = $sth->fetchrow_hashref) {
+        push @files, {
+            link_refName    => $row->{link_refName},
+            link_description => $row->{link_description},
+            link_posted     => $row->{link_posted},
+            owner           => $row->{owner},
+            link_url        => $row->{link_url},
+        };
     }
-
-    return \@links;
+    
+    # Return the results as an array of hashes
+    return \@files;
 }
 
 
