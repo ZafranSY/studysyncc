@@ -276,6 +276,48 @@ sub getlinkbyRefname {
     return \@files;
 }
 
+sub createUser {
+    my ($dbh, $json) = @_;
+
+    my $full_name = $json->{full_name};
+    my $login_name = $json->{login_name};
+    my $email = $json->{email};
+    my $role = $json->{role} // '';  
+    my $session_id = $json->{session_id};
+    my $successful_logins = $json->{successful_logins} // 0;  
+    my $last_login = $json->{last_login} // 'CURRENT_TIMESTAMP';  
+
+    my $sth = $dbh->prepare(
+        'SELECT user_id, successful_logins FROM user WHERE login_name = ? OR email = ?'
+    ) or die 'prepare statement failed: ' . $dbh->errstr();
+    $sth->execute($login_name, $email) or die 'execution failed: ' . $dbh->errstr();
+    my $existing_user = $sth->fetchrow_hashref();
+    
+    if ($existing_user) {
+        my $new_successful_logins = $existing_user->{successful_logins} + 1;
+
+        $sth = $dbh->prepare(
+            'UPDATE user SET successful_logins = ?, session_id = ?, last_login = ? WHERE user_id = ?'
+        ) or die 'prepare statement failed: ' . $dbh->errstr();
+        $sth->execute($new_successful_logins, $session_id, $last_login, $existing_user->{user_id}) 
+            or die 'execution failed: ' . $dbh->errstr();
+        
+        return { success => 1, message => "User updated successfully" };
+    } else {
+        $sth = $dbh->prepare(
+            'INSERT INTO user (full_name, login_name, email, role, session_id, successful_logins, last_login)
+            VALUES (?, ?, ?, ?, ?, ?, ?)'
+        ) or die 'prepare statement failed: ' . $dbh->errstr();
+        $sth->execute($full_name, $login_name, $email, $role, $session_id, $successful_logins, $last_login)
+            or die 'execution failed: ' . $dbh->errstr();
+        
+        return { success => 1, message => "User created successfully" };
+    }
+}
+
+
+
+
 
 
 1;
