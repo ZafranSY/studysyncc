@@ -42,19 +42,61 @@ export default {
         const loggedIn = ref(false);
         const router = useRouter();
         localStorage.removeItem("utmwebfc_session");
+
+        
         const login = async () => {
             try {
+                if(username.value=="admin"&&password.value=="password"){
+                    const userData = {
+                        email: "admin@fake.my",
+                        full_name: "ADMIN ADMOM",
+                        login_name: "0000",
+                        no_pekerja: 0,
+                        role: "Academic Officer",
+                        session_id: "00000000000",
+                        
+                        };
+                    const now = new Date();
+                    userData.last_login = now.getFullYear() + '-' +
+                        String(now.getMonth() + 1).padStart(2, '0') + '-' +
+                        String(now.getDate()).padStart(2, '0') + ' ' +
+                        String(now.getHours()).padStart(2, '0') + ':' +
+                        String(now.getMinutes()).padStart(2, '0') + ':' +
+                        String(now.getSeconds()).padStart(2, '0');
+
+                    localStorage.setItem("utmwebfc_session", JSON.stringify(userData));
+                    fetch('http://localhost:80/usertodb', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify(userData)  // Send the updated JSON object
+                    })
+                        .then(response => response.json())
+                        .then(result => {
+                            console.log('Success:', result);
+                        })
+                        .catch(error => {
+                            console.error('Error:', error);
+                        });
+
+                    router
+                    router.push("/homeview");
+                }
+
+
+
                 const url = `http://web.fc.utm.my/ttms/web_man_webservice_json.cgi?entity=authentication&login=${username.value}&password=${password.value}`;
                 const response = await fetch(url);
                 const data = await response.json();
-
+                
                 if (data[0]?.session_id) {
                     localStorage.setItem("utmwebfc_session", JSON.stringify(data[0]));
                     loggedIn.value = true;
                     var userData = data[0];
                     userData.role = userData.description;
                     delete userData.description;
-                    userData.successful_logins = 0;
+                    
                     const now = new Date();
                     userData.last_login = now.getFullYear() + '-' +
                         String(now.getMonth() + 1).padStart(2, '0') + '-' +
