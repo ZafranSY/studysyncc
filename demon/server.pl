@@ -4,9 +4,12 @@ use JSON::XS;
 
 require("./CRUD.pl");
 hook after_dispatch => sub ($c) {
+    # Allow CORS headers for all methods
     $c->res->headers->header('Access-Control-Allow-Origin' => '*');
     $c->res->headers->header('Access-Control-Allow-Methods' => 'GET, POST, OPTIONS');
     $c->res->headers->header('Access-Control-Allow-Headers' => 'Content-Type');
+
+
 };
 # Connect to the database.
 my $database = 'adj2425';
@@ -65,60 +68,71 @@ get '/delete' => sub ($c) {
 ### http://localhost:3000/getCategory
 get '/getCategory' => sub ($c) {
     my $categories = CRUD::getCategory($dbh);
-
     $c->render(json => $categories);
 };
 
 ### http://localhost:3000/getSemester
 get '/getSemester' => sub ($c) {
     my $semesters = CRUD::getSemester($dbh);
-
     $c->render(json => $semesters);
 };
 ### Example URL: http://localhost:3000/getBySemesterAndCategory?semester=2023/2024-1&category=Internship
 get '/getBySemesterAndCategory' => sub ($c) {
     my $semester = $c->param('semester');
     my $category = $c->param('category');
-
-    # Call the CRUD function with the database handle and parameters
     my $results = CRUD::getBySemesterAndCategory($dbh, $semester, $category);
-
-    # Render the results as JSON
     $c->render(json => $results);
 };
 get '/getUpload' => sub ($c)
 {
-     my $link = $c->param('link');
+    my $link = $c->param('link');
     my $message = $c->param('message');  # Get the user's message
 
     if ($link =~ m/^https?:\/\/[a-zA-Z0-9\-\.]+\.[a-zA-Z]{2,3}(\/\S*)?$/) {
-        # Save the link and message to the database
-        my $result = CRUD::addLinkWithMessage($dbh, $link, $message);  # You would define this in your CRUD module
-
-        # Send a success response
+        my $result = CRUD::addLinkWithMessage($dbh, $link, $message);  
         $c->render(json => { message => "Link and message shared successfully", link => $link, user_message => $message });
     } else {
-        # Return an error response if the link is invalid
+
         $c->render(json => { error => "Invalid URL format" });
     }
 };
-get '/search' =>sub ($c)
-{
-    my $search = $c->param('search');
-    my $results = CRUD::getSearch($dbh, $search);
 
-    $c->render(json => $results);
-};
 
 ### Example URL: http://localhost:3000/getCategoryBySemester?semester=2023/2024-1
 get '/getCategoryBySemester' => sub ($c) {
     my $semester = $c->param('semester');
-
-    # Call the CRUD function with the database handle and semester parameter
     my $categories = CRUD::getCategoryBySemester($dbh, $semester);
-
-    # Render the categories as JSON
     $c->render(json => $categories);
 };
+
+### Example URL: http://localhost:3000/getLinks
+get '/getRefnameByCategory' => sub ($c) {
+    my $category = $c->param('category');  # Get the 'category' parameter from the URL
+    my $result = CRUD::getRefnameByCategory($dbh, $category);
+    $c->render(json => $result);
+};
+
+### Example URL: http://localhost:3000/getLinks
+get '/getlinkbyRefname' => sub ($c) {
+     my $ref_name = $c->param('link_refName');
+    my $links = CRUD::getlinkbyRefname($dbh,$ref_name);
+
+    # Render the links as JSON
+    $c->render(json => $links);
+};
+
+
+options '/usertodb' => sub ($c) {
+    $c->res->code(200); 
+    $c->render(text => '');
+};
+
+post '/usertodb' => sub ($c) {
+    my $jsonStr = $c->req->body;
+    my $json = decode_json($jsonStr);
+    my $result = CRUD::createUser($dbh, $json);
+    $c->render(json => $result);
+};
+
 
 app->start;

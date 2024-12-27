@@ -174,19 +174,7 @@ sub getBySemesterAndCategory {
     # Fetch all matching rows
     return $sth->fetchall_arrayref({});
 }
-sub getUpload{
-    my $dbh = shift(@_);
-     my $sth = $dbh->prepare('SELECT * FROM gdlinks')
-        or die 'prepare statement failed: ' . $dbh->errstr();
 
-    # Execute the query
-    $sth->execute() or die 'execution failed: ' . $dbh->errstr();
-
-    # Fetch all the links
-    return $sth->fetchall_arrayref({});
-
-
-}
 # Function to handle search
 sub getSearch {
     my ($dbh, $search) = @_;
@@ -203,15 +191,15 @@ sub getSearch {
     # Fetch matching rows
     return $sth->fetchall_arrayref({});
 }
-sub addLinkWithMessage {
-    my ($dbh, $link, $message) = @_;
+sub addLinkWithDesc {
+    my ($dbh, $link, $Desc) = @_;
 
     # Prepare the SQL statement to insert the link and message into the database
     my $sth = $dbh->prepare('INSERT INTO gdlinks (link, message) VALUES (?, ?)')
         or die 'prepare statement failed: ' . $dbh->errstr();
 
     # Execute the query
-    $sth->execute($link, $message) or die 'execution failed: ' . $dbh->errstr();
+    $sth->execute($link, $Desc) or die 'execution failed: ' . $dbh->errstr();
 
     # Return a success status
     return 1;
@@ -236,5 +224,100 @@ sub getCategoryBySemester {
 
     return \@categories;
 }
+sub getRefnameByCategory {
+    my ($dbh, $category) = @_;  # Get the database handle and category from the caller
+
+    # SQL query to select the desired columns (ref_name, description, owner) where the category matches
+    my $sql = 'SELECT ref_name, description, owner FROM gdlinks WHERE category = ?';
+    
+    # Prepare the statement and execute it with the provided category
+    my $sth = $dbh->prepare($sql) or die 'prepare statement failed: ' . $dbh->errstr();
+    $sth->execute($category) or die 'execution failed: ' . $dbh->errstr();
+    
+    # Fetch all results
+    my @files;
+    while (my $row = $sth->fetchrow_hashref) {
+        push @files, {
+            ref_name    => $row->{ref_name},
+            sessem => $row->{sessem},
+            description => $row->{description},
+            owner       => $row->{owner},
+        };
+    }
+    
+    # Return the results as an array of hashes
+    return \@files;
+}
+
+
+sub getlinkbyRefname {
+    my ($dbh, $category) = @_;  # Get the database handle and category from the caller
+
+    # SQL query to select the desired columns (ref_name, description, owner) where the category matches
+    my $sql = 'SELECT link_refName, link_description, link_posted, owner, link_url FROM link_details WHERE link_refName = ?';
+    
+    # Prepare the statement and execute it with the provided category
+    my $sth = $dbh->prepare($sql) or die 'prepare statement failed: ' . $dbh->errstr();
+    $sth->execute($category) or die 'execution failed: ' . $dbh->errstr();
+    
+    # Fetch all results
+    my @files;
+    while (my $row = $sth->fetchrow_hashref) {
+        push @files, {
+            link_refName    => $row->{link_refName},
+            link_description => $row->{link_description},
+            link_posted     => $row->{link_posted},
+            owner           => $row->{owner},
+            link_url        => $row->{link_url},
+        };
+    }
+    
+    # Return the results as an array of hashes
+    return \@files;
+}
+
+sub createUser {
+    my ($dbh, $json) = @_;
+
+    my $full_name = $json->{full_name};
+    my $login_name = $json->{login_name};
+    my $email = $json->{email};
+    my $role = $json->{role} // '';  
+    my $session_id = $json->{session_id};
+    my $successful_logins = $json->{successful_logins} // 0;  
+    my $last_login = $json->{last_login} // 'CURRENT_TIMESTAMP';  
+
+    my $sth = $dbh->prepare(
+        'SELECT user_id, successful_logins FROM user WHERE login_name = ? OR email = ?'
+    ) or die 'prepare statement failed: ' . $dbh->errstr();
+    $sth->execute($login_name, $email) or die 'execution failed: ' . $dbh->errstr();
+    my $existing_user = $sth->fetchrow_hashref();
+    
+    if ($existing_user) {
+        my $new_successful_logins = $existing_user->{successful_logins} + 1;
+
+        $sth = $dbh->prepare(
+            'UPDATE user SET successful_logins = ?, session_id = ?, last_login = ? WHERE user_id = ?'
+        ) or die 'prepare statement failed: ' . $dbh->errstr();
+        $sth->execute($new_successful_logins, $session_id, $last_login, $existing_user->{user_id}) 
+            or die 'execution failed: ' . $dbh->errstr();
+        
+        return { success => 1, message => "User updated successfully" };
+    } else {
+        $sth = $dbh->prepare(
+            'INSERT INTO user (full_name, login_name, email, role, session_id, successful_logins, last_login)
+            VALUES (?, ?, ?, ?, ?, ?, ?)'
+        ) or die 'prepare statement failed: ' . $dbh->errstr();
+        $sth->execute($full_name, $login_name, $email, $role, $session_id, $successful_logins, $last_login)
+            or die 'execution failed: ' . $dbh->errstr();
+        
+        return { success => 1, message => "User created successfully" };
+    }
+}
+
+
+
+
+
 
 1;

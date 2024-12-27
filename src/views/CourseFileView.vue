@@ -5,7 +5,7 @@
       <div class="header-container">
         <div class="header-left">
           <h1>Course File</h1>
-          <h2>Courses SEM 20/21 1</h2>
+          <h2>Courses {{ files[0]?.sessem || "N/A" }}</h2>
         </div>
         <div class="header-right">
           <router-link to="/">Home</router-link> |
@@ -23,39 +23,39 @@
         </button>
       </div>
       <div class="details-container">
-          <table class="files-table">
-<thead>
-  <tr>
-    <th>Ref No</th>
-    <th>Description</th>
-    <th>Created</th>
-    <th>Owner</th>
-  </tr>
-</thead>
-<tbody>
-  <tr
-    v-for="file in filteredFiles"
-    :key="file.id"
-    @click="navigateToDetails(file.id)"
-    class="clickable-row"
-  >
-    <td>
-      <img
-     
-:src="require('@/assets/folderimg.png')"
-alt="Folder"
-class="icon"
-/>
-
-
-      {{ file.ref }}
-    </td>
-    <td>{{ file.description }}</td>
-    <td>{{ file.created }}</td>
-    <td>{{ file.owner }}</td>
-  </tr>
-</tbody>
-</table>
+        <table class="files-table">
+          <thead>
+            <tr>
+              <th>Ref No</th>
+              <th>Description</th>
+              <th>Created</th>
+              <th>Owner</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr
+              v-for="file in filteredFiles"
+              :key="file.id"
+              @click="
+                navigateToDetails(file.id);
+                setLink_refName(file.ref_name);
+              "
+              class="clickable-row"
+            >
+              <td>
+                <img
+                  :src="require('@/assets/folderimg.png')"
+                  alt="Folder"
+                  class="icon"
+                />
+                {{ file.ref_name }}
+              </td>
+              <td>{{ file.description }}</td>
+              <td>{{ file.sessem }}</td>
+              <td>{{ file.owner }}</td>
+            </tr>
+          </tbody>
+        </table>
 
         <div class="add-button" @click="addNewFile">
           <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
@@ -69,7 +69,7 @@ class="icon"
 
 <script>
 import NavbarView from "@/components/NavBar.vue";
-import { useRouter } from "vue-router";
+//import { useRouter } from "vue-router";
 
 export default {
   name: "CourseFileView",
@@ -79,49 +79,103 @@ export default {
   data() {
     return {
       searchQuery: "",
-      files: [
-        {
-          id: 1,
-          ref: "SECJ0001",
-          description: "Computer Science 101",
-          created: "2021-10-31 17:24",
-          owner: "Noriman",
-        },
-        {
-          id: 2,
-          ref: "SECJ0002",
-          description: "Computer Science 503",
-          created: "2021-10-31 17:24",
-          owner: "Tivenesh",
-        },
-        {
-          id: 3,
-          ref: "SECJ0003",
-          description: "Computer Science 404",
-          created: "2021-10-31 17:24",
-          owner: "Abdul",
-        },
-      ],
+      files: [], // Initialize an empty array for files
+      categoryTitle: "",
+      sessem: "",
     };
   },
   computed: {
     filteredFiles() {
-      return !this.searchQuery
+      const searchQueryLower = this.searchQuery.trim().toLowerCase();
+
+      // Filter based on search query
+      const filtered = !searchQueryLower
         ? this.files
         : this.files.filter((file) =>
-            file.description.toLowerCase().includes(this.searchQuery.toLowerCase())
+            file.description.toLowerCase().includes(searchQueryLower)
           );
+
+      // Remove duplicates based on ref_name, description, sessem, and owner
+      const uniqueFiles = [];
+      const seen = new Set();
+
+      filtered.forEach((file) => {
+        const uniqueKey = `${file.ref_name}-${file.description}-${file.sessem}-${file.owner}`;
+        if (!seen.has(uniqueKey)) {
+          seen.add(uniqueKey);
+          uniqueFiles.push(file);
+        }
+      });
+
+      return uniqueFiles;
     },
   },
-  setup() {
-    const router = useRouter();
-    const navigateToDetails = (id) => {
-      router.push(`/course-files/${id}`);
-    };
-    const addNewFile = () => {
+  mounted() {
+    // Fetch data from the API when the component is mounted
+    var sem = sessionStorage.getItem("category");
+    console.log(sem); // Check the value in sessionStorage
+
+    // Parse the stringified category object
+    if (sem) {
+      sem = JSON.parse(sem);
+      console.log(sem); // Check the parsed object
+
+      // Now you can access the title
+      const categoryTitle = sem.title;
+      console.log("Category Title:", categoryTitle);
+
+      // Do something with the title (e.g., display it)
+      // Example: you can assign it to a data property if you want to use it in the template
+      this.categoryTitle = categoryTitle;
+
+      const url =
+        `http://localhost/getRefnameByCategory?category=${encodeURIComponent(
+          categoryTitle
+        )}`.replace(/\s+/g, "-");
+
+      console.log(url);
+
+      fetch(url)
+        .then((response) => response.json())
+        .then((data) => {
+          this.files = data.map((file) => ({
+            id: file.id || file.ref_name, // Ensure each file has a unique id
+            ref_name: file.ref_name,
+            sessem: file.sessem || "N/A",
+            description: file.description,
+            created: "file.created", // This should come from the response
+            owner: file.owner, // Assuming 'owner' field exists in the data
+          }));
+          // if (data.length > 0) {
+          //   this.sessem = data[0].sessem;
+          // }
+          console.log(this.files); // Ensure the data is loaded correctly
+        })
+        .catch((error) => {
+          console.error("Error fetching categories:", error);
+        });
+    }
+  },
+
+  methods: {
+    navigateToDetails(id) {
+      // Navigate to the course file details page
+      this.$router.push(`/course-files/${id}`);
+    },
+    addNewFile() {
+      // Placeholder for adding a new file
       alert("Add new file functionality coming soon!");
-    };
-    return { navigateToDetails, addNewFile };
+    },
+    searchFiles() {
+      // Handle search manually if needed (optional)
+      console.log(this.searchQuery);
+    },
+    setLink_refName(link_refName) {
+      sessionStorage.setItem("link_refName", JSON.stringify(link_refName));
+      console.log(`link_refName set: ${JSON.stringify(link_refName)}`);
+      // Optionally, navigate to the next page
+      this.$router.push("/course-files/SECJ2013-03");
+    },
   },
 };
 </script>

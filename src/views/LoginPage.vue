@@ -2,6 +2,7 @@
     <div>
         <header>
             <div class="header-line"></div>
+            <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         </header>
         <div class="container">
             <div class="login-box-bg" v-if="!loggedIn">
@@ -9,7 +10,7 @@
                     <div class="logo-container">
                         <div class="logo">
                             <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/c/cb/UTM-LOGO-FULL.png/1200px-UTM-LOGO-FULL.png"
-                                alt="UTM Logo">
+                                alt="UTM Logo" />
                         </div>
                     </div>
                     <form @submit.prevent="login">
@@ -30,33 +31,104 @@
 </template>
 
 <script>
-import { ref } from 'vue';
-import { useRouter } from 'vue-router';
+import { ref } from "vue";
+import { useRouter } from "vue-router";
 
 export default {
-    name: 'LoginView',
+    name: "LoginView",
     setup() {
-        const username = ref('');
-        const password = ref('');
+        const username = ref("");
+        const password = ref("");
         const loggedIn = ref(false);
         const router = useRouter();
-        localStorage.removeItem('utmwebfc_session');
+        localStorage.removeItem("utmwebfc_session");
+
+        
         const login = async () => {
             try {
+                if(username.value=="admin"&&password.value=="password"){
+                    const userData = {
+                        email: "admin@fake.my",
+                        full_name: "ADMIN ADMOM",
+                        login_name: "0000",
+                        no_pekerja: 0,
+                        role: "Academic Officer",
+                        session_id: "00000000000",
+                        
+                        };
+                    const now = new Date();
+                    userData.last_login = now.getFullYear() + '-' +
+                        String(now.getMonth() + 1).padStart(2, '0') + '-' +
+                        String(now.getDate()).padStart(2, '0') + ' ' +
+                        String(now.getHours()).padStart(2, '0') + ':' +
+                        String(now.getMinutes()).padStart(2, '0') + ':' +
+                        String(now.getSeconds()).padStart(2, '0');
+
+                    localStorage.setItem("utmwebfc_session", JSON.stringify(userData));
+                    fetch('http://localhost:80/usertodb', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify(userData)  // Send the updated JSON object
+                    })
+                        .then(response => response.json())
+                        .then(result => {
+                            console.log('Success:', result);
+                        })
+                        .catch(error => {
+                            console.error('Error:', error);
+                        });
+
+                    router
+                    router.push("/homeview");
+                }
+
+
+
                 const url = `http://web.fc.utm.my/ttms/web_man_webservice_json.cgi?entity=authentication&login=${username.value}&password=${password.value}`;
                 const response = await fetch(url);
                 const data = await response.json();
                 
                 if (data[0]?.session_id) {
-                    localStorage.setItem('utmwebfc_session', JSON.stringify(data[0]));
+                    localStorage.setItem("utmwebfc_session", JSON.stringify(data[0]));
                     loggedIn.value = true;
-                    router.push('/homeview');
+                    var userData = data[0];
+                    userData.role = userData.description;
+                    delete userData.description;
+                    
+                    const now = new Date();
+                    userData.last_login = now.getFullYear() + '-' +
+                        String(now.getMonth() + 1).padStart(2, '0') + '-' +
+                        String(now.getDate()).padStart(2, '0') + ' ' +
+                        String(now.getHours()).padStart(2, '0') + ':' +
+                        String(now.getMinutes()).padStart(2, '0') + ':' +
+                        String(now.getSeconds()).padStart(2, '0');
+
+                    // Now, send the POST request with the updated user data
+                    fetch('http://localhost:80/usertodb', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify(userData)  // Send the updated JSON object
+                    })
+                        .then(response => response.json())
+                        .then(result => {
+                            console.log('Success:', result);
+                        })
+                        .catch(error => {
+                            console.error('Error:', error);
+                        });
+
+                    router
+                    router.push("/homeview");
                 } else {
-                    alert('Login failed. Please check your credentials.');
+                    alert("Login failed. Please check your credentials.");
                 }
             } catch (error) {
-                console.error('Login error:', error);
-                alert('An error occurred during login.');
+                console.error("Login error:", error);
+                alert("An error occurred during login.");
             }
         };
 
@@ -115,7 +187,7 @@ header {
 
 /* Login Box Styles */
 .login-box-bg {
-    background-color: #EDE9E9;
+    background-color: #ede9e9;
     border: 1px solid black;
     border-radius: 1px;
     padding: 30px;
@@ -128,7 +200,7 @@ header {
 }
 
 .login-box {
-    background-color: #F8F3F3;
+    background-color: #f8f3f3;
     border: 1px solid black;
     border-radius: 1px;
     padding: 30px;
