@@ -57,31 +57,39 @@
           </tbody>
         </table>
 
-        <div class="add-button" @click="addNewFile">
+        <!-- Plus Button -->
+        <div class="add-button" @click="openUploadModal">
           <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
             <path d="M13 11h8v2h-8v8h-2v-8H3v-2h8V3h2v8Z" />
           </svg>
         </div>
       </div>
+
+      <!-- Upload Modal -->
+      <UploadModal
+        v-if="showModal"
+        :show="showModal"
+        @close="closeUploadModal"
+      />
     </div>
   </div>
 </template>
 
 <script>
 import NavbarView from "@/components/NavBar.vue";
-//import { useRouter } from "vue-router";
+import UploadModal from "@/components/UploadModal.vue";
 
 export default {
   name: "CourseFileView",
   components: {
     NavbarView,
+    UploadModal,
   },
   data() {
     return {
       searchQuery: "",
-      files: [], // Initialize an empty array for files
-      categoryTitle: "",
-      sessem: "",
+      files: [],
+      showModal: false,
     };
   },
   computed: {
@@ -110,72 +118,51 @@ export default {
       return uniqueFiles;
     },
   },
-  mounted() {
-    // Fetch data from the API when the component is mounted
-    var sem = sessionStorage.getItem("category");
-    console.log(sem); // Check the value in sessionStorage
-
-    // Parse the stringified category object
-    if (sem) {
-      sem = JSON.parse(sem);
-      console.log(sem); // Check the parsed object
-
-      // Now you can access the title
-      const categoryTitle = sem.title;
-      console.log("Category Title:", categoryTitle);
-
-      // Do something with the title (e.g., display it)
-      // Example: you can assign it to a data property if you want to use it in the template
-      this.categoryTitle = categoryTitle;
-
-      const url =
-        `http://localhost/getRefnameByCategory?category=${encodeURIComponent(
-          categoryTitle
-        )}`.replace(/\s+/g, "-");
-
-      console.log(url);
-
-      fetch(url)
-        .then((response) => response.json())
-        .then((data) => {
-          this.files = data.map((file) => ({
-            id: file.id || file.ref_name, // Ensure each file has a unique id
-            ref_name: file.ref_name,
-            sessem: file.sessem || "N/A",
-            description: file.description,
-            created: "file.created", // This should come from the response
-            owner: file.owner, // Assuming 'owner' field exists in the data
-          }));
-          // if (data.length > 0) {
-          //   this.sessem = data[0].sessem;
-          // }
-          console.log(this.files); // Ensure the data is loaded correctly
-        })
-        .catch((error) => {
-          console.error("Error fetching categories:", error);
-        });
-    }
-  },
-
   methods: {
     navigateToDetails(id) {
-      // Navigate to the course file details page
       this.$router.push(`/course-files/${id}`);
     },
-    addNewFile() {
-      // Placeholder for adding a new file
-      alert("Add new file functionality coming soon!");
-    },
     searchFiles() {
-      // Handle search manually if needed (optional)
       console.log(this.searchQuery);
     },
     setLink_refName(link_refName) {
       sessionStorage.setItem("link_refName", JSON.stringify(link_refName));
       console.log(`link_refName set: ${JSON.stringify(link_refName)}`);
-      // Optionally, navigate to the next page
       this.$router.push("/course-files/SECJ2013-03");
     },
+    openUploadModal() {
+      this.showModal = true;
+    },
+    closeUploadModal() {
+      this.showModal = false;
+    },
+  },
+  mounted() {
+    // Fetch data when component is mounted
+    var sem = sessionStorage.getItem("category");
+    if (sem) {
+      sem = JSON.parse(sem);
+      const categoryTitle = sem.title;
+
+      const url = `http://localhost/getRefnameByCategory?category=${encodeURIComponent(
+        categoryTitle
+      )}`.replace(/\s+/g, "-");
+
+      fetch(url)
+        .then((response) => response.json())
+        .then((data) => {
+          this.files = data.map((file) => ({
+            id: file.id || file.ref_name,
+            ref_name: file.ref_name,
+            sessem: file.sessem || "N/A",
+            description: file.description,
+            owner: file.owner,
+          }));
+        })
+        .catch((error) => {
+          console.error("Error fetching categories:", error);
+        });
+    }
   },
 };
 </script>

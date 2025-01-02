@@ -24,7 +24,6 @@ CREATE TABLE Semester (
     updated_at TIMESTAMP
 );
 
-
 CREATE TABLE user (
     user_id INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
     full_name VARCHAR(255) NOT NULL,

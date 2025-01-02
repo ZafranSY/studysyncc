@@ -2,28 +2,25 @@
   <div v-if="show" class="modal-overlay">
     <div class="modal-content">
       <div class="modal-header">
-        <h2>Link Upload</h2>
+        <h2>Upload Course File</h2>
         <button class="close-btn" @click="closeModal">X</button>
       </div>
       <div class="modal-body">
-        <label class="left-aligned">
-          Category:
-          <input type="text" v-model="formData.category" placeholder="Enter category" />
+        <label>
+          Ref No:
+          <input type="text" v-model="formData.refNo" placeholder="Enter Ref No" />
         </label>
-        <label class="left-aligned">
-          URL:
-          <div class="url-input-container">
-            <input type="text" v-model="formData.url" placeholder="Enter URL" />
-            <button class="upload-btn">Upload</button>
-          </div>
-        </label>
-        <label class="left-aligned">
-          Reference Name:
-          <input type="text" v-model="formData.refName" placeholder="Enter reference name" />
-        </label>
-        <label class="left-aligned">
+        <label>
           Description:
-          <textarea v-model="formData.description" placeholder="Enter description"></textarea>
+          <input type="text" v-model="formData.description" placeholder="Enter Description" />
+        </label>
+        <label>
+          Created:
+          <input type="text" v-model="formData.created" placeholder="Enter Created Date" />
+        </label>
+        <label>
+          Owner:
+          <input type="text" v-model="formData.owner" placeholder="Enter Owner" />
         </label>
       </div>
       <div class="modal-footer">
@@ -41,18 +38,14 @@ export default {
       type: Boolean,
       required: true,
     },
-    file: {
-      type: Object,
-      required: false,
-    },
   },
   data() {
     return {
       formData: {
-        category: "",
-        url: "",
-        refName: "",
+        refNo: "",
         description: "",
+        created: "",
+        owner: "",
       },
     };
   },
@@ -61,7 +54,24 @@ export default {
       this.$emit("close");
     },
     saveData() {
-      console.log("Form data:", this.formData);
+      if (
+        !this.formData.refNo ||
+        !this.formData.description ||
+        !this.formData.created ||
+        !this.formData.owner
+      ) {
+        alert("Please fill in all fields!");
+        return;
+      }
+      // Emit form data to the parent
+      this.$emit("save", this.formData);
+      // Reset form fields
+      this.formData = {
+        refNo: "",
+        description: "",
+        created: "",
+        owner: "",
+      };
       this.closeModal();
     },
   },
