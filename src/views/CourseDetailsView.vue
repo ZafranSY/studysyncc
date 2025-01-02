@@ -63,11 +63,12 @@
       <button class="upload-circle-btn" @click="openUploadModal">+</button>
 
       <!-- Upload Modal -->
-      <UploadModal
+      <UploadModalLink
         v-if="showModal"
         :show="showModal"
         :file="selectedFile"
         @close="closeModal"
+        @save="addFile"
       />
     </div>
   </div>
@@ -75,13 +76,13 @@
 
 <script>
 import NavbarView from "@/components/NavBar.vue";
-import UploadModal from "@/components/UploadModal.vue";
+import UploadModalLink from "@/components/UploadModalLink.vue";
 
 export default {
   name: "CourseDetailsView",
   components: {
     NavbarView,
-    UploadModal,
+    UploadModalLink,
   },
   data() {
     return {
@@ -117,6 +118,16 @@ export default {
       console.log("Closing modal");
       this.showModal = false;
       this.selectedFile = null;
+    },
+    addFile(newFile) {
+      this.files.push({
+        id: newFile.refName, // Generate a unique ID based on the Ref Name
+        refName: newFile.refName,
+        linkDescription: newFile.description,
+        linkPosted: newFile.created,
+        owner: newFile.owner,
+        url: newFile.url,
+      });
     },
     searchFiles() {
       console.log("Searching for files with query:", this.searchQuery);
