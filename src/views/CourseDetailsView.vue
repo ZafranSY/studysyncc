@@ -106,10 +106,50 @@ export default {
     },
   },
   methods: {
-    goToFile(file) {
-      console.log("Navigating to file link:", file);
-      window.open(file.linkUrl, "_blank");
-    },
+    mounted() {
+  const sem = sessionStorage.getItem("link_refName");
+  console.log(sem);
+
+  if (sem) {
+    const parsedSem = JSON.parse(sem);
+    console.log(parsedSem);
+    this.link_refName = parsedSem.title;
+    this.categoryDescription = parsedSem.description;
+
+    const url = `http://localhost:3000/getlinkbyRefname?link_refName=${encodeURIComponent(
+      parsedSem.title
+    )}`;
+
+    console.log("Fetching:", url);
+
+    fetch(url)
+      .then((response) => response.json())
+      .then((data) => {
+        this.files = data.map((file) => ({
+          id: file.link_refName,
+          refName: file.link_refName,
+          linkDescription: file.link_description,
+          linkPosted: file.link_posted,
+          owner: file.owner,
+          url: file.link_url, // Ensure correct mapping
+        }));
+      })
+      .catch((error) => {
+        console.error("Error fetching link details:", error);
+      });
+  }
+},
+
+goToFile(file) {
+  if (!file.url) {
+    alert("No URL provided.");
+    return;
+  }
+
+  const validUrl = /^https?:\/\//i.test(file.url) ? file.url : `http://${file.url}`;
+  window.open(validUrl, "_blank");
+},
+
     openUploadModal() {
       console.log("Opening upload modal");
       this.showModal = true;
@@ -120,15 +160,15 @@ export default {
       this.selectedFile = null;
     },
     addFile(newFile) {
-      this.files.push({
-        id: newFile.refName, // Generate a unique ID based on the Ref Name
-        refName: newFile.refName,
-        linkDescription: newFile.description,
-        linkPosted: newFile.created,
-        owner: newFile.owner,
-        url: newFile.url,
-      });
-    },
+  this.files.push({
+    id: newFile.refName, // Generate a unique ID based on the Ref Name
+    refName: newFile.refName,
+    linkDescription: newFile.description,
+    linkPosted: newFile.created,
+    owner: newFile.owner,
+    url: newFile.url, // This field holds the URL
+  });
+},
     searchFiles() {
       console.log("Searching for files with query:", this.searchQuery);
     },

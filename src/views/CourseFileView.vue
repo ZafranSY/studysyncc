@@ -1,11 +1,12 @@
 <template>
+  
   <div class="page-container">
     <NavbarView class="navbar" />
     <div class="content-container">
       <div class="header-container">
         <div class="header-left">
           <h1>Course File</h1>
-          <h2>Courses {{ files[0]?.sessem || "N/A" }}</h2>
+          <h2>Courses {{ files.length > 0 ? files[0]?.sessem || "N/A" : "N/A" }}</h2>
         </div>
         <div class="header-right">
           <router-link to="/">Home</router-link> |
@@ -70,9 +71,12 @@
         v-if="showModal"
         :show="showModal"
         @close="closeUploadModal"
+        @save="addFile"
       />
     </div>
   </div>
+
+  
 </template>
 
 <script>
@@ -88,8 +92,8 @@ export default {
   data() {
     return {
       searchQuery: "",
-      files: [],
-      showModal: false,
+      files: [], // Ensure files is initialized as an empty array
+      showModal: false, // Modal visibility
     };
   },
   computed: {
@@ -119,6 +123,39 @@ export default {
     },
   },
   methods: {
+
+    saveCourseFile() {
+    // Create payload for the new course file
+    const payload = {
+      link_refName: this.newCourseFile.refName,
+      link_description: this.newCourseFile.description,
+      link_url: this.newCourseFile.url,
+      owner: this.newCourseFile.owner,
+    };
+    // Make an API call to the backend
+    fetch('http://localhost:3000/create', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(payload),
+    })
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error('Failed to save the course file');
+        }
+        return response.json();
+      })
+      .then((data) => {
+        // Push the new file into the `files` array to update the table
+        this.files.push(data);
+        this.showAddForm = false; // Close the form
+        this.newCourseFile = {}; // Reset the form
+      })
+      .catch((error) => {
+        console.error('Error:', error);
+      });
+    },
     navigateToDetails(id) {
       this.$router.push(`/course-files/${id}`);
     },
@@ -136,9 +173,19 @@ export default {
     closeUploadModal() {
       this.showModal = false;
     },
+    addFile(newFile) {
+      // Add the new file to the table data
+      this.files.push({
+        id: newFile.refNo, // Use Ref No as a unique ID
+        ref_name: newFile.refNo,
+        description: newFile.description,
+        sessem: newFile.created,
+        owner: newFile.owner,
+      });
+    },
   },
   mounted() {
-    // Fetch data when component is mounted
+    // Fetch data when the component is mounted
     var sem = sessionStorage.getItem("category");
     if (sem) {
       sem = JSON.parse(sem);
@@ -161,11 +208,16 @@ export default {
         })
         .catch((error) => {
           console.error("Error fetching categories:", error);
+          this.files = []; // Ensure files is always defined
         });
+    } else {
+      this.files = []; // Handle case where session storage is empty
     }
   },
 };
+
 </script>
+
 
 <style scoped>
 .page-container {
