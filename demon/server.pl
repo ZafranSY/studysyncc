@@ -170,25 +170,23 @@ post '/create' => sub ($c) {
     $c->render(json => { id => $id, %$json });
 };
 post '/save_coursefile' => sub ($c) {
-    my $data = {
-        refName     => $c->param('refName'),
-        description => $c->param('description'),
-        url         => $c->param('url'),
-        owner       => $c->param('owner'),
-    };
+    my $data = $c->req->json; # Correctly parse JSON payload
 
-    print "DEBUG: Received data - refName: $data->{refName}, description: $data->{description}, url: $data->{url}, owner: $data->{owner}\n";
+    print "DEBUG: Received data: ", Dumper($data);
+
+    if (!$data->{refName} || !$data->{url} || !$data->{owner}) {
+        return $c->render(json => { error => 'Missing required fields' }, status => 400);
+    }
 
     my $result = CRUD::saveCourseFile($dbh, $data);
 
     if ($result->{success}) {
-        print "DEBUG: Data saved successfully\n";
         $c->render(json => { message => $result->{message} });
     } else {
-        print "ERROR: Failed to save data - $result->{error}\n";
         $c->render(json => { error => $result->{error} }, status => 500);
     }
 };
+
 
 
 app->start;

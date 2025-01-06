@@ -78,7 +78,7 @@ export default {
       try {
         console.log("DEBUG: Sending data:", data);
 
-        const response = await fetch("http://localhost/save_coursefile", {
+        const response = await fetch("http://localhost:80/save_coursefile", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
@@ -87,6 +87,7 @@ export default {
         });
 
         if (!response.ok) {
+          console.error("HTTP Error:", response.status, response.statusText);
           throw new Error(`HTTP error! status: ${response.status}`);
         }
 
