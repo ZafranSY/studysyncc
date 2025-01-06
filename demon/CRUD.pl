@@ -1,6 +1,8 @@
 package CRUD;
 
 use JSON::XS;
+use Data::Dumper;
+print Dumper($json);
 
 sub create {
     my $dbh = shift(@_);
@@ -254,7 +256,8 @@ sub getlinkbyRefname {
     my ($dbh, $category) = @_;  # Get the database handle and category from the caller
 
     # SQL query to select the desired columns (ref_name, description, owner) where the category matches
-    my $sql = 'SELECT link_refName, link_description, link_posted, owner, link_url FROM link_details WHERE link_refName = ?';
+my $sql = 'SELECT link_refName, link_description, link_posted, owner, link_url FROM link_details WHERE link_refName = ?';
+
     
     # Prepare the statement and execute it with the provided category
     my $sth = $dbh->prepare($sql) or die 'prepare statement failed: ' . $dbh->errstr();
