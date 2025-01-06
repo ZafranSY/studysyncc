@@ -317,9 +317,86 @@ sub createUser {
         return { success => 1, message => "User created successfully" };
     }
 }
+sub getCurrentSessem {
+    my ($dbh, $owner) = @_;
 
+    # Query to get the most recent session-semester for the owner
+    my $sth = $dbh->prepare(
+        "SELECT sessem FROM gdlinks WHERE owner = ? ORDER BY id_gdlink DESC LIMIT 1"
+    );
+    $sth->execute($owner);
 
+    if (my $row = $sth->fetchrow_hashref()) {
+        return $row->{sessem};  # Return the latest session-semester
+    } else {
+        return "N/A";  # Default if no records found
+    }
+}
 
+sub getCurrentCategory {
+    my ($dbh, $owner) = @_;
+
+    # Query to get the most recent category for the owner
+    my $sth = $dbh->prepare(
+        "SELECT category FROM gdlinks WHERE owner = ? ORDER BY id_gdlink DESC LIMIT 1"
+    );
+    $sth->execute($owner);
+
+    if (my $row = $sth->fetchrow_hashref()) {
+        return $row->{category};  # Return the latest category
+    } else {
+        return "General";  # Default category
+    }
+}
+
+sub saveCourseFile {
+    my ($dbh, $data) = @_;
+
+    # Retrieve the current session-semester and category from user context
+    my $sessem   = '2023-Fall';  # Replace with a method to get the actual value
+    my $category = 'Internship'; # Replace with a method to get the actual value
+
+    eval {
+        print "DEBUG: Preparing to insert into gdlinks...\n";
+
+        # Insert into gdlinks
+        my $sth1 = $dbh->prepare(
+            "INSERT INTO gdlinks (category, ref_name, sessem, description, owner, link)
+             VALUES (?, ?, ?, ?, ?, ?)"
+        );
+        $sth1->execute(
+            $category,
+            $data->{refName},
+            $sessem,
+            $data->{description},
+            $data->{owner},
+            $data->{url}
+        );
+
+        print "DEBUG: Successfully inserted into gdlinks\n";
+        print "DEBUG: Preparing to insert into link_details...\n";
+
+        # Insert into link_details
+        my $sth2 = $dbh->prepare(
+            "INSERT INTO link_details (link_refName, link_description, link_url, owner, link_posted)
+             VALUES (?, ?, ?, ?, NOW())"
+        );
+        $sth2->execute(
+            $data->{refName},
+            $data->{description},
+            $data->{url},
+            $data->{owner}
+        );
+
+        print "DEBUG: Successfully inserted into link_details\n";
+
+        return { success => 1, message => "Data saved successfully" };
+    } or do {
+        my $error = $@ || 'Unknown error';
+        print "ERROR: $error\n";
+        return { success => 0, error => $error };
+    };
+}
 
 
 

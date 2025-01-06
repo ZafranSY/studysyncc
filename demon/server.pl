@@ -169,5 +169,26 @@ post '/create' => sub ($c) {
     # Respond with the created data and ID
     $c->render(json => { id => $id, %$json });
 };
+post '/save_coursefile' => sub ($c) {
+    my $data = {
+        refName     => $c->param('refName'),
+        description => $c->param('description'),
+        url         => $c->param('url'),
+        owner       => $c->param('owner'),
+    };
+
+    print "DEBUG: Received data - refName: $data->{refName}, description: $data->{description}, url: $data->{url}, owner: $data->{owner}\n";
+
+    my $result = CRUD::saveCourseFile($dbh, $data);
+
+    if ($result->{success}) {
+        print "DEBUG: Data saved successfully\n";
+        $c->render(json => { message => $result->{message} });
+    } else {
+        print "ERROR: Failed to save data - $result->{error}\n";
+        $c->render(json => { error => $result->{error} }, status => 500);
+    }
+};
+
 
 app->start;
