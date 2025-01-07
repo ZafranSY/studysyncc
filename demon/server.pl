@@ -169,5 +169,47 @@ post '/create' => sub ($c) {
     # Respond with the created data and ID
     $c->render(json => { id => $id, %$json });
 };
+post '/save_coursefile' => sub ($c) {
+    my $data = $c->req->json;
+
+    # Validate required fields
+    if (!$data->{refName} || !$data->{url} || !$data->{owner} || !$data->{sessem} || !$data->{category} || !$data->{courseFile}) {
+        return $c->render(json => { error => 'Missing required fields' }, status => 400);
+    }
+
+    print "DEBUG: Received data: ", Dumper($data);
+
+    my $result = CRUD::saveCourseFile($dbh, $data);
+
+    if ($result->{success}) {
+        $c->render(json => { message => $result->{message} });
+    } else {
+        $c->render(json => { error => $result->{error} }, status => 500);
+    }
+};
+
+
+get '/getlink' => sub ($c) {
+    my $sessem    = $c->param('sessem');
+    my $category  = $c->param('category');
+    my $courseFile_refName = $c->param('courseFile_refName');
+
+    # Validate input parameters
+    unless ($sessem && $category && $courseFile_refName) {
+        return $c->render(json => { error => 'Missing required parameters' }, status => 400);
+    }
+
+    # Call the getlink subroutine
+    my $filters = {
+        sessem             => $sessem,
+        category           => $category,
+        courseFile_refName => $courseFile_refName,
+    };
+
+    my $links = getlink($dbh, $filters);
+
+    # Render the results as JSON
+    $c->render(json => $links);
+};
 
 app->start;

@@ -1,12 +1,13 @@
 <template>
-  
   <div class="page-container">
     <NavbarView class="navbar" />
     <div class="content-container">
       <div class="header-container">
         <div class="header-left">
           <h1>Course File</h1>
-          <h2>Courses {{ files.length > 0 ? files[0]?.sessem || "N/A" : "N/A" }}</h2>
+          <h2>
+            Courses {{ files.length > 0 ? files[0]?.sessem || "N/A" : "N/A" }}
+          </h2>
         </div>
         <div class="header-right">
           <router-link to="/">Home</router-link> |
@@ -40,6 +41,7 @@
               @click="
                 navigateToDetails(file.id);
                 setLink_refName(file.ref_name);
+                setCourseFile(file.ref_name);
               "
               class="clickable-row"
             >
@@ -75,8 +77,6 @@
       />
     </div>
   </div>
-
-  
 </template>
 
 <script>
@@ -123,38 +123,37 @@ export default {
     },
   },
   methods: {
-
     saveCourseFile() {
-    // Create payload for the new course file
-    const payload = {
-      link_refName: this.newCourseFile.refName,
-      link_description: this.newCourseFile.description,
-      link_url: this.newCourseFile.url,
-      owner: this.newCourseFile.owner,
-    };
-    // Make an API call to the backend
-    fetch('http://localhost:3000/create', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(payload),
-    })
-      .then((response) => {
-        if (!response.ok) {
-          throw new Error('Failed to save the course file');
-        }
-        return response.json();
+      // Create payload for the new course file
+      const payload = {
+        link_refName: this.newCourseFile.refName,
+        link_description: this.newCourseFile.description,
+        link_url: this.newCourseFile.url,
+        owner: this.newCourseFile.owner,
+      };
+      // Make an API call to the backend
+      fetch("http://localhost:3000/create", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(payload),
       })
-      .then((data) => {
-        // Push the new file into the `files` array to update the table
-        this.files.push(data);
-        this.showAddForm = false; // Close the form
-        this.newCourseFile = {}; // Reset the form
-      })
-      .catch((error) => {
-        console.error('Error:', error);
-      });
+        .then((response) => {
+          if (!response.ok) {
+            throw new Error("Failed to save the course file");
+          }
+          return response.json();
+        })
+        .then((data) => {
+          // Push the new file into the `files` array to update the table
+          this.files.push(data);
+          this.showAddForm = false; // Close the form
+          this.newCourseFile = {}; // Reset the form
+        })
+        .catch((error) => {
+          console.error("Error:", error);
+        });
     },
     navigateToDetails(id) {
       this.$router.push(`/course-files/${id}`);
@@ -183,17 +182,37 @@ export default {
         owner: newFile.owner,
       });
     },
+    setCourseFile(refName) {
+      if (!refName) {
+        console.error("refName is undefined or null");
+        return;
+      }
+
+      // Store only the ref_name in sessionStorage
+      sessionStorage.setItem("courseFile", refName);
+
+      // Log the saved value to verify
+      console.log(`Course file ref_name set: ${refName}`);
+    },
   },
   mounted() {
     // Fetch data when the component is mounted
+    const storedRefName = sessionStorage.getItem("courseFile");
+    if (storedRefName) {
+      console.log("Retrieved course file ref_name:", storedRefName);
+      // Use the ref_name as needed
+    } else {
+      console.warn("No course file ref_name found in session storage");
+    }
     var sem = sessionStorage.getItem("category");
     if (sem) {
       sem = JSON.parse(sem);
       const categoryTitle = sem.title;
 
-      const url = `http://localhost/getRefnameByCategory?category=${encodeURIComponent(
-        categoryTitle
-      )}`.replace(/\s+/g, "-");
+      const url =
+        `http://localhost/getRefnameByCategory?category=${encodeURIComponent(
+          categoryTitle
+        )}`.replace(/\s+/g, "-");
 
       fetch(url)
         .then((response) => response.json())
@@ -215,9 +234,7 @@ export default {
     }
   },
 };
-
 </script>
-
 
 <style scoped>
 .page-container {
