@@ -69,6 +69,7 @@
         :file="selectedFile"
         @close="closeModal"
         @save="addFile"
+        @saveSuccess="fetchFiles"
       />
     </div>
   </div>
@@ -106,49 +107,50 @@ export default {
     },
   },
   methods: {
-    mounted() {
-  const sem = sessionStorage.getItem("link_refName");
-  console.log(sem);
+    fetchFiles() {
+      const courseId = sessionStorage.getItem("link_refName"); // Ensure session storage value is used
+      if (!courseId) {
+        console.error("Missing course ID in session storage.");
+        return;
+      }
 
-  if (sem) {
-    const parsedSem = JSON.parse(sem);
-    console.log(parsedSem);
-    this.link_refName = parsedSem.title;
-    this.categoryDescription = parsedSem.description;
+      const url = `http://localhost:80/getFilesByCourse?courseId=${encodeURIComponent(
+        courseId
+      )}`;
+      fetch(url)
+        .then((response) => {
+          if (!response.ok) {
+            throw new Error(`Failed to fetch files: ${response.statusText}`);
+          }
+          return response.json();
+        })
+        .then((data) => {
+          this.files = data.map((file) => ({
+            id: file.refName, // Ensure this matches the backend response
+            refName: file.refName,
+            linkDescription: file.description,
+            linkPosted: file.created || "N/A",
+            owner: file.owner,
+            url: file.url,
+          }));
+          console.log("Files fetched successfully:", this.files);
+        })
+        .catch((error) => {
+          console.error("Error fetching files:", error);
+        });
+    },
 
-    const url = `http://localhost:3000/getlinkbyRefname?link_refName=${encodeURIComponent(
-      parsedSem.title
-    )}`;
+    goToFile(file) {
+      if (!file.url) {
+        alert("No URL provided.");
+        return;
+      }
 
-    console.log("Fetching:", url);
-
-    fetch(url)
-      .then((response) => response.json())
-      .then((data) => {
-        this.files = data.map((file) => ({
-          id: file.link_refName,
-          refName: file.link_refName,
-          linkDescription: file.link_description,
-          linkPosted: file.link_posted,
-          owner: file.owner,
-          url: file.link_url, // Ensure correct mapping
-        }));
-      })
-      .catch((error) => {
-        console.error("Error fetching link details:", error);
-      });
-  }
-},
-
-goToFile(file) {
-  if (!file.url) {
-    alert("No URL provided.");
-    return;
-  }
-
-  const validUrl = /^https?:\/\//i.test(file.url) ? file.url : `http://${file.url}`;
-  window.open(validUrl, "_blank");
-},
+      const validUrl = /^https?:\/\//i.test(file.url)
+        ? file.url
+        : `http://${file.url}`;
+      window.open(validUrl, "_blank");
+    },
 
     openUploadModal() {
       console.log("Opening upload modal");
@@ -160,15 +162,16 @@ goToFile(file) {
       this.selectedFile = null;
     },
     addFile(newFile) {
-  this.files.push({
-    id: newFile.refName, // Generate a unique ID based on the Ref Name
-    refName: newFile.refName,
-    linkDescription: newFile.description,
-    linkPosted: newFile.created,
-    owner: newFile.owner,
-    url: newFile.url, // This field holds the URL
-  });
-},
+      this.files.push({
+        id: newFile.refName,
+        refName: newFile.refName,
+        linkDescription: newFile.description,
+        linkPosted: newFile.created || new Date().toISOString(), // Provide a default date if missing
+        owner: newFile.owner,
+        url: newFile.url,
+      });
+    },
+
     searchFiles() {
       console.log("Searching for files with query:", this.searchQuery);
     },
@@ -180,41 +183,48 @@ goToFile(file) {
     },
   },
   mounted() {
-    const sem = sessionStorage.getItem("link_refName");
-    console.log(sem); // Check the value in sessionStorage
+    const category = JSON.parse(sessionStorage.getItem("category")); // Category object
+    const courseFile = sessionStorage.getItem("courseFile"); // Course file refName
+    const semester = sessionStorage.getItem("semester"); // Semester (sessem)
 
-    if (sem) {
-      // Parse the category data and update the page
-      const parsedSem = JSON.parse(sem);
-      console.log(parsedSem); // Check the parsed object
-      this.link_refName = parsedSem.title; // Extract the category title
-      this.categoryDescription = parsedSem.description; // Extract description
-
-      // Now make the API call based on the category
-      const url = `http://127.0.0.1/getlinkbyRefname?link_refName=${encodeURIComponent(
-        parsedSem
-      )}`;
-
-      console.log(url); // Ensure the URL is formed correctly
-
-      // Fetch the data based on link_refName
-      fetch(url)
-        .then((response) => response.json())
-        .then((data) => {
-          this.files = data.map((file) => ({
-            id: file.link_refName, // Use link_refName for unique id
-            refName: file.link_refName,
-            linkDescription: file.link_description,
-            linkPosted: file.link_posted,
-            linkUrl: file.link_url,
-            owner: file.owner,
-          }));
-          console.log(this.files); // Ensure the data is loaded correctly
-        })
-        .catch((error) => {
-          console.error("Error fetching links:", error);
-        });
+    // Ensure all necessary data is available
+    if (!category || !category.title || !courseFile || !semester) {
+      console.error("Missing required session storage values.");
+      return;
     }
+
+    // Construct the API URL with the required query parameters
+    const url = `http://127.0.0.1/getlink?sessem=${encodeURIComponent(
+      semester
+    )}&category=${encodeURIComponent(
+      category.title
+    )}&courseFile_refName=${encodeURIComponent(courseFile)}`;
+
+    console.log("Fetching files from URL:", url);
+
+    // Make the API call
+    fetch(url)
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error(`Failed to fetch files: ${response.statusText}`);
+        }
+        return response.json();
+      })
+      .then((data) => {
+        // Map the API response to match the table format
+        this.files = data.map((file) => ({
+          id: file.link_refName, // Use link_refName as unique ID
+          refName: file.link_refName,
+          linkDescription: file.link_description,
+          linkPosted: file.link_posted || "N/A", // Default to "N/A" if not provided
+          owner: file.owner,
+          url: file.link_url,
+        }));
+        console.log("Files fetched successfully:", this.files);
+      })
+      .catch((error) => {
+        console.error("Error fetching files:", error);
+      });
   },
 };
 </script>

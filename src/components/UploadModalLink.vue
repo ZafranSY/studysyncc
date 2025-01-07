@@ -10,7 +10,7 @@
           Ref Name:
           <input
             type="text"
-            v-model="formData.refName"
+            v-model="formData.link_refName"
             placeholder="Enter Ref Name"
           />
         </label>
@@ -18,7 +18,7 @@
           Description:
           <input
             type="text"
-            v-model="formData.description"
+            v-model="formData.link_desc"
             placeholder="Enter Description"
           />
         </label>
@@ -55,8 +55,8 @@ export default {
   data() {
     return {
       formData: {
-        refName: "",
-        description: "",
+        link_refName: "",
+        link_desc: "",
         created: "",
         owner: "",
         url: "",
@@ -81,13 +81,13 @@ export default {
           courseFile,
         });
         alert("Unable to fetch required session values. Please try again.");
-        return;
+        return this.$emit("save", data);
       }
 
       // Validate form inputs
       const requiredFields = [
-        this.formData.refName,
-        this.formData.description,
+        this.formData.link_refName,
+        this.formData.link_desc,
         this.formData.owner,
         this.formData.url,
         semester,
@@ -102,8 +102,8 @@ export default {
 
       // Prepare data payload
       const data = {
-        refName: this.formData.refName,
-        description: this.formData.description,
+        refName: this.formData.link_refName,
+        description: this.formData.link_desc,
         owner: this.formData.owner,
         url: this.formData.url,
         sessem: semester,

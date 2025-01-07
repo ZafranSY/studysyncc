@@ -363,6 +363,41 @@ sub saveCourseFile {
         return { success => 0, error => $error };
     };
 }
+sub getlink { 
+    my ($dbh, $filters) = @_;  # $filters is a hashref containing sessem, category, and courseFile_refName (ref_name)
+
+    # Validate input parameters
+    my $sessem    = $filters->{sessem};
+    my $category  = $filters->{category};
+    my $courseFile_refName = $filters->{courseFile_refName};
+
+    # SQL query to join gdlinks and link_details and filter based on sessem, category, and ref_name
+    my $sql = q{
+        SELECT ld.link_refName, ld.link_description, ld.link_posted, ld.owner, ld.link_url
+        FROM link_details ld
+        INNER JOIN gdlinks g ON ld.link_refName = g.ref_name
+        WHERE g.sessem = ? AND g.category = ? AND g.ref_name = ?
+    };
+
+    # Prepare the statement and execute it with the provided filters
+    my $sth = $dbh->prepare($sql) or die 'prepare statement failed: ' . $dbh->errstr();
+    $sth->execute($sessem, $category, $courseFile_refName) or die 'execution failed: ' . $dbh->errstr();
+
+    # Fetch all results
+    my @files;
+    while (my $row = $sth->fetchrow_hashref) {
+        push @files, {
+            link_refName    => $row->{link_refName},
+            link_description => $row->{link_description},
+            link_posted     => $row->{link_posted},
+            owner           => $row->{owner},
+            link_url        => $row->{link_url},
+        };
+    }
+
+    # Return the results as an array of hashes
+    return \@files;
+}
 
 
 
