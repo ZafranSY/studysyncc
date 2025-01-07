@@ -68,16 +68,53 @@ export default {
       this.$emit("close");
     },
     async saveData() {
+      // Retrieve session storage values
+      const category = JSON.parse(sessionStorage.getItem("category") || "{}");
+      const semester = sessionStorage.getItem("semester");
+      const courseFile = sessionStorage.getItem("courseFile");
+
+      // Validate session storage values
+      if (!category.title || !semester || !courseFile) {
+        console.error("Missing session storage values", {
+          category,
+          semester,
+          courseFile,
+        });
+        alert("Unable to fetch required session values. Please try again.");
+        return;
+      }
+
+      // Validate form inputs
+      const requiredFields = [
+        this.formData.refName,
+        this.formData.description,
+        this.formData.owner,
+        this.formData.url,
+        semester,
+        category.title,
+        courseFile,
+      ];
+
+      if (requiredFields.includes("") || requiredFields.includes(null)) {
+        alert("Please fill out all required fields.");
+        return;
+      }
+
+      // Prepare data payload
       const data = {
         refName: this.formData.refName,
         description: this.formData.description,
         owner: this.formData.owner,
         url: this.formData.url,
+        sessem: semester,
+        category: category.title,
+        courseFile: courseFile,
       };
 
       try {
         console.log("DEBUG: Sending data:", data);
 
+        // Send data to the backend
         const response = await fetch("http://localhost:80/save_coursefile", {
           method: "POST",
           headers: {
@@ -88,18 +125,30 @@ export default {
 
         if (!response.ok) {
           console.error("HTTP Error:", response.status, response.statusText);
-          throw new Error(`HTTP error! status: ${response.status}`);
+          throw new Error(`HTTP error! Status: ${response.status}`);
         }
 
+        // Parse the response from the server
         const result = await response.json();
         console.log("DEBUG: Response from server:", result);
 
-        alert(result.message || "Data saved successfully!");
+        // Notify user of success or error
+        if (result.message) {
+          alert(result.message);
+          this.closeModal(); // Close the modal on success
+        } else {
+          alert("Data saved successfully!");
+          this.closeModal();
+        }
       } catch (error) {
         console.error("Error during fetch:", error);
-        alert("Failed to save data. Please check your connection.");
+        alert(
+          "Failed to save data. Please check your connection or try again later."
+        );
       }
     },
+
+    // Save selected sessem and category in sessionStorage
   },
 };
 </script>

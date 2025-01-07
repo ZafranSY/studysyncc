@@ -317,44 +317,10 @@ sub createUser {
         return { success => 1, message => "User created successfully" };
     }
 }
-sub getCurrentSessem {
-    my ($dbh, $owner) = @_;
 
-    # Query to get the most recent session-semester for the owner
-    my $sth = $dbh->prepare(
-        "SELECT sessem FROM gdlinks WHERE owner = ? ORDER BY id_gdlink DESC LIMIT 1"
-    );
-    $sth->execute($owner);
-
-    if (my $row = $sth->fetchrow_hashref()) {
-        return $row->{sessem};  # Return the latest session-semester
-    } else {
-        return "N/A";  # Default if no records found
-    }
-}
-
-sub getCurrentCategory {
-    my ($dbh, $owner) = @_;
-
-    # Query to get the most recent category for the owner
-    my $sth = $dbh->prepare(
-        "SELECT category FROM gdlinks WHERE owner = ? ORDER BY id_gdlink DESC LIMIT 1"
-    );
-    $sth->execute($owner);
-
-    if (my $row = $sth->fetchrow_hashref()) {
-        return $row->{category};  # Return the latest category
-    } else {
-        return "General";  # Default category
-    }
-}
 
 sub saveCourseFile {
     my ($dbh, $data) = @_;
-
-    # Retrieve the current session-semester and category from user context
-    my $sessem   = '2023-Fall';  # Replace with a method to get the actual value
-    my $category = 'Internship'; # Replace with a method to get the actual value
 
     eval {
         print "DEBUG: Preparing to insert into gdlinks...\n";
@@ -365,9 +331,9 @@ sub saveCourseFile {
              VALUES (?, ?, ?, ?, ?, ?)"
         );
         $sth1->execute(
-            $category,
-            $data->{refName},
-            $sessem,
+            $data->{category},
+            $data->{courseFile}, # Use courseFile as ref_name
+            $data->{sessem},
             $data->{description},
             $data->{owner},
             $data->{url}
@@ -382,7 +348,7 @@ sub saveCourseFile {
              VALUES (?, ?, ?, ?, NOW())"
         );
         $sth2->execute(
-            $data->{refName},
+            $data->{courseFile},  # Use courseFile as link_refName
             $data->{description},
             $data->{url},
             $data->{owner}

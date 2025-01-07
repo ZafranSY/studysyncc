@@ -41,6 +41,7 @@
               @click="
                 navigateToDetails(file.id);
                 setLink_refName(file.ref_name);
+                setCourseFile(file.ref_name);
               "
               class="clickable-row"
             >
@@ -181,9 +182,28 @@ export default {
         owner: newFile.owner,
       });
     },
+    setCourseFile(refName) {
+      if (!refName) {
+        console.error("refName is undefined or null");
+        return;
+      }
+
+      // Store only the ref_name in sessionStorage
+      sessionStorage.setItem("courseFile", refName);
+
+      // Log the saved value to verify
+      console.log(`Course file ref_name set: ${refName}`);
+    },
   },
   mounted() {
     // Fetch data when the component is mounted
+    const storedRefName = sessionStorage.getItem("courseFile");
+    if (storedRefName) {
+      console.log("Retrieved course file ref_name:", storedRefName);
+      // Use the ref_name as needed
+    } else {
+      console.warn("No course file ref_name found in session storage");
+    }
     var sem = sessionStorage.getItem("category");
     if (sem) {
       sem = JSON.parse(sem);

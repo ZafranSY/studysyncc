@@ -170,13 +170,14 @@ post '/create' => sub ($c) {
     $c->render(json => { id => $id, %$json });
 };
 post '/save_coursefile' => sub ($c) {
-    my $data = $c->req->json; # Correctly parse JSON payload
+    my $data = $c->req->json;
 
-    print "DEBUG: Received data: ", Dumper($data);
-
-    if (!$data->{refName} || !$data->{url} || !$data->{owner}) {
+    # Validate required fields
+    if (!$data->{refName} || !$data->{url} || !$data->{owner} || !$data->{sessem} || !$data->{category} || !$data->{courseFile}) {
         return $c->render(json => { error => 'Missing required fields' }, status => 400);
     }
+
+    print "DEBUG: Received data: ", Dumper($data);
 
     my $result = CRUD::saveCourseFile($dbh, $data);
 
