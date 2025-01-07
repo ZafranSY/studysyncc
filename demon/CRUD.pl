@@ -362,8 +362,7 @@ sub saveCourseFile {
         print "ERROR: $error\n";
         return { success => 0, error => $error };
     };
-}
-sub getlink { 
+}sub getlink {
     my ($dbh, $filters) = @_;  # $filters is a hashref containing sessem, category, and courseFile_refName (ref_name)
 
     # Validate input parameters
@@ -373,9 +372,9 @@ sub getlink {
 
     # SQL query to join gdlinks and link_details and filter based on sessem, category, and ref_name
     my $sql = q{
-        SELECT ld.link_refName, ld.link_description, ld.link_posted, ld.owner, ld.link_url
-        FROM link_details ld
-        INNER JOIN gdlinks g ON ld.link_refName = g.ref_name
+        SELECT g.ref_name, g.description, g.owner, g.link, ld.link_refName, ld.link_description, ld.link_posted, ld.owner AS link_owner, ld.link_url
+        FROM gdlinks g
+        LEFT JOIN link_details ld ON g.ref_name = ld.link_refName
         WHERE g.sessem = ? AND g.category = ? AND g.ref_name = ?
     };
 
@@ -387,18 +386,21 @@ sub getlink {
     my @files;
     while (my $row = $sth->fetchrow_hashref) {
         push @files, {
-            link_refName    => $row->{link_refName},
+            ref_name         => $row->{ref_name},
+            description      => $row->{description},
+            owner            => $row->{owner},
+            link             => $row->{link},
+            link_refName     => $row->{link_refName},
             link_description => $row->{link_description},
-            link_posted     => $row->{link_posted},
-            owner           => $row->{owner},
-            link_url        => $row->{link_url},
+            link_posted      => $row->{link_posted},
+            link_owner       => $row->{link_owner},
+            link_url         => $row->{link_url},
         };
     }
 
     # Return the results as an array of hashes
     return \@files;
 }
-
 
 
 1;

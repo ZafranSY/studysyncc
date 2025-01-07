@@ -190,9 +190,8 @@ post '/save_coursefile' => sub ($c) {
 
 
 get '/getlink' => sub ($c) {
-    # Retrieve query parameters
-    my $sessem = $c->param('sessem');
-    my $category = $c->param('category');
+    my $sessem    = $c->param('sessem');
+    my $category  = $c->param('category');
     my $courseFile_refName = $c->param('courseFile_refName');
 
     # Validate input parameters
@@ -200,14 +199,17 @@ get '/getlink' => sub ($c) {
         return $c->render(json => { error => 'Missing required parameters' }, status => 400);
     }
 
-    # Call the getlink subroutine from CRUD.pl
-    my $links = CRUD::getlink($dbh, {
-        sessem    => $sessem,
-        category  => $category,
+    # Call the getlink subroutine
+    my $filters = {
+        sessem             => $sessem,
+        category           => $category,
         courseFile_refName => $courseFile_refName,
-    });
+    };
 
-    # Render the links as JSON
+    my $links = getlink($dbh, $filters);
+
+    # Render the results as JSON
     $c->render(json => $links);
 };
+
 app->start;
