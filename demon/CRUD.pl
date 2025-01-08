@@ -319,88 +319,8 @@ sub createUser {
 }
 
 
-sub saveCourseFile {
-    my ($dbh, $data) = @_;
 
-    eval {
-        print "DEBUG: Preparing to insert into gdlinks...\n";
 
-        # Insert into gdlinks
-        my $sth1 = $dbh->prepare(
-            "INSERT INTO gdlinks (category, ref_name, sessem, description, owner, link)
-             VALUES (?, ?, ?, ?, ?, ?)"
-        );
-        $sth1->execute(
-            $data->{category},
-            $data->{courseFile}, # Use courseFile as ref_name
-            $data->{sessem},
-            $data->{description},
-            $data->{owner},
-            $data->{url}
-        );
-
-        print "DEBUG: Successfully inserted into gdlinks\n";
-        print "DEBUG: Preparing to insert into link_details...\n";
-
-        # Insert into link_details
-        my $sth2 = $dbh->prepare(
-            "INSERT INTO link_details (link_refName, link_description, link_url, owner, link_posted)
-             VALUES (?, ?, ?, ?, NOW())"
-        );
-        $sth2->execute(
-            $data->{courseFile},  # Use courseFile as link_refName
-            $data->{description},
-            $data->{url},
-            $data->{owner}
-        );
-
-        print "DEBUG: Successfully inserted into link_details\n";
-
-        return { success => 1, message => "Data saved successfully" };
-    } or do {
-        my $error = $@ || 'Unknown error';
-        print "ERROR: $error\n";
-        return { success => 0, error => $error };
-    };
-}sub getlink {
-    my ($dbh, $filters) = @_;  # $filters is a hashref containing sessem, category, and courseFile_refName (ref_name)
-
-    # Validate input parameters
-    my $sessem    = $filters->{sessem};
-    my $category  = $filters->{category};
-    my $courseFile_refName = $filters->{courseFile_refName};
-
-    # SQL query to join gdlinks and link_details and filter based on sessem, category, and ref_name
-    my $sql = q{
-        SELECT g.ref_name, g.description, g.owner, g.link, ld.link_refName, ld.link_description, ld.link_posted, ld.owner AS link_owner, ld.link_url
-        FROM gdlinks g
-        LEFT JOIN link_details ld ON g.ref_name = ld.link_refName
-        WHERE g.sessem = ? AND g.category = ? AND g.ref_name = ?
-    };
-
-    # Prepare the statement and execute it with the provided filters
-    my $sth = $dbh->prepare($sql) or die 'prepare statement failed: ' . $dbh->errstr();
-    $sth->execute($sessem, $category, $courseFile_refName) or die 'execution failed: ' . $dbh->errstr();
-
-    # Fetch all results
-    my @files;
-    while (my $row = $sth->fetchrow_hashref) {
-        push @files, {
-            ref_name         => $row->{ref_name},
-            description      => $row->{description},
-            owner            => $row->{owner},
-            link             => $row->{link},
-            link_refName     => $row->{link_refName},
-            link_description => $row->{link_description},
-            link_posted      => $row->{link_posted},
-            link_owner       => $row->{link_owner},
-            link_url         => $row->{link_url},
-        };
-    }
-
-    # Return the results as an array of hashes
-    return \@files;
-}
 
 
 1;
