@@ -8,11 +8,10 @@
 
       <div class="menu-section">
         <div class="menu-header">MAIN</div>
-        <router-link to="/allfile" class="menu-item">
-          
+        <a href="#" class="menu-item">
           <span>🏠</span>
           All
-        </router-link>
+        </a>
         <a href="#" class="menu-item">
           <span>⭐</span>
           Favourite

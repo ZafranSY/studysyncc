@@ -401,19 +401,6 @@ sub saveCourseFile {
     # Return the results as an array of hashes
     return \@files;
 }
-sub getAllLinks {
-    my ($dbh) = @_;
 
-    # SQL query to fetch all records without filters
-    my $sql = q{
-        SELECT g.ref_name, g.description, g.owner, ld.link_url, ld.link_posted
-        FROM gdlinks g
-        LEFT JOIN link_details ld ON g.ref_name = ld.link_refName
-    };
 
-    my $sth = $dbh->prepare($sql) or die 'prepare statement failed: ' . $dbh->errstr();
-    $sth->execute() or die 'execution failed: ' . $dbh->errstr();
-
-    return $sth->fetchall_arrayref({});
-}
 1;

@@ -212,10 +212,4 @@ get '/getlink' => sub ($c) {
     $c->render(json => $links);
 };
 
-
-get '/getAllLinks' => sub ($c) {
-    my $links = getAllLinks($dbh);  # Call the new function to get all links
-    $c->render(json => $links);
-};
-
 app->start;
