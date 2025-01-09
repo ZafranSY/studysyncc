@@ -1,0 +1,48 @@
+package Authorization;
+
+use DBI;
+use Log::Log4perl;
+
+# Initialize Log4perl with a configuration
+Log::Log4perl->init(\ q(
+    log4perl.rootLogger              = DEBUG, Screen
+    log4perl.appender.Screen         = Log::Log4perl::Appender::Screen
+    log4perl.appender.Screen.layout  = Log::Log4perl::Layout::SimpleLayout
+));
+
+# Get a logger object
+my $logger = Log::Log4perl->get_logger();
+
+sub check_session_role {
+    my ($dbh, $session_id, $required_rolename) = @_;
+
+    # Log the start of the process
+    $logger->info("Checking session role for session_id: $session_id, required role: $required_rolename");
+
+    my $sth = $dbh->prepare('SELECT * FROM roles WHERE role_name=?')
+        or do return { error => 'Failed to prepare statement: ' . $dbh->errstr };
+    
+    $sth->execute($required_rolename)
+        or do return { error => 'Execution failed: ' . $dbh->errstr };
+    
+    my $req_role_id = $sth->fetchrow_hashref;
+    
+    $sth = $dbh->prepare('SELECT * FROM user WHERE session_id=?');
+    $sth->execute($session_id)
+        or do return { error => 'Execution failed: ' . $dbh->errstr };
+        
+    my $user_role_id = $sth->fetchrow_hashref;
+
+    if (!$user_role_id) {
+        return { error => 'Invalid session_id' };
+    }
+
+    if ($user_role_id->{role_id} ne $req_role_id->{role_id}) {
+        $logger->error("Insufficient role privileges for session_id: $session_id  $user_role_id->{role_id}  $req_role_id->{role_id}");
+        return { error => 'Insufficient role privileges' };
+    }
+
+    return { message => 'Authentication successful' };
+}
+
+1;
