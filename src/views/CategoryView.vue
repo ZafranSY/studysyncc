@@ -30,16 +30,16 @@
         </div>
       </div>
 
-      <!-- Semester Cards -->
+      <!-- Category Cards -->
       <div class="card-grid">
         <CategoryCard
-          v-for="semester in filteredSemesters"
-          :key="semester.id"
-          :title="semester.title"
-          :subtitle="semester.subtitle"
-          :bgColor="semester.bgColor"
-          :link="'/homeview/category/' + semester.title.replace(/\s+/g, '-')"
-          @click="setCategory(semester)"
+          v-for="category in filteredCategories"
+          :key="category.id"
+          :title="category.title"
+          :subtitle="category.subtitle"
+          :bgColor="category.bgColor"
+          @click="setCategory(category)"
+          @delete-category="confirmAndRemoveCategory"
         />
       </div>
 
@@ -63,53 +63,38 @@
 
 <script>
 import NavbarView from "@/components/NavBar.vue";
-import UploadModalCategory from "@/components/UploadModalCategory.vue"; // Import category modal
+import UploadModalCategory from "@/components/UploadModalCategory.vue";
 import CategoryCard from "@/components/CategoryCard.vue";
 
 export default {
   components: { NavbarView, CategoryCard, UploadModalCategory },
   data() {
     return {
-      selectedFilter: "All",
       searchQuery: "",
-      semesters: [],
-      showCategoryModal: false, // Control visibility of category modal
+      categories: [],
+      showCategoryModal: false,
     };
   },
   computed: {
-    filteredSemesters() {
-      return this.semesters.filter((semester) => {
-        const matchesFilter =
-          this.selectedFilter === "All" ||
-          semester.title.startsWith(this.selectedFilter);
+    filteredCategories() {
+      return this.categories.filter((category) => {
         const matchesSearch =
-          semester.title
-            .toLowerCase()
-            .includes(this.searchQuery.toLowerCase()) ||
-          semester.subtitle
-            .toLowerCase()
-            .includes(this.searchQuery.toLowerCase());
-        return matchesFilter && matchesSearch;
+          category.title.toLowerCase().includes(this.searchQuery.toLowerCase()) ||
+          category.subtitle.toLowerCase().includes(this.searchQuery.toLowerCase());
+        return matchesSearch;
       });
     },
   },
   mounted() {
-    // Fetch categories from the API when the component is created
-    var sem = sessionStorage.getItem("semester");
-    if (sem.startsWith('"') && sem.endsWith('"')) {
-      sem = sem.slice(1, -1);
-    }
-    const url = `http://localhost/getCategoryBySemester?semester=${encodeURIComponent(
-      sem
-    )}`;
-    console.log(url);
+    const semester = JSON.parse(sessionStorage.getItem("semester"));
+    const url = `http://localhost/getCategoryBySemester?semester=${encodeURIComponent(semester)}`;
     fetch(url)
       .then((response) => response.json())
       .then((data) => {
-        this.semesters = data.map((category, index) => ({
+        this.categories = data.map((category, index) => ({
           id: index + 1,
           title: category,
-          subtitle: ` ${category}`,
+          subtitle: category,
           bgColor: this.getRandomColor(),
         }));
       })
@@ -129,7 +114,6 @@ export default {
     setCategory(category) {
       sessionStorage.setItem("category", JSON.stringify(category));
       const formattedTitle = category.title.replace(/\s+/g, "-");
-      console.log(`Category set: ${JSON.stringify(category)}`);
       this.$router.push(`/homeview/category/${formattedTitle}`);
     },
     openCategoryModal() {
@@ -140,13 +124,34 @@ export default {
     },
     addCategory(newCategory) {
       const newCategoryEntry = {
-        id: this.semesters.length + 1,
+        id: this.categories.length + 1,
         title: newCategory.categoryName,
-        subtitle: ` ${newCategory.categoryName}`,
+        subtitle: newCategory.categoryName,
         bgColor: this.getRandomColor(),
       };
-      this.semesters.push(newCategoryEntry);
+      this.categories.push(newCategoryEntry);
       this.showCategoryModal = false;
+    },
+      confirmAndRemoveCategory(categoryTitle) {
+    if (window.confirm(`Are you sure you want to delete "${categoryTitle}"?`)) {
+      const index = this.categories.findIndex((c) => c.title === categoryTitle);
+      if (index !== -1) {
+        this.categories.splice(index, 1);
+        // Optionally send a request to the backend
+        fetch(`http://localhost/deleteCategory?title=${encodeURIComponent(categoryTitle)}`, { method: 'DELETE' })
+          .then((response) => {
+            if (!response.ok) {
+              throw new Error('Failed to delete category');
+            }
+          })
+          .catch((error) => {
+            console.error('Error deleting category:', error);
+            alert('Deletion failed. Please try again.');
+            // Optionally re-add the category if the deletion request fails
+            this.categories.splice(index, 0, { id: index + 1, title: categoryTitle, subtitle: categoryTitle, bgColor: this.getRandomColor() });
+            });
+        }
+      }
     },
   },
 };

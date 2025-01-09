@@ -38,8 +38,8 @@
           :title="semester.title"
           :subtitle="semester.subtitle"
           :bgColor="semester.bgColor"
-          :link="'/homeview/category'"
           @click="setSemester(semester.title)"
+          @delete-semester="removeSemester"
           img="https://elearning-archive.utm.my/21223/pluginfile.php/1/theme_moove/sliderimage1/1663554195/2021202203.jpg"
         />
       </div>
@@ -134,6 +134,12 @@ export default {
         bgColor: this.getRandomColor(),
       });
       this.showModal = false;
+    },
+    removeSemester(semesterTitle) {
+      const index = this.semesters.findIndex((s) => s.title === semesterTitle);
+      if (index !== -1) {
+        this.semesters.splice(index, 1); // Remove the semester from the list
+      }
     },
   },
 };
