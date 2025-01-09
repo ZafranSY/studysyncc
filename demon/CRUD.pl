@@ -318,7 +318,24 @@ sub createUser {
     }
 }
 
+sub getAllLinks {
+    my $dbh = shift(@_);  # Database handle
 
+    # Prepare the SQL statement to get all rows from gdlinks
+    my $sth = $dbh->prepare('SELECT * FROM gdlinks')
+        or die 'prepare statement failed: ' . $dbh->errstr();
+
+    # Execute the query
+    $sth->execute() or die 'execution failed: ' . $dbh->errstr();
+
+    # Fetch all rows as an array of hashes
+    my @files = ();
+    while (my $row = $sth->fetchrow_hashref()) {
+        push @files, $row;
+    }
+
+    return \@files;  # Return the array reference containing all records
+}
 
 
 

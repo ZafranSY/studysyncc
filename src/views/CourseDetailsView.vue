@@ -7,10 +7,7 @@
           <h1>Course File</h1>
           <h2>{{ categoryTitle }}: {{ categoryDescription }}</h2>
         </div>
-        <div class="header-right">
-          <router-link to="/">Home</router-link> |
-          <router-link to="/login">Login</router-link>
-        </div>
+        
       </div>
 
       <div class="details-container">
@@ -49,18 +46,53 @@
               <td>{{ file.linkPosted }}</td>
               <td>{{ file.owner }}</td>
               <td>
-                <!-- Updated Go To Button -->
-                <button class="action-btn" @click="goToFile(file)">
-                  Go To
-                </button>
+                <button @click="editRecord(file)" class="icon-button">
+    <img :src="require('@/assets/edit.png')" alt="Edit" class="icon" />
+  </button>
+  <button @click="deleteRecord(file.id)" class="icon-button">
+    <img :src="require('@/assets/delete.png')" alt="Delete" class="icon" />
+  </button>
+  <button @click="goToFile(file)" class="icon-button">
+    <img :src="require('@/assets/goto.png')" alt="Go To" class="icon" />
+  </button>
               </td>
             </tr>
           </tbody>
         </table>
+
+        <!-- Edit Modal -->
+        <div v-if="showEditModal" class="modal">
+          <div class="modal-content">
+            <h3>Edit Link Details</h3>
+            <form @submit.prevent="updateRecord">
+              <label for="refName">Ref Name:</label>
+              <input v-model="editForm.refName" id="refName" placeholder="Enter Ref Name" required />
+
+              <label for="description">Description:</label>
+              <input v-model="editForm.linkDescription" id="description" placeholder="Enter Description" required />
+
+              <label for="owner">Owner:</label>
+              <input v-model="editForm.owner" id="owner" placeholder="Enter Owner" required />
+
+              <label for="url">URL:</label>
+              <input v-model="editForm.url" id="url" placeholder="Enter URL" required />
+
+              <div class="modal-actions">
+                <button type="submit" class="btn save">Update</button>
+                <button type="button" class="btn cancel" @click="closeEditModal">Cancel</button>
+              </div>
+            </form>
+          </div>
+        </div>
+
       </div>
 
-      <!-- Circle Button for Upload -->
-      <button class="upload-circle-btn" @click="openUploadModal">+</button>
+      <div class="add-button" @click="openUploadModal">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+            <path d="M13 11h8v2h-8v8h-2v-8H3v-2h8V3h2v8Z" />
+          </svg>
+        </div>
+     
 
       <!-- Upload Modal -->
       <UploadModalLink
@@ -88,10 +120,18 @@ export default {
     return {
       searchQuery: "",
       showModal: false,
+      showEditModal: false,
       selectedFile: null,
       files: [], // Store files data fetched from the API
       categoryTitle: "",
       categoryDescription: "",
+      editForm: {
+        id: null,
+        refName: "",
+        linkDescription: "",
+        owner: "",
+        url: "",
+      },
     };
   },
   computed: {
@@ -106,77 +146,58 @@ export default {
     },
   },
   methods: {
-    mounted() {
-  const sem = sessionStorage.getItem("link_refName");
-  console.log(sem);
-
-  if (sem) {
-    const parsedSem = JSON.parse(sem);
-    console.log(parsedSem);
-    this.link_refName = parsedSem.title;
-    this.categoryDescription = parsedSem.description;
-
-    const url = `http://localhost:3000/getlinkbyRefname?link_refName=${encodeURIComponent(
-      parsedSem.title
-    )}`;
-
-    console.log("Fetching:", url);
-
-    fetch(url)
-      .then((response) => response.json())
-      .then((data) => {
-        this.files = data.map((file) => ({
-          id: file.link_refName,
-          refName: file.link_refName,
-          linkDescription: file.link_description,
-          linkPosted: file.link_posted,
-          owner: file.owner,
-          url: file.link_url, // Ensure correct mapping
-        }));
-      })
-      .catch((error) => {
-        console.error("Error fetching link details:", error);
-      });
-  }
-},
-
-goToFile(file) {
-  if (!file.url) {
-    alert("No URL provided.");
-    return;
-  }
-
-  const validUrl = /^https?:\/\//i.test(file.url) ? file.url : `http://${file.url}`;
-  window.open(validUrl, "_blank");
-},
-
     openUploadModal() {
-      console.log("Opening upload modal");
       this.showModal = true;
     },
     closeModal() {
-      console.log("Closing modal");
       this.showModal = false;
       this.selectedFile = null;
     },
     addFile(newFile) {
-  this.files.push({
-    id: newFile.refName, // Generate a unique ID based on the Ref Name
-    refName: newFile.refName,
-    linkDescription: newFile.description,
-    linkPosted: newFile.created,
-    owner: newFile.owner,
-    url: newFile.url, // This field holds the URL
-  });
-},
+      this.files.push({
+        id: newFile.refName, // Generate a unique ID based on the Ref Name
+        refName: newFile.refName,
+        linkDescription: newFile.description,
+        linkPosted: newFile.created,
+        owner: newFile.owner,
+        url: newFile.url, // This field holds the URL
+      });
+    },
+    editRecord(file) {
+      this.editForm = { ...file };
+      this.showEditModal = true;
+    },
+    closeEditModal() {
+      this.showEditModal = false;
+      this.editForm = {
+        id: null,
+        refName: "",
+        linkDescription: "",
+        owner: "",
+        url: "",
+      };
+    },
+    updateRecord() {
+      const index = this.files.findIndex((file) => file.id === this.editForm.id);
+      if (index !== -1) {
+        this.files.splice(index, 1, { ...this.editForm });
+      }
+      this.closeEditModal();
+    },
+    deleteRecord(id) {
+      this.files = this.files.filter((file) => file.id !== id);
+    },
+    goToFile(file) {
+      if (!file.url) {
+        alert("No URL provided.");
+        return;
+      }
+
+      const validUrl = /^https?:\/\//i.test(file.url) ? file.url : `http://${file.url}`;
+      window.open(validUrl, "_blank");
+    },
     searchFiles() {
       console.log("Searching for files with query:", this.searchQuery);
-    },
-    setLink_refName(link_refName) {
-      sessionStorage.setItem("link_refName", JSON.stringify(link_refName));
-      console.log(`link_refName set: ${JSON.stringify(link_refName)}`);
-      // Optionally, navigate to the next page
-      this.$router.push("/course-files/SECJ2013-03");
     },
   },
   mounted() {
@@ -286,7 +307,7 @@ goToFile(file) {
 .search-bar button {
   margin-left: 10px;
   padding: 10px;
-  background-color: #0072ec;
+  background-color: #630a0a;
   color: #fff;
   border: none;
   border-radius: 10px;
@@ -331,7 +352,7 @@ goToFile(file) {
 
 .action-btn {
   padding: 5px 10px;
-  background-color: #007bff;
+  background-color: #7A003B;
   color: #fff;
   border: none;
   border-radius: 4px;
@@ -341,25 +362,269 @@ goToFile(file) {
 .action-btn:hover {
   background-color: #0056b3;
 }
-.upload-circle-btn {
+
+add-button {
   position: fixed;
-  bottom: 20px;
-  right: 20px;
-  width: 60px;
-  height: 60px;
+  width: 70px;
+  height: 70px;
+  bottom: 30px;
+  right: 30px;
   border-radius: 50%;
-  background-color: #007bff;
-  color: white;
-  font-size: 24px;
-  border: none;
+  background-color: #d9d9d9;
   display: flex;
   justify-content: center;
   align-items: center;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
   cursor: pointer;
-  box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+}
+.add-button {
+  position: fixed;
+  width: 70px;
+  height: 70px;
+  bottom: 30px;
+  right: 30px;
+  border-radius: 50%;
+  background-color: #d9d9d9;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  cursor: pointer;
 }
 
+.add-button svg {
+  width: 40px;
+  height: 40px;
+  fill: #5c001e;
+}
 .upload-circle-btn:hover {
   background-color: #0056b3;
+}
+
+.modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.modal-content {
+  background: white;
+  border-radius: 16px;
+  padding: 32px;
+  width: 90%;
+  max-width: 500px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+  position: relative;
+  animation: modalSlideIn 0.3s ease-out;
+}
+
+@keyframes modalSlideIn {
+  from {
+    transform: translateY(-20px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.modal-content h3 {
+  margin: 0 0 24px 0;
+  font-size: 24px;
+  color: #2c3e50;
+  font-weight: 600;
+  text-align: left;
+}
+
+/* Form styling */
+.modal-content form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+/* Label styling */
+.modal-content label {
+  font-size: 14px;
+  font-weight: 500;
+  color: #4a5568;
+  margin-bottom: 4px;
+  display: block;
+}
+
+/* Input styling */
+.modal-content input {
+  width: 100%;
+  padding: 12px 16px;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  font-size: 14px;
+  transition: all 0.2s;
+  background: #f8fafc;
+}
+
+.modal-content input:focus {
+  outline: none;
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+  background: white;
+}
+
+/* Button container */
+.modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  margin-top: 24px;
+}
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 30px;
+}
+
+.modal-header h2 {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 500;
+  color: #1a1a1a;
+}
+
+.btn {
+  padding: 10px 20px;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+  border: none;
+}
+
+
+
+.btn.save {
+  background-color: #3b82f6;
+  color: white;
+}
+
+.btn.save:hover {
+  background-color: #2563eb;
+}
+
+.btn.cancel {
+  background-color: #e2e8f0;
+  color: #4a5568;
+}
+
+.btn.cancel:hover {
+  background-color: #cbd5e1;
+}
+
+.close-btn {
+  background: none;
+  border: none;
+  font-size: 18px;
+  cursor: pointer;
+  color: #000;
+  padding: 0;
+}
+
+.form-group {
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+.label {
+  font-size: 14px;
+  color: #1a1a1a;
+  margin-bottom: 8px;
+  display: block;
+  text-align: center;
+}
+
+input {
+  width: 100%;
+  padding: 10px 15px;
+  border: 1px solid #e0e0e0;
+  border-radius: 6px;
+  font-size: 14px;
+  box-sizing: border-box;
+  margin-top: 5px;
+}
+.icon-button {
+  background: none;
+  border: none;
+  padding: 0;
+  margin: 0;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.icon {
+  width: 20px; /* Adjust size as needed */
+  height: 20px; /* Adjust size as needed */
+  transition: opacity 0.2s;
+}
+
+.icon-button:hover .icon {
+  opacity: 0.7; /* Slight fade on hover for better feedback */
+}
+
+input::placeholder {
+  color: #757575;
+}
+
+.modal-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  margin-top: 30px;
+}
+
+.save-btn, 
+.cancel-btn {
+  padding: 8px 25px;
+  border: none;
+  border-radius: 4px;
+  font-size: 14px;
+  cursor: pointer;
+  font-weight: normal;
+}
+
+.save-btn {
+  background-color: rgb(40, 167, 69);
+  color: white;
+}
+
+.cancel-btn {
+  background-color: rgb(220, 53, 69);
+  color: white;
+}
+
+.form-group:last-of-type {
+  margin-bottom: 0;
 }
 </style>
