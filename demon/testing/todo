@@ -19,3 +19,9 @@ Link
 User
 -hardcode admin creds
 
+Category
+-create category should add default perm for academic officer ( cannot be overide),, and everyone ( cannot be deleted)
+
+
+Permission
+-add constarinst,,, if read==0 ,, then set all other to 0 aswell
