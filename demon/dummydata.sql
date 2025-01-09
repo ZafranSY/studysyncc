@@ -1,52 +1,30 @@
--- 1. Insert sessionSemester
-INSERT INTO sessionSemester (semester_id)
-VALUES 
-    ('2024/2025-1'),
-    ('2024/2025-2'),
-    ('2023/2024-1'),
-    ('2023/2024-2'),
-    ('2022/2023-1'),
-    ('2022/2023-2');
+INSERT INTO sessionSemester (semester_id) VALUES ('2024/2025-1'), ('2024/2025-2');
 
--- 2. Insert Categories
-INSERT INTO Categories (category, semester_id)
-VALUES
-    ('PSM 1', '2024/2025-1'),
-    ('Timetable', '2024/2025-2'),
-    ('CourseFiles', '2023/2024-1'),
-    ('Research', '2023/2024-2'),
-    ('Course Coordination', '2024/2025-2'),
-    ('Training', '2022/2023-1'),
-    ('Workshop', '2022/2023-2');
+INSERT INTO Categories (category, semester_id) VALUES 
+('PSM 1', '2024/2025-1'),
+('Course Files', '2024/2025-1'),
+('Training', '2024/2025-1'),
+('Workshop', '2024/2025-1'),
+('PSM 2', '2024/2025-2'),
+('Course Materials', '2024/2025-2'),
+('Seminars', '2024/2025-2'),
+('Internship', '2024/2025-2'),
+('Conferences', '2024/2025-2'),
+('Lectures', '2024/2025-2');
 
--- 3. Insert roles
-INSERT INTO roles (role_name)
-VALUES
-    ('Academic Officer'),
-    ('Pensyarah'),
-    ('Pelajar FSKSM');
+INSERT INTO roles (role_name) VALUES ('Admin'), ('Teacher'), ('Student');
 
--- 4. Insert some example users
-INSERT INTO user (full_name, login_name, email, role_id, session_id)
-VALUES 
-    ('Rizam Ahmad', 'rizam', 'rizam@utm.my', 2, '2024/2025-1'),
-    ('Ali Hassan', 'ali', 'ali@utm.my', 3, '2024/2025-2'),
-    ('Siti Mariam', 'siti', 'siti@utm.my', 1, '2023/2024-1');
+INSERT INTO user (full_name, login_name, email, role_id, session_id) VALUES
+('Alice Johnson', 'alice', 'alice@example.com', 1, '313'),
+('Bob Smith', 'bob', 'bob@example.com', 2, 'qw'),
+('Charlie Brown', 'charlie', 'charlie@example.com', 3, 'wassup');
 
--- 5. Insert gdlinks
-INSERT INTO gdlinks (category, sessem, ref_name, description, owner, link)
-VALUES
-    ('Course Coordination', '2023/2024-2', 'Web Technology course materials', 'WebTech course materials', 'rizam@utm.my', 'https://drive.google.com/drive/folders/???'),
-    ('Research', '2024/2025-1', 'AI Research Papers', 'Research papers on AI', 'rizam@utm.my', 'https://drive.google.com/drive/folders/???'),
-    ('Timetable', '2023/2024-1', 'Semester Timetable', 'Fall 2023 Semester Timetable', 'ali@utm.my', 'https://drive.google.com/drive/folders/???'),
-    ('CourseFiles', '2022/2023-1', 'Database Systems Course Materials', 'Course materials for Database Systems', 'siti@utm.my', 'https://drive.google.com/drive/folders/???'),
-    ('Workshop', '2022/2023-2', 'Workshop on Machine Learning', 'Machine Learning Workshop files', 'rizam@utm.my', 'https://drive.google.com/drive/folders/???');
-
--- 6. Insert linkVisibility
-INSERT INTO linkVisibility (gdlink_id, user_id, role_id)
-VALUES
-    (1, 1, 2),  -- Web Technology course materials visible to Rizam with Pensyarah role
-    (2, 2, 3),  -- AI Research Papers visible to Ali with Pelajar FSKSM role
-    (3, 3, 1),  -- Semester Timetable visible to Siti with Academic Officer role
-    (4, 2, 2),  -- Database Systems Course Materials visible to Ali with Pensyarah role
-    (5, 1, 3);  -- Machine Learning Workshop visible to Rizam with Pelajar FSKSM role
+INSERT INTO gdlinks (category, sessem, ref_name, description, owner, link) VALUES
+('PSM 1', '2024/2025-1', 'Thesis Guidelines', 'Thesis writing instructions', 'alice@example.com', 'http://example.com/thesis'),
+('Course Files', '2024/2025-1', 'Lecture Notes', 'All lecture notes', 'bob@example.com', 'http://example.com/notes'),
+('Training', '2024/2025-1', 'Cybersecurity Training', 'Basic cybersecurity training', 'charlie@example.com', 'http://example.com/cybersecurity'),
+('Workshop', '2024/2025-1', 'AI Workshop', 'Introduction to AI workshop', 'alice@example.com', 'http://example.com/aiworkshop'),
+('PSM 2', '2024/2025-2', 'Final Reports', 'Examples of final reports', 'bob@example.com', 'http://example.com/reports'),
+('Course Materials', '2024/2025-2', 'Assignment Templates', 'Templates for assignments', 'charlie@example.com', 'http://example.com/templates'),
+('Internship', '2024/2025-2', 'Internship Reports', 'Previous internship reports', 'bob@example.com', 'http://example.com/internship'),
+('Lectures', '2024/2025-2', 'Recorded Lectures', 'Video lectures', 'alice@example.com', 'http://example.com/videos');

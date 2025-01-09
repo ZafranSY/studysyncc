@@ -6,7 +6,7 @@ CREATE TABLE Categories(
     category VARCHAR(100),
     semester_id VARCHAR(11) not null,
     PRIMARY KEY (category, semester_id),
-    FOREIGN KEY (semester_id) REFERENCES sessionSemester(semester_id) ON UPDATE CASCADE ON DELETE RESTRICT
+    FOREIGN KEY (semester_id) REFERENCES sessionSemester(semester_id) ON UPDATE CASCADE ON DELETE CASCADE
 );
 
 CREATE TABLE roles (
@@ -36,17 +36,43 @@ create table gdlinks (
     owner varchar(255) not null, 
     link varchar(255), 
     primary key(gdlink_id),
-    FOREIGN KEY (sessem) REFERENCES sessionSemester(semester_id) ON UPDATE CASCADE ON DELETE RESTRICT,
-    FOREIGN KEY (category) REFERENCES Categories(category) ON UPDATE CASCADE ON DELETE RESTRICT,
+    FOREIGN KEY (sessem) REFERENCES sessionSemester(semester_id) ON UPDATE CASCADE ON DELETE CASCADE,
+    FOREIGN KEY (category) REFERENCES Categories(category) ON UPDATE CASCADE ON DELETE CASCADE,
     FOREIGN KEY (owner) REFERENCES user(email)
 );
 
-CREATE TABLE linkVisibility (
-    link_visibility_id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
-    gdlink_id INT NOT NULL,
-    user_id INT,
-    role_id INT,
-    FOREIGN KEY (gdlink_id) REFERENCES gdlinks(gdlink_id),
-    FOREIGN KEY (user_id) REFERENCES user(user_id),
-    FOREIGN KEY (role_id) REFERENCES roles(role_id)
+CREATE TABLE categoryPermission (
+    category_perm_id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    category VARCHAR(100) NOT NULL,
+    semester_id VARCHAR(11) NOT NULL,
+    user_email VARCHAR(255),
+    role_name VARCHAR(255),
+    can_read BOOLEAN DEFAULT FALSE,
+    can_update BOOLEAN DEFAULT FALSE,
+    can_delete BOOLEAN DEFAULT FALSE,
+    can_create BOOLEAN DEFAULT FALSE,
+    FOREIGN KEY (user_email) REFERENCES user(email),
+    FOREIGN KEY (role_name) REFERENCES roles(role_name),
+    FOREIGN KEY (semester_id) REFERENCES sessionSemester(semester_id) ON UPDATE CASCADE ON DELETE CASCADE,
+    FOREIGN KEY (category) REFERENCES Categories(category) ON UPDATE CASCADE ON DELETE CASCADE,
+    CHECK (user_email IS NULL OR role_name IS NULL)
+);
+
+
+CREATE TABLE linkPermission (
+    link_perm_id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    category VARCHAR(100) NOT NULL,
+    semester_id VARCHAR(11) NOT NULL,
+    gdlink_id int NOT NULL,
+    user_email VARCHAR(255),
+    role_name VARCHAR(255),
+    can_read BOOLEAN DEFAULT FALSE,
+    can_update BOOLEAN DEFAULT FALSE,
+    can_delete BOOLEAN DEFAULT FALSE,
+    FOREIGN KEY (user_email) REFERENCES user(email),
+    FOREIGN KEY (role_name) REFERENCES roles(role_name),
+    FOREIGN KEY (semester_id) REFERENCES sessionSemester(semester_id) ON UPDATE CASCADE ON DELETE CASCADE,
+    FOREIGN KEY (category) REFERENCES Categories(category) ON UPDATE CASCADE ON DELETE CASCADE,
+    FOREIGN KEY (gdlink_id) REFERENCES gdlinks(gdlink_id) ON UPDATE CASCADE ON DELETE CASCADE,
+    CHECK (user_email IS NULL OR role_name IS NULL)
 );

@@ -33,18 +33,34 @@ async function runTest(METHOD,link,payload) {
 //  type =>
 //       Semester
 //       Category
-// 
+//       CategoryPermission
+//                      All
+//                      Read
+//                      Delete
+//                      Create
+//                      Update
+//
+//
 
 //  PARAM       (if crud = /get)
 //      PARAMTYPE
 //      PARAMVALUE
 //  IF MULTIPLE RIP IDK 
 
+// eslint-disable-next-line no-unused-vars
+const b=
+{
+    "session_id": "313",
+    "new_semester_id": "2099/2012-3",
+    "semester_id": "2099/3212-2",
+    "category_name": "PSM 414",
+    "new_category_name": "KUCING"
+}
 
 const host='http://localhost:80'
-let METHOD='GET'
+let METHOD='POST'
 const crud='/get'
-const type='Category'
+const type='CategoryPermissionView'
 
 
 // ONLY for GET method, can leave this alone if POST
@@ -54,7 +70,7 @@ const PARAMVALUE='=2099/3212-2'
 const payload = {
     session_id: '313',
     new_semester_id: '2099/2012-3',
-    semester_id: '2099/3212-2',
+    semester_id: '2022/2023-2',
     category_name: 'PSM 414',
     new_category_name: 'KUCING',
 };
@@ -136,3 +152,48 @@ else
 //       session_id : ??     ======= get from localStorage
 //       semester_id : ??    ======= get from localStorage
 //       category_name : ??
+
+
+// ===================================================
+// ===================================================
+//              CATEGORY PERMISSION
+// ===================================================
+// ===================================================
+
+// http://localhost/getCategoryPermissionAll
+// request body =>
+//       session_id : ??     ======= get from localStorage
+//       semester_id : ??    ======= get from localStorage 
+
+// http://localhost/getCategoryPermissionCreate
+// request body =>
+//       session_id : ??     ======= get from localStorage
+//       semester_id : ??    ======= get from localStorage 
+
+// http://localhost/getCategoryPermissionUpdate
+// request body =>
+//       session_id : ??     ======= get from localStorage
+//       semester_id : ??    ======= get from localStorage 
+
+// http://localhost/getCategoryPermissionRead
+// request body =>
+//       session_id : ??     ======= get from localStorage
+//       semester_id : ??    ======= get from localStorage 
+
+// http://localhost/getCategoryPermissionDelete
+// request body =>
+//       session_id : ??     ======= get from localStorage
+//       semester_id : ??    ======= get from localStorage 
+
+
+// http://localhost/createCategoryPermission
+// request body =>
+//       session_id : ??     ======= get from localStorage
+//       semester_id : ??    ======= get from localStorage
+//       category : ??
+//       can_create : ??
+//       can_read : ??
+//       can_update : ??
+//       can_delete : ??
+//       role_name  : ??
+//       user_email : ??

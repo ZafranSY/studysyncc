@@ -44,4 +44,32 @@ sub check_session_role {
     return { message => 'Authentication successful' };
 }
 
+sub getRoleName{
+    my ($dbh, $session_id) = @_;
+    my $sth = $dbh->prepare('SELECT * FROM user WHERE session_id=?')
+        or do return { error => 'Failed to prepare statement: ' . $dbh->errstr };
+    $sth->execute($session_id)
+        or do return { error => 'Execution failed: ' . $dbh->errstr };
+    $role_id=$sth->fetchrow_hashref->{role_id};
+    my $sth = $dbh->prepare('SELECT role_name FROM roles WHERE role_id=?')
+        or do return { error => 'Failed to prepare statement: ' . $dbh->errstr };
+    $sth->execute($role_id)
+        or do return { error => 'Execution failed: ' . $dbh->errstr };
+    
+    $role_name=$sth->fetchrow_hashref->{role_name};    
+    $logger->info("Checking session role for session_id: $session_id, role_name: $role_name");
+    return $role_name;
+}
+
+sub getEmail{
+    my ($dbh, $session_id) = @_;
+    my $sth = $dbh->prepare('SELECT * FROM user WHERE session_id=?')
+        or do return { error => 'Failed to prepare statement: ' . $dbh->errstr };
+    $sth->execute($session_id)
+        or do return { error => 'Execution failed: ' . $dbh->errstr };
+    $email=$sth->fetchrow_hashref->{email};
+    
+    return $email;
+}
+
 1;

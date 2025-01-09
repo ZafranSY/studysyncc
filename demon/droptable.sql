@@ -1,4 +1,5 @@
-DROP TABLE IF EXISTS linkVisibility;
+DROP TABLE IF EXISTS linkPermission;
+DROP TABLE IF EXISTS categoryPermission;
 DROP TABLE IF EXISTS gdlinks;
 DROP TABLE IF EXISTS user;
 DROP TABLE IF EXISTS roles;
