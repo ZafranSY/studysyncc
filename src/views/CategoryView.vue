@@ -13,18 +13,26 @@
 
       <!-- Filter Section -->
       <div class="filter-section">
-        <!-- Search Box -->
-        <input
-          type="text"
-          v-model="searchQuery"
-          placeholder="Search..."
-          class="filter-input"
-        />
+        <div class="search-bar">
+          <!-- Icon -->
+          <span class="search-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M11 2a9 9 0 1 0 6.28 15.28l4.41 4.42 1.41-1.41-4.41-4.42A9 9 0 0 0 11 2zm0 16a7 7 0 1 1 7-7 7 7 0 0 1-7 7z" />
+            </svg>
+          </span>
+          <!-- Search Input -->
+          <input
+            type="text"
+            v-model="searchQuery"
+            placeholder="Search..."
+            class="filter-input"
+          />
+        </div>
       </div>
 
       <!-- Semester Cards -->
       <div class="card-grid">
-        <SemesterCard
+        <CategoryCard
           v-for="semester in filteredSemesters"
           :key="semester.id"
           :title="semester.title"
@@ -34,21 +42,38 @@
           @click="setCategory(semester)"
         />
       </div>
+
+      <!-- Plus Button -->
+      <div class="add-button" @click="openCategoryModal">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+          <path d="M13 11h8v2h-8v8h-2v-8H3v-2h8V3h2v8Z" />
+        </svg>
+      </div>
+
+      <!-- Upload Category Modal -->
+      <UploadModalCategory
+        v-if="showCategoryModal"
+        :show="showCategoryModal"
+        @close="closeCategoryModal"
+        @save="addCategory"
+      />
     </div>
   </div>
 </template>
 
 <script>
 import NavbarView from "@/components/NavBar.vue";
-import SemesterCard from "@/components/SemesterCard.vue";
+import UploadModalCategory from "@/components/UploadModalCategory.vue"; // Import category modal
+import CategoryCard from "@/components/CategoryCard.vue";
 
 export default {
-  components: { NavbarView, SemesterCard },
+  components: { NavbarView, CategoryCard, UploadModalCategory },
   data() {
     return {
       selectedFilter: "All",
       searchQuery: "",
-      semesters: [], // Initialize semesters as an empty array
+      semesters: [],
+      showCategoryModal: false, // Control visibility of category modal
     };
   },
   computed: {
@@ -81,12 +106,11 @@ export default {
     fetch(url)
       .then((response) => response.json())
       .then((data) => {
-        // Map fetched categories to the semester structure
         this.semesters = data.map((category, index) => ({
           id: index + 1,
           title: category,
-          subtitle: ` ${category}`, // Adjust as needed
-          bgColor: this.getRandomColor(), // Assign a random color
+          subtitle: ` ${category}`,
+          bgColor: this.getRandomColor(),
         }));
       })
       .catch((error) => {
@@ -95,7 +119,6 @@ export default {
   },
   methods: {
     getRandomColor() {
-      // Generate a random color
       const letters = "0123456789ABCDEF";
       let color = "#";
       for (let i = 0; i < 6; i++) {
@@ -106,12 +129,24 @@ export default {
     setCategory(category) {
       sessionStorage.setItem("category", JSON.stringify(category));
       const formattedTitle = category.title.replace(/\s+/g, "-");
-
-      // Log to verify the value
       console.log(`Category set: ${JSON.stringify(category)}`);
-
-      // Navigate to the desired route
       this.$router.push(`/homeview/category/${formattedTitle}`);
+    },
+    openCategoryModal() {
+      this.showCategoryModal = true;
+    },
+    closeCategoryModal() {
+      this.showCategoryModal = false;
+    },
+    addCategory(newCategory) {
+      const newCategoryEntry = {
+        id: this.semesters.length + 1,
+        title: newCategory.categoryName,
+        subtitle: ` ${newCategory.categoryName}`,
+        bgColor: this.getRandomColor(),
+      };
+      this.semesters.push(newCategoryEntry);
+      this.showCategoryModal = false;
     },
   },
 };
@@ -138,7 +173,6 @@ export default {
   flex-direction: column;
   align-items: flex-start;
   border-bottom: 2px solid #ddd;
-  /* Subtle underline */
   padding-bottom: 10px;
   margin-bottom: 20px;
 }
@@ -153,7 +187,6 @@ export default {
 .section-title {
   font-size: 18px;
   font-weight: bold;
-  /* Bold "Course Coordination" */
   margin: 0;
   color: #333;
 }
@@ -165,21 +198,28 @@ export default {
   margin-bottom: 20px;
 }
 
-.filter-dropdown {
-  padding: 6px 12px;
-  border: 1px solid #ccc;
-  border-radius: 6px;
-  font-size: 14px;
-  background-color: #fff;
-  width: 100px;
-  height: 39px;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+.search-bar {
+  display: flex;
+  align-items: center;
+  position: relative;
+  width: 254px;
+}
+
+.search-icon {
+  position: absolute;
+  left: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  color: #666;
 }
 
 .filter-input {
-  width: 254px;
+  width: 100%;
   height: 39px;
-  padding: 6px 12px;
+  padding: 6px 12px 6px 40px; /* Adding space for the icon */
   border: 1px solid #ccc;
   border-radius: 6px;
   font-size: 14px;
@@ -193,5 +233,27 @@ export default {
   justify-content: center;
   max-width: 1200px;
   margin: 0 auto;
+}
+
+.add-button {
+  position: fixed;
+  width: 70px;
+  height: 70px;
+  bottom: 30px;
+  right: 30px;
+  border-radius: 50%;
+  background-color: #007bff;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  cursor: pointer;
+  color: white;
+}
+
+.add-button svg {
+  width: 40px;
+  height: 40px;
+  fill: white;
 }
 </style>

@@ -13,21 +13,21 @@
 
       <!-- Filter Section -->
       <div class="filter-section">
-        <!-- Dropdown -->
-        <select v-model="selectedFilter" class="filter-dropdown">
-          <option value="All">All</option>
-          <option value="20/21">20/21</option>
-          <option value="21/22">21/22</option>
-          <option value="22/23">22/23</option>
-        </select>
-
-        <!-- Search Box -->
-        <input
-          type="text"
-          v-model="searchQuery"
-          placeholder="Search..."
-          class="filter-input"
-        />
+        <!-- Search Box with Icon -->
+        <div class="search-wrapper">
+          <span class="search-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="11" cy="11" r="8"></circle>
+              <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+            </svg>
+          </span>
+          <input
+            type="text"
+            v-model="searchQuery"
+            placeholder="Search..."
+            class="filter-input"
+          />
+        </div>
       </div>
 
       <!-- Semester Cards -->
@@ -43,6 +43,19 @@
           img="https://elearning-archive.utm.my/21223/pluginfile.php/1/theme_moove/sliderimage1/1663554195/2021202203.jpg"
         />
       </div>
+
+      <!-- Floating Action Button -->
+      <button class="fab-btn" @click="openSemesterModal">
+        <span>+</span>
+      </button>
+
+      <!-- Modal for Adding a New Semester -->
+      <UploadModalSemester
+        v-if="showModal"
+        :show="showModal"
+        @close="closeSemesterModal"
+        @save="saveSemester"
+      />
     </div>
   </div>
 </template>
@@ -50,21 +63,16 @@
 <script>
 import NavbarView from "@/components/NavBar.vue";
 import SemesterCard from "@/components/SemesterCard.vue";
+import UploadModalSemester from "@/components/UploadModalSemester.vue";
 
 export default {
-  components: { NavbarView, SemesterCard },
+  components: { NavbarView, SemesterCard, UploadModalSemester },
   data() {
     return {
       selectedFilter: "All",
       searchQuery: "",
-      semesters: [
-        // { id: 1, title: "20/21 1", subtitle: "Sem 20211", bgColor: "#4CB5F5" },
-        // { id: 2, title: "20/21 2", subtitle: "Sem 20212", bgColor: "#D3D3D3" },
-        // { id: 3, title: "21/22 1", subtitle: "Sem 21221", bgColor: "#CC6666" },
-        // { id: 4, title: "21/22 2", subtitle: "Sem 21222", bgColor: "#6A5ACD" },
-        // { id: 5, title: "22/23 1", subtitle: "Sem 22231", bgColor: "#DDA0DD" },
-        // { id: 6, title: "22/23 2", subtitle: "Sem 22232", bgColor: "#8FBC8F" },
-      ],
+      semesters: [],
+      showModal: false,
     };
   },
   computed: {
@@ -85,29 +93,47 @@ export default {
     },
   },
   mounted() {
-    // Fetch categories from the API when the component is created
-
     fetch("http://localhost/getSemester")
       .then((response) => response.json())
       .then((data) => {
-        // Map fetched categories to the semester structure
         this.semesters = data.map((semester, index) => ({
           id: index + 1,
           title: semester,
-          subtitle: ` ${semester}`, // Adjust as needed
-          // Assign a random color
+          subtitle: `${semester} `,
+          bgColor: this.getRandomColor(),
         }));
       })
       .catch((error) => {
-        console.error("Error fetching categories:", error);
+        console.error("Error fetching semesters:", error);
       });
   },
   methods: {
+    getRandomColor() {
+      const letters = "0123456789ABCDEF";
+      let color = "#";
+      for (let i = 0; i < 6; i++) {
+        color += letters[Math.floor(Math.random() * 16)];
+      }
+      return color;
+    },
     setSemester(semester) {
       sessionStorage.setItem("semester", JSON.stringify(semester));
-      console.log(`Semester set: ${JSON.stringify(semester)}`);
-      // Optionally, navigate to the next page
       this.$router.push("/homeview/category");
+    },
+    openSemesterModal() {
+      this.showModal = true;
+    },
+    closeSemesterModal() {
+      this.showModal = false;
+    },
+    saveSemester(data) {
+      this.semesters.push({
+        id: this.semesters.length + 1,
+        title: data.semesterName,
+        subtitle: `${data.semesterName} `,
+        bgColor: this.getRandomColor(),
+      });
+      this.showModal = false;
     },
   },
 };
@@ -127,13 +153,14 @@ export default {
   overflow-y: auto;
   display: flex;
   flex-direction: column;
+  position: relative;
 }
 
 .header {
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-  border-bottom: 2px solid #ddd; /* Subtle underline */
+  border-bottom: 2px solid #ddd;
   padding-bottom: 10px;
   margin-bottom: 20px;
 }
@@ -141,14 +168,12 @@ export default {
 .page-title {
   font-size: 28px;
   font-weight: 500;
-  margin: 0 0 4px 0;
   color: #000;
 }
 
 .section-title {
   font-size: 18px;
-  font-weight: bold; /* Bold "Course Coordination" */
-  margin: 0;
+  font-weight: bold;
   color: #333;
 }
 
@@ -159,21 +184,23 @@ export default {
   margin-bottom: 20px;
 }
 
-.filter-dropdown {
-  padding: 6px 12px;
-  border: 1px solid #ccc;
-  border-radius: 6px;
-  font-size: 14px;
-  background-color: #fff;
-  width: 100px;
-  height: 39px;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+.search-wrapper {
+  position: relative;
+  width: 254px;
+}
+
+.search-icon {
+  position: absolute;
+  top: 50%;
+  left: 10px;
+  transform: translateY(-50%);
+  color: #999;
 }
 
 .filter-input {
-  width: 254px;
+  width: 100%;
   height: 39px;
-  padding: 6px 12px;
+  padding: 6px 12px 6px 38px; /* Add padding-left to make space for the icon */
   border: 1px solid #ccc;
   border-radius: 6px;
   font-size: 14px;
@@ -187,5 +214,44 @@ export default {
   justify-content: center;
   max-width: 1200px;
   margin: 0 auto;
+}
+
+.fab-btn {
+  position: fixed;
+  right: 30px;
+  bottom: 30px;
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  background-color: #007bff;
+  color: white;
+  font-size: 32px;
+  border: none;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.fab-btn:hover {
+  background-color: #0056b3;
+}
+
+.fab-btn span {
+  display: inline-block;
+  font-size: 32px;
+  line-height: 1;
+}
+
+@media (max-width: 768px) {
+  .main-content {
+    margin-left: 0;
+  }
+
+  .filter-section {
+    flex-direction: column;
+  }
 }
 </style>

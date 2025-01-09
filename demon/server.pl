@@ -170,4 +170,11 @@ post '/create' => sub ($c) {
     $c->render(json => { id => $id, %$json });
 };
 
+# Route to get all records from gdlinks
+get '/getAllLinks' => sub ($c) {
+    my $results = CRUD::getAllFiles($dbh);  # Calls the function from CRUD.pl
+    $c->render(json => $results);  # Render results as JSON
+};
+
+
 app->start;

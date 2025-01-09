@@ -41,6 +41,11 @@ const routes = [
       this.$router.push(`/course-files/${id}`);
     },
   },
+  {
+    path: "/allfile",
+    name: "AllFile",
+    component: () => import("@/views/AllFile.vue"),
+  },
 ];
 
 const router = createRouter({
