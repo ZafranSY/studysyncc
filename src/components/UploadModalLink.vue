@@ -158,12 +158,12 @@
   }
   
   .cancel-btn {
-    background-color: #f0f0f0;
+    background-color: #f90303;
     margin-right: 10px;
   }
   
   .save-btn {
-    background-color: #007bff;
+    background-color: #08c832;
     color: white;
   }
   
