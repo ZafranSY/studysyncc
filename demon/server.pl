@@ -1,8 +1,8 @@
+
 use Mojolicious::Lite -signatures;
 use DBI;
 use JSON::XS;
 use Data::Dumper;
-print Dumper($json);
 
 require("./CRUD.pl");
 
@@ -50,7 +50,9 @@ post '/save_coursefile' => sub ($c) {
 # Other routes
 get '/create' => sub ($c) {
     my $jsonStr = $c->param('jsonStr');
-    my $json    = decode_json($jsonStr);
+    my $json    = decode_json($jsonStr);  # Decode JSON string
+    print Dumper($json);  # Debug: print the decoded JSON object
+
     my $result  = CRUD::createJSON($dbh, $json);
     $c->render(json => $result);
 };
@@ -148,7 +150,6 @@ post '/create' => sub ($c) {
     my $json = $c->req->json;  # Get the JSON payload
 
     # Debugging: Print the received JSON payload to the terminal
-    use Data::Dumper;
     print Dumper($json);
 
     # SQL query to insert data into the database
