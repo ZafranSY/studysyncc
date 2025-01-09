@@ -87,8 +87,12 @@
 
       </div>
 
-      <!-- Circle Button for Upload -->
-      <button class="upload-circle-btn" @click="openUploadModal">+</button>
+      <div class="add-button" @click="openUploadModal">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+            <path d="M13 11h8v2h-8v8h-2v-8H3v-2h8V3h2v8Z" />
+          </svg>
+        </div>
+     
 
       <!-- Upload Modal -->
       <UploadModalLink
@@ -303,7 +307,7 @@ export default {
 .search-bar button {
   margin-left: 10px;
   padding: 10px;
-  background-color: #0072ec;
+  background-color: #630a0a;
   color: #fff;
   border: none;
   border-radius: 10px;
@@ -348,7 +352,7 @@ export default {
 
 .action-btn {
   padding: 5px 10px;
-  background-color: #007bff;
+  background-color: #7A003B;
   color: #fff;
   border: none;
   border-radius: 4px;
@@ -358,24 +362,41 @@ export default {
 .action-btn:hover {
   background-color: #0056b3;
 }
-.upload-circle-btn {
+
+add-button {
   position: fixed;
-  bottom: 20px;
-  right: 20px;
-  width: 60px;
-  height: 60px;
+  width: 70px;
+  height: 70px;
+  bottom: 30px;
+  right: 30px;
   border-radius: 50%;
-  background-color: #007bff;
-  color: white;
-  font-size: 24px;
-  border: none;
+  background-color: #d9d9d9;
   display: flex;
   justify-content: center;
   align-items: center;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
   cursor: pointer;
-  box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+}
+.add-button {
+  position: fixed;
+  width: 70px;
+  height: 70px;
+  bottom: 30px;
+  right: 30px;
+  border-radius: 50%;
+  background-color: #d9d9d9;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  cursor: pointer;
 }
 
+.add-button svg {
+  width: 40px;
+  height: 40px;
+  fill: #5c001e;
+}
 .upload-circle-btn:hover {
   background-color: #0056b3;
 }
