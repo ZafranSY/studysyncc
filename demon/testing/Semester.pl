@@ -17,8 +17,10 @@ sub CreateSemester {
     if (!$semester_id || length($semester_id) != 11) {
         return { error => 'Invalid semester_id. It must be 11 characters.' };
     }
-    my $sth_check = $dbh->prepare('SELECT 1 FROM sessionSemester WHERE semester_id = ?');
-    $sth_check->execute($semester_id);
+    my $sth_check = $dbh->prepare('SELECT 1 FROM sessionSemester WHERE semester_id = ?')
+                or die 'prepare statement failed: ' . $dbh->errstr();
+    $sth_check->execute($semester_id) 
+                or die 'prepare statement failed: ' . $dbh->errstr();
     my $exists = $sth_check->fetchrow_array;
     if ($exists) {
         return { error => "Semester ID $semester_id already exists" };
@@ -35,14 +37,16 @@ sub CreateSemester {
 sub CreateSemester {
     my ($dbh, $semester_id) = @_;
     
-    my $sth_check = $dbh->prepare('SELECT 1 FROM sessionSemester WHERE semester_id = ?');
-    $sth_check->execute($semester_id);
+    my $sth_check = $dbh->prepare('SELECT 1 FROM sessionSemester WHERE semester_id = ?') or die 'prepare statement failed: ' . $dbh->errstr();
+    $sth_check->execute($semester_id) 
+                or die 'prepare statement failed: ' . $dbh->errstr();
     my $exists = $sth_check->fetchrow_array;
     if (!$exists) {
         return { error => "Semester ID $semester_id doesnt exists, Cannot delete" };
     }
-    my $sth_insert = $dbh->prepare('DELETE FROM sessionSemester where semester_id = ? ');
-    $result=$sth_insert->execute($semester_id);
+    my $sth_insert = $dbh->prepare('DELETE FROM sessionSemester where semester_id = ? ') or die 'prepare statement failed: ' . $dbh->errstr();
+    $result=$sth_insert->execute($semester_id) 
+                or die 'prepare statement failed: ' . $dbh->errstr();
     if ($result) {
         return { message => 'Semester deleted successfully' };
     } else {
