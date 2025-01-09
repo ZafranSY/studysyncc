@@ -7,10 +7,7 @@
           <h1>Course File</h1>
           <h2>{{ categoryTitle }}: {{ categoryDescription }}</h2>
         </div>
-        <div class="header-right">
-          <router-link to="/">Home</router-link> |
-          <router-link to="/login">Login</router-link>
-        </div>
+        
       </div>
 
       <div class="details-container">
@@ -49,11 +46,15 @@
               <td>{{ file.linkPosted }}</td>
               <td>{{ file.owner }}</td>
               <td>
-                <button @click="editRecord(file)">Edit</button>
-                <button @click="deleteRecord(file.id)">Delete</button>
-                <button class="action-btn" @click="goToFile(file)">
-                  Go To
-                </button>
+                <button @click="editRecord(file)" class="icon-button">
+    <img :src="require('@/assets/edit.png')" alt="Edit" class="icon" />
+  </button>
+  <button @click="deleteRecord(file.id)" class="icon-button">
+    <img :src="require('@/assets/delete.png')" alt="Delete" class="icon" />
+  </button>
+  <button @click="goToFile(file)" class="icon-button">
+    <img :src="require('@/assets/goto.png')" alt="Go To" class="icon" />
+  </button>
               </td>
             </tr>
           </tbody>
@@ -383,37 +384,14 @@ export default {
   position: fixed;
   top: 0;
   left: 0;
-  width: 100%;
-  height: 100%;
+  right: 0;
+  bottom: 0;
   background-color: rgba(0, 0, 0, 0.5);
   display: flex;
-  justify-content: center;
   align-items: center;
+  justify-content: center;
+  z-index: 1000;
 }
-
-.modal-content {
-  background: white;
-  padding: 20px;
-  border-radius: 8px;
-  width: 400px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-}
-
-.modal-actions {
-  display: flex;
-  justify-content: space-between;
-}
-
-.btn.save {
-  background-color: #3904e7;
-  color: white;
-}
-
-.btn.cancel {
-  background-color: #6c757d;
-  color: white;
-}
-
 .modal-overlay {
   position: fixed;
   top: 0;
@@ -428,68 +406,186 @@ export default {
 }
 
 .modal-content {
-  background: #fff;
-  padding: 20px;
-  border-radius: 8px;
-  width: 450px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  background: white;
+  border-radius: 16px;
+  padding: 32px;
+  width: 90%;
+  max-width: 500px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+  position: relative;
+  animation: modalSlideIn 0.3s ease-out;
 }
 
+@keyframes modalSlideIn {
+  from {
+    transform: translateY(-20px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.modal-content h3 {
+  margin: 0 0 24px 0;
+  font-size: 24px;
+  color: #2c3e50;
+  font-weight: 600;
+  text-align: left;
+}
+
+/* Form styling */
+.modal-content form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+/* Label styling */
+.modal-content label {
+  font-size: 14px;
+  font-weight: 500;
+  color: #4a5568;
+  margin-bottom: 4px;
+  display: block;
+}
+
+/* Input styling */
+.modal-content input {
+  width: 100%;
+  padding: 12px 16px;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  font-size: 14px;
+  transition: all 0.2s;
+  background: #f8fafc;
+}
+
+.modal-content input:focus {
+  outline: none;
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+  background: white;
+}
+
+/* Button container */
+.modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  margin-top: 24px;
+}
 .modal-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 25px;
+  margin-bottom: 30px;
 }
 
 .modal-header h2 {
   margin: 0;
-  font-size: 16px;
-  font-weight: bold;
-  color: #333;
+  font-size: 18px;
+  font-weight: 500;
+  color: #1a1a1a;
+}
+
+.btn {
+  padding: 10px 20px;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+  border: none;
+}
+
+
+
+.btn.save {
+  background-color: #3b82f6;
+  color: white;
+}
+
+.btn.save:hover {
+  background-color: #2563eb;
+}
+
+.btn.cancel {
+  background-color: #e2e8f0;
+  color: #4a5568;
+}
+
+.btn.cancel:hover {
+  background-color: #cbd5e1;
 }
 
 .close-btn {
   background: none;
   border: none;
-  font-size: 16px;
+  font-size: 18px;
   cursor: pointer;
-  color: #333;
+  color: #000;
+  padding: 0;
 }
 
 .form-group {
-  margin-bottom: 15px;
+  margin-bottom: 20px;
+  text-align: center;
 }
 
 .label {
   font-size: 14px;
-  color: #333;
-  margin-bottom: 5px;
+  color: #1a1a1a;
+  margin-bottom: 8px;
+  display: block;
+  text-align: center;
 }
 
 input {
   width: 100%;
-  padding: 8px 12px;
-  border: 1px solid #ddd;
-  border-radius: 4px;
+  padding: 10px 15px;
+  border: 1px solid #e0e0e0;
+  border-radius: 6px;
   font-size: 14px;
   box-sizing: border-box;
+  margin-top: 5px;
+}
+.icon-button {
+  background: none;
+  border: none;
+  padding: 0;
+  margin: 0;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.icon {
+  width: 20px; /* Adjust size as needed */
+  height: 20px; /* Adjust size as needed */
+  transition: opacity 0.2s;
+}
+
+.icon-button:hover .icon {
+  opacity: 0.7; /* Slight fade on hover for better feedback */
 }
 
 input::placeholder {
-  color: #999;
+  color: #757575;
 }
 
 .modal-footer {
   display: flex;
   justify-content: flex-end;
-  gap: 10px;
-  margin-top: 20px;
+  gap: 12px;
+  margin-top: 30px;
 }
 
 .save-btn, 
 .cancel-btn {
-  padding: 8px 20px;
+  padding: 8px 25px;
   border: none;
   border-radius: 4px;
   font-size: 14px;
@@ -498,13 +594,16 @@ input::placeholder {
 }
 
 .save-btn {
-  background-color: #000100;
+  background-color: rgb(40, 167, 69);
   color: white;
 }
 
 .cancel-btn {
-  background-color: #dc3545;
+  background-color: rgb(220, 53, 69);
   color: white;
 }
+
+.form-group:last-of-type {
+  margin-bottom: 0;
+}
 </style>
-  
