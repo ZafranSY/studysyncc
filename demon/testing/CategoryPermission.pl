@@ -130,6 +130,7 @@ sub CreateCategoryPermission {
     } else {
         return { error => "Failed to add Category $category on $semester_id" };
     }
+    return $result;
 }
 
 sub DeleteCategoryPermission {

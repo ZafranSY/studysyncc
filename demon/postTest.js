@@ -54,13 +54,17 @@ const b=
     "new_semester_id": "2099/2012-3",
     "semester_id": "2099/3212-2",
     "category_name": "PSM 414",
-    "new_category_name": "KUCING"
+    "new_category_name": "KUCING",
+    "username" : "12085",
+    "password" : "S808323",
+    "username1" : "A16CS4016",
+    "password1" : "201608M10112",
 }
 
 const host='http://localhost:80'
 let METHOD='POST'
 const crud='/get'
-const type='CategoryPermissionView'
+const type='UserLogin'
 
 
 // ONLY for GET method, can leave this alone if POST
@@ -73,6 +77,8 @@ const payload = {
     semester_id: '2022/2023-2',
     category_name: 'PSM 414',
     new_category_name: 'KUCING',
+    username : "12085",
+    password : "S808323",
 };
 
 const endpoint=crud+type
@@ -85,6 +91,20 @@ if(METHOD=='GET'){
 
 else
     runTest(METHOD,link,payload);
+
+
+// ===================================================
+// ===================================================
+//                  SEMESTER
+// ===================================================
+// ===================================================
+
+// http://localhost/getUserLogin
+// request body =>
+//       username : ??  
+//       password : ?? 
+
+
 
 
 // ===================================================

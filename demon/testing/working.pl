@@ -1,6 +1,9 @@
 use Mojolicious::Lite -signatures;
 use DBI;
+use LWP::UserAgent;
+use URI::Escape;
 
+require("./User.pl");
 require("./Semester.pl");
 require("./Categories.pl");
 require("./Authorization.pl");
@@ -34,6 +37,24 @@ my $dbh      = DBI->connect(
                 );
 
 get '/' => { text => 'GD Links AJAX/JSON Service' };
+
+# http://localhost/getUserLogin
+# request body =>
+#       username : ??  
+#       password : ?? 
+post '/getUserLogin' => sub ($c) {
+    my $payload = $c->req->json;
+    my $username = $payload->{username};
+    my $password = $payload->{password};
+    my $result = User::callAuthAPI($username, $password);
+
+    if ($result->{success} == 1) {
+        my $result = User::userToDB($dbh,$result);
+    } else {
+    }
+    $c->render(json => $result);
+};
+
 
 # http://localhost/getSemester
 get '/getSemester' => sub ($c) {
@@ -263,7 +284,7 @@ post '/createCategoryPermission' => sub ($c) {
     my $can_delete = $payload->{can_delete};
     my $user_email = $payload->{user_email};
     my $role_name = $payload->{role_name};
-    my $result = CategoryPermission::CreateCategoryPermission($dbh, $semester_id,$categoryPermission);
+    my $result = CategoryPermission::CreateCategoryPermission($dbh, $semester_id,$role_name);
     $c->render(json => $result);
 };
 

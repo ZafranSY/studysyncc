@@ -1,0 +1,21 @@
+CategoryPermission
+-Create
+-Delete
+-Update
+-FIX get,, it should return name/role and CategoryPermission
+
+LinkPermission
+-Create
+-Delete
+-Update
+-Get
+
+Link
+-Create
+-Delete
+-Update
+-Get
+
+User
+-hardcode admin creds
+

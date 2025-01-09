@@ -308,7 +308,7 @@ sub createUser {
         return { success => 1, message => "User updated successfully" };
     } else {
         $sth = $dbh->prepare(
-            'INSERT INTO user (full_name, login_name, email, role, session_id, successful_logins, last_login)
+            'INSERT INTO user (full_name, login_name, email, role_name, session_id, successful_logins, last_login)
             VALUES (?, ?, ?, ?, ?, ?, ?)'
         ) or die 'prepare statement failed: ' . $dbh->errstr();
         $sth->execute($full_name, $login_name, $email, $role, $session_id, $successful_logins, $last_login)
