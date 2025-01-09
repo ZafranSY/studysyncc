@@ -1,5 +1,4 @@
 <template>
-  
   <div class="page-container">
     <NavbarView class="navbar" />
     <div class="content-container">
@@ -37,10 +36,7 @@
             <tr
               v-for="file in filteredFiles"
               :key="file.id"
-              @click="
-                navigateToDetails(file.id);
-                setLink_refName(file.ref_name);
-              "
+              @click="navigateToDetails(file.id); setLink_refName(file.ref_name)"
               class="clickable-row"
             >
               <td>
@@ -75,8 +71,6 @@
       />
     </div>
   </div>
-
-  
 </template>
 
 <script>
@@ -123,38 +117,38 @@ export default {
     },
   },
   methods: {
-
     saveCourseFile() {
-    // Create payload for the new course file
-    const payload = {
-      link_refName: this.newCourseFile.refName,
-      link_description: this.newCourseFile.description,
-      link_url: this.newCourseFile.url,
-      owner: this.newCourseFile.owner,
-    };
-    // Make an API call to the backend
-    fetch('http://localhost:3000/create', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(payload),
-    })
-      .then((response) => {
-        if (!response.ok) {
-          throw new Error('Failed to save the course file');
-        }
-        return response.json();
+      // Create payload for the new course file
+      const payload = {
+        link_refName: this.newCourseFile.refName,
+        link_description: this.newCourseFile.description,
+        link_url: this.newCourseFile.url,
+        owner: this.newCourseFile.owner,
+      };
+
+      // Make an API call to the backend
+      fetch("http://localhost:3000/save_coursefile", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(payload),
       })
-      .then((data) => {
-        // Push the new file into the `files` array to update the table
-        this.files.push(data);
-        this.showAddForm = false; // Close the form
-        this.newCourseFile = {}; // Reset the form
-      })
-      .catch((error) => {
-        console.error('Error:', error);
-      });
+        .then((response) => {
+          if (!response.ok) {
+            throw new Error("Failed to save the course file");
+          }
+          return response.json();
+        })
+        .then((data) => {
+          alert(data.message);
+          this.files.push(payload); // Update local data
+          this.closeUploadModal(); // Close the modal
+        })
+        .catch((error) => {
+          console.error("Error:", error);
+          alert("Failed to save data!");
+        });
     },
     navigateToDetails(id) {
       this.$router.push(`/course-files/${id}`);
@@ -174,26 +168,52 @@ export default {
       this.showModal = false;
     },
     addFile(newFile) {
-      // Add the new file to the table data
-      this.files.push({
-        id: newFile.refNo, // Use Ref No as a unique ID
-        ref_name: newFile.refNo,
+      // Add the new file to the `files` array and save it to the database
+      const payload = {
+        refNo: newFile.refNo,
         description: newFile.description,
-        sessem: newFile.created,
+        created: new Date().toISOString(),
         owner: newFile.owner,
-      });
+      };
+
+      fetch("http://localhost:3000/save_coursefile", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(payload),
+      })
+        .then((response) => response.json())
+        .then((data) => {
+          if (data.error) {
+            alert(`Error: ${data.error}`);
+          } else {
+            alert("Data saved successfully!");
+            this.files.push({
+              ref_name: payload.refNo,
+              description: payload.description,
+              sessem: payload.created || "N/A",
+              owner: payload.owner,
+            });
+          }
+        })
+        .catch((error) => {
+          console.error("Error saving data:", error);
+          alert("Failed to save data!");
+        });
+
+      this.closeUploadModal();
     },
   },
   mounted() {
     // Fetch data when the component is mounted
-    var sem = sessionStorage.getItem("category");
+    const sem = sessionStorage.getItem("category");
     if (sem) {
-      sem = JSON.parse(sem);
-      const categoryTitle = sem.title;
+      const categoryTitle = JSON.parse(sem).title;
 
       const url = `http://localhost/getRefnameByCategory?category=${encodeURIComponent(
         categoryTitle
-      )}`.replace(/\s+/g, "-");
+      )}`;
 
       fetch(url)
         .then((response) => response.json())
@@ -215,8 +235,36 @@ export default {
     }
   },
 };
-
 </script>
+
+---
+
+### **Backend Endpoint Reminder (`server.pl`)**
+Ensure that the `server.pl` contains the `/save_coursefile` route:
+```perl
+post '/save_coursefile' => sub ($c) {
+    my $json = $c->req->json;  # Receive JSON payload
+    my $refName     = $json->{refNo};
+    my $description = $json->{description};
+    my $created     = $json->{created} // 'CURRENT_TIMESTAMP';
+    my $owner       = $json->{owner};
+
+    # Insert into the database
+    my $sth = $dbh->prepare(
+        "INSERT INTO link_details (link_refName, link_description, link_posted, owner) 
+         VALUES (?, ?, NOW(), ?)"
+    );
+
+    eval {
+        $sth->execute($refName, $description, $owner);
+        $c->render(json => { message => 'Data saved successfully' });
+    } or do {
+        my $error = $@ || 'Unknown error';
+        print "Error occurred: $error\n";
+        $c->render(json => { error => $error }, status => 500);
+    };
+};
+
 
 
 <style scoped>
