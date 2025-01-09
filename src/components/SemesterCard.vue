@@ -52,7 +52,7 @@ export default {
     deleteSemester() {
       const confirmation = confirm(`Are you sure you want to delete "${this.title}"?`);
       if (confirmation) {
-        this.$emit("delete-semester", this.title); // Emit event for deletion
+        this.$emit("delete-semester", this.title); // Emit event for deletion.
       }
     },
   },
