@@ -16,7 +16,6 @@ my $logger = Log::Log4perl->get_logger();
 sub check_session_role {
     my ($dbh, $session_id, $required_rolename) = @_;
 
-    # Log the start of the process
     $logger->info("Checking session role for session_id: $session_id, required role: $required_rolename");
 
     my $sth = $dbh->prepare('SELECT * FROM roles WHERE role_name=?')

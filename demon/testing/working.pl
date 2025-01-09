@@ -2,6 +2,7 @@ use Mojolicious::Lite -signatures;
 use DBI;
 
 require("./Semester.pl");
+require("./Categories.pl");
 require("./Authorization.pl");
 
 hook after_dispatch => sub ($c) {
@@ -23,11 +24,16 @@ my $dbh      = DBI->connect(
 
 get '/' => { text => 'GD Links AJAX/JSON Service' };
 
+# http://localhost/getSemester
 get '/getSemester' => sub ($c) {
     my $result  = Semester::getSemester($dbh);
     $c->render(json => $result);
 };
 
+# http://localhost/createSemester
+# request body =>
+#       session_id : ??  ======= get from localStorage
+#       semester_id : ?? i.e 2024/2025-1
 post '/createSemester' => sub ($c) {
     my $payload = $c->req->json;
     my $session_id = $payload->{session_id};
@@ -39,18 +45,16 @@ post '/createSemester' => sub ($c) {
         return;
     }
     
-    my $semester_id = $payload->{'semester_id'};
+    my $semester_id = $payload->{semester_id};
     my $result = Semester::CreateSemester($dbh, $semester_id);
     $c->render(json => $result);
 };
 
-
-get '/getCategories' => sub ($c) {
-    my $result  = Semester::getSemester($dbh);
-    $c->render(json => $result);
-};
-
-post '/createCategories' => sub ($c) {
+# http://localhost/deleteSemester
+# request body =>
+#       session_id : ??  ======= get from localStorage
+#       semester_id : ?? i.e 2024/2025-1
+post '/deleteSemester' => sub ($c) {
     my $payload = $c->req->json;
     my $session_id = $payload->{session_id};
     my $required_rolename = 'Academic Officer'; 
@@ -61,11 +65,63 @@ post '/createCategories' => sub ($c) {
         return;
     }
     
-    my $semester_id = $payload->{'semester_id'};
+    my $semester_id = $payload->{semester_id};
     my $result = Semester::CreateSemester($dbh, $semester_id);
     $c->render(json => $result);
 };
 
+# http://localhost/getCategories?semester_id=2024/2025-1
+# semester_id                ======= get from localStorage
+get '/getCategories' => sub ($c) {
+    my $semester_id   = $c->param('semester_id');
+    my $categories = Categories::getCategories($dbh, $semester_id);
+    $c->render(json => { semester_id => $semester_id, categories => $categories });
+};
+
+
+# http://localhost/createCategory
+# request body =>
+#       session_id : ??     ======= get from localStorage
+#       semester_id : ??    ======= get from localStorage
+#       category_name : ??
+post '/createCategory' => sub ($c) {
+    my $payload = $c->req->json;
+    my $session_id = $payload->{session_id};
+    my $required_rolename = 'Academic Officer'; 
+    my $auth_result = Authorization::check_session_role($dbh, $session_id, $required_rolename);
+    
+    if ($auth_result->{error}) {
+        $c->render(json => $auth_result);
+        return;
+    }
+    
+    my $semester_id = $payload->{semester_id};
+    my $category = $payload->{category_name};
+    my $result = Categories::CreateCategory($dbh, $semester_id,$category);
+    $c->render(json => $result);
+};
+
+# http://localhost/deleteCategory
+# request body =>
+#       session_id : ??     ======= get from localStorage
+#       semester_id : ??    ======= get from localStorage
+#       category_name : ??
+post '/deleteCategory' => sub ($c) {
+    my $payload = $c->req->json;
+    my $session_id = $payload->{session_id};
+    my $required_rolename = 'Academic Officer'; 
+    my $auth_result = Authorization::check_session_role($dbh, $session_id, $required_rolename);
+    
+    if ($auth_result->{error}) {
+        $c->render(json => $auth_result);
+        return;
+    }
+    
+    my $semester_id = $payload->{semester_id};
+    my $category = $payload->{category_name};
+    my $result = Categories::DeleteCategory($dbh, $semester_id,$category);
+    $c->render(json => $result);
+};
 
 
 app->start;

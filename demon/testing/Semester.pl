@@ -24,7 +24,7 @@ sub CreateSemester {
         return { error => "Semester ID $semester_id already exists" };
     }
     my $sth_insert = $dbh->prepare('INSERT INTO sessionSemester (semester_id) VALUES (?)');
-    $sth_insert->execute($semester_id);
+    $result=$sth_insert->execute($semester_id);
     if ($result) {
         return { message => 'Semester added successfully' };
     } else {
@@ -32,6 +32,22 @@ sub CreateSemester {
     }
 }
 
-1;
+sub CreateSemester {
+    my ($dbh, $semester_id) = @_;
+    
+    my $sth_check = $dbh->prepare('SELECT 1 FROM sessionSemester WHERE semester_id = ?');
+    $sth_check->execute($semester_id);
+    my $exists = $sth_check->fetchrow_array;
+    if (!$exists) {
+        return { error => "Semester ID $semester_id doesnt exists, Cannot delete" };
+    }
+    my $sth_insert = $dbh->prepare('DELETE FROM sessionSemester where semester_id = ? ');
+    $result=$sth_insert->execute($semester_id);
+    if ($result) {
+        return { message => 'Semester deleted successfully' };
+    } else {
+        return { error => 'Failed to delete semester' };
+    }
+}
 
 1;
