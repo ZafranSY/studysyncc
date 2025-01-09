@@ -53,7 +53,7 @@ post '/createSemester' => sub ($c) {
 # http://localhost/deleteSemester
 # request body =>
 #       session_id : ??  ======= get from localStorage
-#       semester_id : ?? i.e 2024/2025-1
+#       semester_id : ?? i.e 2024/2025-1  
 post '/deleteSemester' => sub ($c) {
     my $payload = $c->req->json;
     my $session_id = $payload->{session_id};
@@ -66,15 +66,39 @@ post '/deleteSemester' => sub ($c) {
     }
     
     my $semester_id = $payload->{semester_id};
-    my $result = Semester::CreateSemester($dbh, $semester_id);
+    my $result = Semester::DeleteSemester($dbh, $semester_id);
     $c->render(json => $result);
 };
 
-# http://localhost/getCategories?semester_id=2024/2025-1
-# semester_id                ======= get from localStorage
-get '/getCategories' => sub ($c) {
+# http://localhost/updateSemester
+# request body =>
+#       session_id : ??  ======= get from localStorage
+#       semester_id : ?? i.e 2024/2025-1   
+#       new_semester_id : ?? i.e 2024/2025-1
+post '/updateSemester' => sub ($c) {
+    my $payload = $c->req->json;
+    my $session_id = $payload->{session_id};
+    my $required_rolename = 'Academic Officer'; 
+    my $auth_result = Authorization::check_session_role($dbh, $session_id, $required_rolename);
+    
+    if ($auth_result->{error}) {
+        $c->render(json => $auth_result);
+        return;
+    }
+    
+    my $semester_id = $payload->{semester_id};
+    my $new_semester_id = $payload->{new_semester_id};
+    my $result = Semester::UpdateSemester($dbh, $semester_id,$new_semester_id);
+    $c->render(json => $result);
+};
+
+
+# http://localhost/getCategory?semester_id=2024/2025-1
+# param => 
+#       semester_id         ======= get from localStorage
+get '/getCategory' => sub ($c) {
     my $semester_id   = $c->param('semester_id');
-    my $categories = Categories::getCategories($dbh, $semester_id);
+    my $categories = Categories::getCategory($dbh, $semester_id);
     $c->render(json => { semester_id => $semester_id, categories => $categories });
 };
 
@@ -123,5 +147,28 @@ post '/deleteCategory' => sub ($c) {
     $c->render(json => $result);
 };
 
+# http://localhost/updateCategory
+# request body =>
+#       session_id : ??  ======= get from localStorage
+#       semester_id : ?? ======= get from localStorage
+#       category_name : ??
+#       new_category_name : ?? i.e 2024/2025-1
+post '/updateCategory' => sub ($c) {
+    my $payload = $c->req->json;
+    my $session_id = $payload->{session_id};
+    my $required_rolename = 'Academic Officer'; 
+    my $auth_result = Authorization::check_session_role($dbh, $session_id, $required_rolename);
+    
+    if ($auth_result->{error}) {
+        $c->render(json => $auth_result);
+        return;
+    }
+    
+    my $semester_id = $payload->{semester_id};
+    my $category = $payload->{category_name};
+    my $new_category_name = $payload->{new_category_name};
+    my $result = Categories::UpdateCategory($dbh, $semester_id,$category,$new_category_name);
+    $c->render(json => $result);
+};
 
 app->start;

@@ -6,7 +6,7 @@ CREATE TABLE Categories(
     category VARCHAR(100),
     semester_id VARCHAR(11) not null,
     PRIMARY KEY (category, semester_id),
-    FOREIGN KEY (semester_id) REFERENCES sessionSemester(semester_id)
+    FOREIGN KEY (semester_id) REFERENCES sessionSemester(semester_id) ON UPDATE CASCADE ON DELETE RESTRICT
 );
 
 CREATE TABLE roles (
@@ -36,8 +36,8 @@ create table gdlinks (
     owner varchar(255) not null, 
     link varchar(255), 
     primary key(gdlink_id),
-    FOREIGN KEY (sessem) REFERENCES sessionSemester(semester_id),
-    FOREIGN KEY (category) REFERENCES Categories(category),
+    FOREIGN KEY (sessem) REFERENCES sessionSemester(semester_id) ON UPDATE CASCADE ON DELETE RESTRICT,
+    FOREIGN KEY (category) REFERENCES Categories(category) ON UPDATE CASCADE ON DELETE RESTRICT,
     FOREIGN KEY (owner) REFERENCES user(email)
 );
 
