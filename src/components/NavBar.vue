@@ -2,7 +2,9 @@
   <div class="container">
     <div class="sidebar">
       <div class="logo">
-        <img src="../assets/utm_logo.png" alt="UTM Logo" />
+        <router-link to="/homeview">
+          <img src="../assets/utm_logo.png" alt="UTM Logo" />
+        </router-link>
         <!-- <span>UTM</span> -->
       </div>
 
