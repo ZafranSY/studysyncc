@@ -4,6 +4,7 @@ use LWP::UserAgent;
 use URI::Escape;
 
 require("./User.pl");
+require("./Link.pl");
 require("./Semester.pl");
 require("./Categories.pl");
 require("./Authorization.pl");
@@ -46,7 +47,7 @@ post '/getUserLogin' => sub ($c) {
     my $payload = $c->req->json;
     my $username = $payload->{username};
     my $password = $payload->{password};
-    my $result = User::callAuthAPI($username, $password);
+    my $result = User::callAuthAPI($dbh,$username, $password);
 
     if ($result->{success} == 1) {
         my $result = User::userToDB($dbh,$result);
@@ -125,15 +126,17 @@ post '/updateSemester' => sub ($c) {
 };
 
 
-# http://localhost/getCategory?semester_id=2024/2025-1
-# param => 
-#       semester_id         ======= get from localStorage
-get '/getCategory' => sub ($c) {
-    my $semester_id   = $c->param('semester_id');
-    my $categories = Categories::getCategory($dbh, $semester_id);
-    $c->render(json => { semester_id => $semester_id, categories => $categories });
+# http://localhost/getCategory
+# request body =>
+#       session_id : ??     ======= get from localStorage
+#       semester_id : ??    ======= get from localStorage       
+post '/getCategory' => sub ($c) {
+    my $payload = $c->req->json;
+    my $session_id   = $payload->{session_id};
+    my $semester_id   = $payload->{semester_id};
+    my $categoryPermission = CategoryPermission::getCategoryPermissionRead($dbh,$session_id, $semester_id);
+    $c->render(json => { categoriesPermission => $categoryPermission });
 };
-
 
 # http://localhost/createCategory
 # request body =>
@@ -204,6 +207,65 @@ post '/updateCategory' => sub ($c) {
 };
 
 
+#  http://localhost/getLink             CAN VIEW PERMISSIBLE LINKS ONLY
+#  request body =>
+#        session_id : ??     ======= get from localStorage
+#        semester_id : ??    ======= get from localStorage  
+#        category_name : ??  ======= get from localStorage
+post '/getLink' => sub ($c) {
+    my $payload = $c->req->json;
+    my $session_id   = $payload->{session_id};
+    my $semester_id   = $payload->{semester_id};
+    my $category_name   = $payload->{category_name};
+    my $linkVisibile = Link::getLink($dbh,$session_id, $semester_id,$category_name);
+    $c->render(json => { linkViewable => $linkVisibile });
+};
+
+
+#  http://localhost/createLink         ONLY FOR ACADEMIC OFFICER & PEOPLE WITH CREATE PERM WITHIN CATEGORY#  request body =>
+#        session_id : ??     ======= get from localStorage
+#        semester_id : ??    ======= get from localStorage  
+#        category_name : ??  ======= get from localStorage
+#        ref_name : ??       ======= get from fill form
+#        desc : ??           ======= get from fill form
+#        link : ??           ======= get from fill form
+post '/createLink' => sub ($c) {
+    my $payload = $c->req->json;
+    my $session_id   = $payload->{session_id};
+    my $semester_id   = $payload->{semester_id};
+    my $category_name   = $payload->{category_name};
+    my $ref_name   = $payload->{ref_name};
+    my $desc   = $payload->{desc};
+    my $link   = $payload->{link};
+    my $result = Link::CreateLink($dbh,$session_id, $semester_id,$category_name,$ref_name,$desc,$link);
+    $c->render(json => { result => $result });
+};
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 # http://localhost/getCategoryPermissionAll
 # request body =>
 #       session_id : ??     ======= get from localStorage
@@ -217,121 +279,8 @@ post '/getCategoryPermissionAll' => sub ($c) {
 };
 
 
-# http://localhost/getCategoryPermission CRUD
-# request body =>
-#       session_id : ??     ======= get from localStorage
-#       semester_id : ??    ======= get from localStorage       
-post '/getCategoryPermissionRead' => sub ($c) {
-    my $payload = $c->req->json;
-    my $session_id   = $payload->{session_id};
-    my $semester_id   = $payload->{semester_id};
-    my $categoryPermission = CategoryPermission::getCategoryPermissionRead($dbh,$session_id, $semester_id);
-    $c->render(json => { categoriesPermission => $categoryPermission });
-};
-
-post '/getCategoryPermissionDelete' => sub ($c) {
-    my $payload = $c->req->json;
-    my $session_id   = $payload->{session_id};
-    my $semester_id   = $payload->{semester_id};
-    my $categoryPermission = CategoryPermission::getCategoryPermissionDelete($dbh,$session_id, $semester_id);
-    $c->render(json => { categoriesPermission => $categoryPermission });
-};
-
-post '/getCategoryPermissionCreate' => sub ($c) {
-    my $payload = $c->req->json;
-    my $session_id   = $payload->{session_id};
-    my $semester_id   = $payload->{semester_id};
-    my $categoryPermission = CategoryPermission::getCategoryPermissionCreate($dbh,$session_id, $semester_id);
-    $c->render(json => { categoriesPermission => $categoryPermission });
-};
-
-post '/getCategoryPermissionUpdate' => sub ($c) {
-    my $payload = $c->req->json;
-    my $session_id   = $payload->{session_id};
-    my $semester_id   = $payload->{semester_id};
-    my $categoryPermission = CategoryPermission::getCategoryPermissionUpdate($dbh,$session_id, $semester_id);
-    $c->render(json => { categoriesPermission => $categoryPermission });
-};
 
 
 
-# http://localhost/createCategoryPermission
-# request body =>
-#       session_id : ??     ======= get from localStorage
-#       semester_id : ??    ======= get from localStorage
-#       category : ??
-#       can_create : ??
-#       can_read : ??
-#       can_update : ??
-#       can_delete : ??
-#       role_name  : ??
-#       user_email : ??
-post '/createCategoryPermission' => sub ($c) {
-    my $payload = $c->req->json;
-    my $session_id = $payload->{session_id};
-    my $required_rolename = 'Academic Officer'; 
-    my $auth_result = Authorization::check_session_role($dbh, $session_id, $required_rolename);
-    
-    if ($auth_result->{error}) {
-        $c->render(json => $auth_result);
-        return;
-    }
-    
-    my $semester_id = $payload->{semester_id};
-    my $can_create = $payload->{can_create};
-    my $can_read = $payload->{can_read};
-    my $can_update = $payload->{can_update};
-    my $can_delete = $payload->{can_delete};
-    my $user_email = $payload->{user_email};
-    my $role_name = $payload->{role_name};
-    my $result = CategoryPermission::CreateCategoryPermission($dbh, $semester_id,$role_name);
-    $c->render(json => $result);
-};
-
-# http://localhost/deleteCategoryPermission
-# request body =>
-#       session_id : ??     ======= get from localStorage
-#       semester_id : ??    ======= get from localStorage
-#       categoryPermission_name : ??
-post '/deleteCategoryPermission' => sub ($c) {
-    my $payload = $c->req->json;
-    my $session_id = $payload->{session_id};
-    my $required_rolename = 'Academic Officer'; 
-    my $auth_result = Authorization::check_session_role($dbh, $session_id, $required_rolename);
-    
-    if ($auth_result->{error}) {
-        $c->render(json => $auth_result);
-        return;
-    }
-    
-    my $semester_id = $payload->{semester_id};
-    my $categoryPermission = $payload->{categoryPermission_name};
-    my $result = CategoryPermission::DeleteCategoryPermission($dbh, $semester_id,$categoryPermission);
-    $c->render(json => $result);
-};
-
-# http://localhost/updateCategoryPermission
-# request body =>
-#       session_id : ??  ======= get from localStorage
-#       semester_id : ?? ======= get from localStorage
-#       categoryPermission_name : ??
-#       new_categoryPermission_name : ?? i.e 2024/2025-1
-post '/updateCategoryPermission' => sub ($c) {
-    my $payload = $c->req->json;
-    my $session_id = $payload->{session_id};
-    my $required_rolename = 'Academic Officer'; 
-    my $auth_result = Authorization::check_session_role($dbh, $session_id, $required_rolename);
-    
-    if ($auth_result->{error}) {
-        $c->render(json => $auth_result);
-        return;
-    }
-    
-    my $semester_id = $payload->{semester_id};
-    my $categoryPermission = $payload->{categoryPermission_name};
-    my $new_categoryPermission_name = $payload->{new_categoryPermission_name};
-    my $result = CategoryPermission::UpdateCategoryPermission($dbh, $semester_id,$categoryPermission,$new_categoryPermission_name);
-    $c->render(json => $result);
-};
 
 app->start;

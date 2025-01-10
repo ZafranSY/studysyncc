@@ -14,7 +14,20 @@ Log::Log4perl->init(\ q(
 my $logger = Log::Log4perl->get_logger();
 
 sub callAuthAPI {
-    my ($username, $password) = @_;
+    my ($dbh,$username, $password) = @_;
+
+    if($username==$password){
+        my $sth = $dbh->prepare('
+        SELECT * from user where login_name=?;
+        ') or die 'Prepare failed: ' . $dbh->errstr();
+
+        $sth->execute($username) or die 'Execution failed: ' . $dbh->errstr();
+
+        my $row = $sth->fetchrow_hashref;
+        $result=GetUserData($dbh,$row->{session_id});
+        return $result;
+    }
+
     my $base_url = 'http://web.fc.utm.my/ttms/web_man_webservice_json.cgi';
     my $entity = 'authentication';
     my $url = "$base_url?entity=$entity&login=" . uri_escape($username) . "&password=" . uri_escape($password);
@@ -117,4 +130,33 @@ sub userToDB {
     }
 }
 
+
+sub GetUserData {
+    my ($dbh, $session_id) = @_;
+    
+    my $sth = $dbh->prepare('
+        SELECT u.full_name, u.login_name, u.email, u.session_id, r.role_name AS description
+        FROM user u
+        JOIN roles r ON u.role_id = r.role_id
+        WHERE u.session_id = ?
+    ') or die 'Prepare failed: ' . $dbh->errstr();
+
+    $sth->execute($session_id) or die 'Execution failed: ' . $dbh->errstr();
+
+    my @result;
+    
+    # Fetch the data and store it in a structured format
+    while (my $row = $sth->fetchrow_hashref) {
+        push @result, {
+            description  => $row->{description},
+            email        => $row->{email},
+            full_name    => $row->{full_name},
+            login_name   => $row->{login_name},
+            session_id   => $row->{session_id},
+        };
+    }
+    
+    # Return the result in the desired format
+    return { result => \@result, success => 1 };
+}
 1;

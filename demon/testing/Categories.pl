@@ -1,17 +1,18 @@
 package Categories;
 
-sub getCategory {
-    my ($dbh, $semester_id) = @_;
-    my $sth = $dbh->prepare('SELECT * FROM Categories where semester_id= ? ')
-        or die 'prepare statement failed: ' . $dbh->errstr();
-    $sth->execute($semester_id) 
-        or die 'execution failed: ' . $dbh->errstr();
-    my @categories;
-    while (my $row = $sth->fetchrow_hashref) {
-        push @categories, $row->{category};
-    }
-    return \@categories;
-}
+# NO LONGER USED
+# sub getCategory {
+#     my ($dbh, $semester_id) = @_;
+#     my $sth = $dbh->prepare('SELECT * FROM Categories where semester_id= ? ')
+#         or die 'prepare statement failed: ' . $dbh->errstr();
+#     $sth->execute($semester_id) 
+#         or die 'execution failed: ' . $dbh->errstr();
+#     my @categories;
+#     while (my $row = $sth->fetchrow_hashref) {
+#         push @categories, $row->{category};
+#     }
+#     return \@categories;
+# }
 
 sub CreateCategory {
     my ($dbh, $semester_id, $category) = @_;

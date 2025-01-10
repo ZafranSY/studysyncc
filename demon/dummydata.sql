@@ -29,11 +29,11 @@ VALUES
 INSERT INTO Categories (category, semester_id) 
 VALUES 
         ('PSM 1', '2024/2025-1'),
-        ('Course Coordination', '2024/2025-1'),
-        ('Timetable', '2024/2025-1'),
-        ('Course Files', '2024/2025-1'),
         ('Research', '2024/2025-1'),
         ('Training', '2024/2025-1'),
+        ('Timetable', '2024/2025-1'),
+        ('Course Coordination', '2024/2025-1'),
+        ('Course Files', '2024/2025-1'),
         
         ('PSM 2', '2024/2025-2'),
         ('Course Coordination', '2024/2025-2'),

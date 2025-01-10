@@ -36,9 +36,8 @@ async function runTest(METHOD,link,payload) {
 //       CategoryPermission
 //                      All
 //                      Read
-//                      Delete
 //                      Create
-//                      Update
+//                      
 //
 //
 
@@ -50,7 +49,7 @@ async function runTest(METHOD,link,payload) {
 // eslint-disable-next-line no-unused-vars
 const b=
 {
-    "session_id": "313",
+    "session_id": "ab",
     "new_semester_id": "2099/2012-3",
     "semester_id": "2099/3212-2",
     "category_name": "PSM 414",
@@ -69,19 +68,21 @@ const type='UserLogin'
 
 // ONLY for GET method, can leave this alone if POST
 const PARAMTYPE='?semester_id'
-const PARAMVALUE='=2099/3212-2'
+const PARAMVALUE='=2024/2025-1'
 
 const payload = {
-    session_id: '313',
+    session_id: 'ab',
     new_semester_id: '2099/2012-3',
-    semester_id: '2022/2023-2',
-    category_name: 'PSM 414',
+    semester_id: '2024/2025-2',
+    category_name: 'Personal',
     new_category_name: 'KUCING',
     // username : "12085",
     // password : "S808323",
-    username : "A16CS4016",
-    password : "201608M10112",
-
+    username : "johnAcad",
+    password : "johnAcad",
+    ref_name :"My Marks ",
+    desc : "Marks for all subject",
+    link :"google.com",
 };
 
 const endpoint=crud+type
@@ -122,18 +123,18 @@ else
 // http://localhost/createSemester
 // request body =>
 //       session_id : ??  ======= get from localStorage
-//       semester_id : ?? i.e 2024/2025-1
+//       semester_id : ?? ======= get from fill form
 
 // http://localhost/deleteSemester
 // request body =>
 //       session_id : ??  ======= get from localStorage
-//       semester_id : ?? i.e 2024/2025-1 
+//       semester_id : ?? ======= get from click
 
 // http://localhost/updateSemester
 // request body =>
 //       session_id : ??  ======= get from localStorage
-//       semester_id : ?? i.e 2024/2025-1   
-//       new_semester_id : ?? i.e 2024/2025-1
+//       semester_id : ?? ======= get from click
+//       new_semester_id : ====== get from fill form
 
 
 
@@ -146,35 +147,67 @@ else
 
 
 
-// http://localhost/getCategory?semester_id=2024/2025-1
-// param => 
-//      semester_id          ======= get from localStorage
+// http://localhost/getCategory             CAN VIEW PERMISSIBLE CATEGORY ONLY
+// request body =>
+//       session_id : ??     ======= get from localStorage
+//       semester_id : ??    ======= get from localStorage  
 
-// http://localhost/createCategory
+// http://localhost/createCategory          ACADEMIC OFFICER ONLY
 // request body =>
 //       session_id : ??     ======= get from localStorage
 //       semester_id : ??    ======= get from localStorage
-//       category_name : ??
+//       category_name : ??  ======= get from fill form
 
-// http://localhost/deleteCategory
+// http://localhost/deleteCategory          ACADEMIC OFFICER ONLY
 // request body =>
 //       session_id : ??     ======= get from localStorage
 //       semester_id : ??    ======= get from localStorage
-//       category_name : ??
+//       category_name : ??  ======= get from click
 
-// http://localhost/updateCategory
+// http://localhost/updateCategory          ACADEMIC OFFICER ONLY
 // request body =>
 //       session_id : ??  ======= get from localStorage
 //       semester_id : ?? ======= get from localStorage
-//       category_name : ??
-//       new_category_name : ?? i.e 2024/2025-1
+//       category_name : ?? ===== get from click
+//       new_category_name : ==== get from fill form
 
 
-// http://localhost/createCategory
+// ===================================================
+// ===================================================
+//              LINKS 
+// ===================================================
+// ===================================================
+
+
+// http://localhost/getLink             CAN VIEW PERMISSIBLE LINKS ONLY
+// request body =>
+//       session_id : ??     ======= get from localStorage
+//       semester_id : ??    ======= get from localStorage  
+//       category_name : ??  ======= get from localStorage
+
+// http://localhost/createLink         ONLY FOR ACADEMIC OFFICER & PEOPLE WITH CREATE PERM WITHIN CATEGORY
+// request body =>
+//        session_id : ??     ======= get from localStorage
+//        semester_id : ??    ======= get from localStorage  
+//        category_name : ??  ======= get from localStorage
+//        ref_name : ??       ======= get from fill form
+//        desc : ??           ======= get from fill form
+//        link : ??           ======= get from fill form
+
+// http://localhost/deleteLink        ONLY FOR ACADEMIC OFFICER & PEOPLE WITH DELETE PERM WITHIN CATEGORY & LINK OWNER
 // request body =>
 //       session_id : ??     ======= get from localStorage
 //       semester_id : ??    ======= get from localStorage
-//       category_name : ??
+//       category_name : ??  ======= get from localStorage
+//       link id       : ??  ======= get from click
+
+// http://localhost/updateLink          ONLY FOR ACADEMIC OFFICER & PEOPLE WITH UPDATE PERM WITHIN CATEGORY & LINK OWNER
+// request body =>
+//       session_id : ??    ======= get from localStorage
+//       semester_id : ??   ======= get from localStorage
+//       category_name : ?? ======= get from localStorage
+//       link uh this is hard
+
 
 
 // ===================================================
@@ -183,40 +216,3 @@ else
 // ===================================================
 // ===================================================
 
-// http://localhost/getCategoryPermissionAll
-// request body =>
-//       session_id : ??     ======= get from localStorage
-//       semester_id : ??    ======= get from localStorage 
-
-// http://localhost/getCategoryPermissionCreate
-// request body =>
-//       session_id : ??     ======= get from localStorage
-//       semester_id : ??    ======= get from localStorage 
-
-// http://localhost/getCategoryPermissionUpdate
-// request body =>
-//       session_id : ??     ======= get from localStorage
-//       semester_id : ??    ======= get from localStorage 
-
-// http://localhost/getCategoryPermissionRead
-// request body =>
-//       session_id : ??     ======= get from localStorage
-//       semester_id : ??    ======= get from localStorage 
-
-// http://localhost/getCategoryPermissionDelete
-// request body =>
-//       session_id : ??     ======= get from localStorage
-//       semester_id : ??    ======= get from localStorage 
-
-
-// http://localhost/createCategoryPermission
-// request body =>
-//       session_id : ??     ======= get from localStorage
-//       semester_id : ??    ======= get from localStorage
-//       category : ??
-//       can_create : ??
-//       can_read : ??
-//       can_update : ??
-//       can_delete : ??
-//       role_name  : ??
-//       user_email : ??
