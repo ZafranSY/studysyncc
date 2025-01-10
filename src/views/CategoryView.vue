@@ -148,6 +148,7 @@ export default {
   methods: {
     navigateToDetails(id) {
       this.$router.push(`/category/${id}`);
+      this.setCategory(id);
     },
     getRandomColor() {
       const letters = "0123456789ABCDEF";
@@ -158,9 +159,8 @@ export default {
       return color;
     },
     setCategory(category) {
+      console.log("category session :", category);
       sessionStorage.setItem("category", JSON.stringify(category));
-      const formattedTitle = category.title.replace(/\s+/g, "-");
-      this.$router.push(`/homeview/category/${formattedTitle}`);
     },
     openCategoryModal() {
       this.showCategoryModal = true;
