@@ -33,7 +33,7 @@ sub getLink {
     } 
     
     my $sth = $dbh->prepare('
-                            SELECT * 
+                        SELECT * 
                         FROM gdlinks 
                         WHERE (
                             gdlink_id IN (

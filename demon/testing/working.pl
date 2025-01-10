@@ -70,6 +70,31 @@ get '/getSemester' => sub ($c) {
     $c->render(json => $result);
 };
 
+# http://localhost/getAllCategoriesWithinSemesterCount
+# request body =>
+#       session_id : ??  ======= get from localStorage
+#       semester_id : ?? i.e 2024/2025-1
+
+post '/getAllCategoriesWithinSemesterCount' => sub ($c) {
+    my $payload = $c->req->json;
+    my $session_id = $payload->{session_id};
+    my $semester_id = $payload->{semester_id};
+    my $result  = Semester::getAllCategoriesWithinSemesterCount($dbh,$session_id,$semester_id);
+    $c->render(json=>$result);
+};
+
+# http://localhost/getViewableCategoriesWithinSemesterCount
+# request body =>
+#       session_id : ??  ======= get from localStorage
+#       semester_id : ?? i.e 2024/2025-1
+post '/getViewableCategoriesWithinSemesterCount' => sub ($c) {
+    my $payload = $c->req->json;
+    my $semester_id = $payload->{semester_id};
+    my $session_id = $payload->{session_id};
+    my $result  = Semester::getViewableCategoriesWithinSemesterCount($dbh,$session_id,$semester_id);
+    $c->render(json=>$result);
+};
+
 # http://localhost/createSemester
 # request body =>
 #       session_id : ??  ======= get from localStorage
@@ -144,6 +169,36 @@ post '/getCategory' => sub ($c) {
     my $categoryPermission = CategoryPermission::getCategoryPermissionRead($dbh,$session_id, $semester_id);
     $c->render(json => { categoriesPermission => $categoryPermission });
 };
+
+# http://localhost/getAllCategoriesWithinSemesterCount
+# request body =>
+#       session_id : ??  ======= get from localStorage
+#       semester_id : ?? i.e 2024/2025-1
+#       category_name : ??
+
+post '/getAllLinksWithinCategoryCount' => sub ($c) {
+    my $payload = $c->req->json;
+    my $session_id = $payload->{session_id};
+    my $semester_id = $payload->{semester_id};
+    my $category_name = $payload->{category_name};
+    my $result  = Categories::getAllLinksWithinCategoryCount($dbh,$session_id,$semester_id,$category_name);
+    $c->render(json=>$result);
+};
+
+# http://localhost/getViewableLinksWithinCategoryCount
+# request body =>
+#       session_id : ??  ======= get from localStorage
+#       semester_id : ?? i.e 2024/2025-1
+#       category_name : ??
+post '/getViewableLinksWithinCategoryCount' => sub ($c) {
+    my $payload = $c->req->json;
+    my $semester_id = $payload->{semester_id};
+    my $session_id = $payload->{session_id};
+    my $category_name = $payload->{category_name};
+    my $result  = Categories::getViewableLinksWithinCategoryCount($dbh,$session_id,$semester_id,$category_name);
+    $c->render(json=>$result);
+};
+
 
 # http://localhost/createCategory
 # request body =>

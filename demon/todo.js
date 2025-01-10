@@ -1,3 +1,35 @@
+// ===================================================
+// ===================================================
+//              EXTRAAAA
+// ===================================================
+// ===================================================
+
+
+// SEMESTER CARD
+//  http://localhost/getAllCategoriesWithinSemesterCount
+//  request body =>
+//        session_id : ??  ======= get from localStorage
+//        semester_id : ?? i.e 2024/2025-1
+//  http://localhost/getViewableCategoriesWithinSemesterCount
+//  request body =>
+//        session_id : ??  ======= get from localStorage
+//        semester_id : ?? i.e 2024/2025-1
+
+// CATEGORY CARD
+//  http://localhost/getAllCategoriesWithinSemesterCount
+//  request body =>
+//        session_id : ??  ======= get from localStorage
+//        semester_id : ?? i.e 2024/2025-1
+//        category_name : ??
+
+//  http://localhost/getViewableLinksWithinCategoryCount
+//  request body =>
+//        session_id : ??  ======= get from localStorage
+//        semester_id : ?? i.e 2024/2025-1
+//        category_name : ??
+
+
+
 
 // ===================================================
 // ===================================================
@@ -150,3 +182,7 @@
 // http://localhost/updateLinkPermission
 // http://localhost/deleteLinkPermission
 // http://localhost/createLinkPermission
+
+
+
+
