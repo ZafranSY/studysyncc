@@ -46,6 +46,7 @@
           :title="category.title"
           :subtitle="category.subtitle"
           :bgColor="category.bgColor"
+          @click="navigateToDetails(category.title)"
         />
       </div>
 
@@ -102,7 +103,7 @@ export default {
   },
   mounted() {
     const session_id = JSON.parse(localStorage.getItem("session_id"));
-    this.semester_id = JSON.parse(sessionStorage.getItem("semester")); // Assign immediately
+    this.semester_id = JSON.parse(sessionStorage.getItem("semester"));
     console.log("Session ID:", session_id);
     console.log("Semester ID:", this.semester_id);
 
@@ -145,6 +146,9 @@ export default {
   },
 
   methods: {
+    navigateToDetails(id) {
+      this.$router.push(`/category/${id}`);
+    },
     getRandomColor() {
       const letters = "0123456789ABCDEF";
       let color = "#";

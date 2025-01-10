@@ -7,7 +7,6 @@
           <h1>Course File</h1>
           <h2>{{ categoryTitle }}: {{ categoryDescription }}</h2>
         </div>
-        
       </div>
 
       <div class="details-container">
@@ -47,14 +46,26 @@
               <td>{{ file.owner }}</td>
               <td>
                 <button @click="editRecord(file)" class="icon-button">
-    <img :src="require('@/assets/edit.png')" alt="Edit" class="icon" />
-  </button>
-  <button @click="deleteRecord(file.id)" class="icon-button">
-    <img :src="require('@/assets/delete.png')" alt="Delete" class="icon" />
-  </button>
-  <button @click="goToFile(file)" class="icon-button">
-    <img :src="require('@/assets/goto.png')" alt="Go To" class="icon" />
-  </button>
+                  <img
+                    :src="require('@/assets/edit.png')"
+                    alt="Edit"
+                    class="icon"
+                  />
+                </button>
+                <button @click="deleteRecord(file.id)" class="icon-button">
+                  <img
+                    :src="require('@/assets/delete.png')"
+                    alt="Delete"
+                    class="icon"
+                  />
+                </button>
+                <button @click="goToFile(file)" class="icon-button">
+                  <img
+                    :src="require('@/assets/goto.png')"
+                    alt="Go To"
+                    class="icon"
+                  />
+                </button>
               </td>
             </tr>
           </tbody>
@@ -66,33 +77,57 @@
             <h3>Edit Link Details</h3>
             <form @submit.prevent="updateRecord">
               <label for="refName">Ref Name:</label>
-              <input v-model="editForm.refName" id="refName" placeholder="Enter Ref Name" required />
+              <input
+                v-model="editForm.refName"
+                id="refName"
+                placeholder="Enter Ref Name"
+                required
+              />
 
               <label for="description">Description:</label>
-              <input v-model="editForm.linkDescription" id="description" placeholder="Enter Description" required />
+              <input
+                v-model="editForm.linkDescription"
+                id="description"
+                placeholder="Enter Description"
+                required
+              />
 
               <label for="owner">Owner:</label>
-              <input v-model="editForm.owner" id="owner" placeholder="Enter Owner" required />
+              <input
+                v-model="editForm.owner"
+                id="owner"
+                placeholder="Enter Owner"
+                required
+              />
 
               <label for="url">URL:</label>
-              <input v-model="editForm.url" id="url" placeholder="Enter URL" required />
+              <input
+                v-model="editForm.url"
+                id="url"
+                placeholder="Enter URL"
+                required
+              />
 
               <div class="modal-actions">
                 <button type="submit" class="btn save">Update</button>
-                <button type="button" class="btn cancel" @click="closeEditModal">Cancel</button>
+                <button
+                  type="button"
+                  class="btn cancel"
+                  @click="closeEditModal"
+                >
+                  Cancel
+                </button>
               </div>
             </form>
           </div>
         </div>
-
       </div>
 
       <div class="add-button" @click="openUploadModal">
-          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
-            <path d="M13 11h8v2h-8v8h-2v-8H3v-2h8V3h2v8Z" />
-          </svg>
-        </div>
-     
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+          <path d="M13 11h8v2h-8v8h-2v-8H3v-2h8V3h2v8Z" />
+        </svg>
+      </div>
 
       <!-- Upload Modal -->
       <UploadModalLink
@@ -146,6 +181,9 @@ export default {
     },
   },
   methods: {
+    navigateToDetails(id) {
+      this.$router.push(`/category/${id}`);
+    },
     openUploadModal() {
       this.showModal = true;
     },
@@ -178,7 +216,9 @@ export default {
       };
     },
     updateRecord() {
-      const index = this.files.findIndex((file) => file.id === this.editForm.id);
+      const index = this.files.findIndex(
+        (file) => file.id === this.editForm.id
+      );
       if (index !== -1) {
         this.files.splice(index, 1, { ...this.editForm });
       }
@@ -193,7 +233,9 @@ export default {
         return;
       }
 
-      const validUrl = /^https?:\/\//i.test(file.url) ? file.url : `http://${file.url}`;
+      const validUrl = /^https?:\/\//i.test(file.url)
+        ? file.url
+        : `http://${file.url}`;
       window.open(validUrl, "_blank");
     },
     searchFiles() {
@@ -352,7 +394,7 @@ export default {
 
 .action-btn {
   padding: 5px 10px;
-  background-color: #7A003B;
+  background-color: #7a003b;
   color: #fff;
   border: none;
   border-radius: 4px;
@@ -521,8 +563,6 @@ add-button {
   border: none;
 }
 
-
-
 .btn.save {
   background-color: #3b82f6;
   color: white;
@@ -604,7 +644,7 @@ input::placeholder {
   margin-top: 30px;
 }
 
-.save-btn, 
+.save-btn,
 .cancel-btn {
   padding: 8px 25px;
   border: none;

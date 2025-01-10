@@ -1,7 +1,6 @@
 import { createRouter, createWebHistory } from "vue-router";
 
 const routes = [
-    
   {
     path: "/about",
     name: "about",
@@ -32,7 +31,7 @@ const routes = [
     component: () => import("@/views/CategoryView.vue"),
   },
   {
-    path: "/course-files/:id",
+    path: "/category/:title",
     name: "CourseDetails",
     component: () => import("@/views/CourseDetailsView.vue"),
 
