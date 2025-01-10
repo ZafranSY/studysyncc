@@ -63,7 +63,7 @@ const b=
 const host='http://localhost:80'
 let METHOD='POST'
 const crud='/get'
-const type='UserLogin'
+const type='Link'
 
 
 // ONLY for GET method, can leave this alone if POST
@@ -71,15 +71,15 @@ const PARAMTYPE='?semester_id'
 const PARAMVALUE='=2024/2025-1'
 
 const payload = {
-    session_id: 'ab',
+    session_id: '313',
+    semester_id: '2024/2025-1',
+    category_name: 'PSM 1',
     new_semester_id: '2099/2012-3',
-    semester_id: '2024/2025-2',
-    category_name: 'Personal',
     new_category_name: 'KUCING',
     // username : "12085",
     // password : "S808323",
     username : "johnAcad",
-    password : "johnAcad",
+    password : "201608M10112",
     ref_name :"My Marks ",
     desc : "Marks for all subject",
     link :"google.com",

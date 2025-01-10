@@ -45,92 +45,41 @@ export default {
 
         
         const login = async () => {
-            try {
-                if(username.value=="admin"&&password.value=="password"){
-                    const userData = {
-                        email: "admin@fake.my",
-                        full_name: "ADMIN ADMOM",
-                        login_name: "0000",
-                        no_pekerja: 0,
-                        role: "Academic Officer",
-                        session_id: "00000000000",
-                        
-                        };
-                    const now = new Date();
-                    userData.last_login = now.getFullYear() + '-' +
-                        String(now.getMonth() + 1).padStart(2, '0') + '-' +
-                        String(now.getDate()).padStart(2, '0') + ' ' +
-                        String(now.getHours()).padStart(2, '0') + ':' +
-                        String(now.getMinutes()).padStart(2, '0') + ':' +
-                        String(now.getSeconds()).padStart(2, '0');
 
-                    localStorage.setItem("utmwebfc_session", JSON.stringify(userData));
-                    fetch('http://localhost:80/usertodb', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json'
-                        },
-                        body: JSON.stringify(userData)  // Send the updated JSON object
-                    })
-                        .then(response => response.json())
-                        .then(result => {
-                            console.log('Success:', result);
-                        })
-                        .catch(error => {
-                            console.error('Error:', error);
-                        });
-
-                    router
-                    router.push("/homeview");
-                }
-
-
-
-                const url = `http://web.fc.utm.my/ttms/web_man_webservice_json.cgi?entity=authentication&login=${username.value}&password=${password.value}`;
-                const response = await fetch(url);
-                const data = await response.json();
-                
-                if (data[0]?.session_id) {
-                    localStorage.setItem("utmwebfc_session", JSON.stringify(data[0]));
-                    loggedIn.value = true;
-                    var userData = data[0];
-                    userData.role = userData.description;
-                    delete userData.description;
-                    
-                    const now = new Date();
-                    userData.last_login = now.getFullYear() + '-' +
-                        String(now.getMonth() + 1).padStart(2, '0') + '-' +
-                        String(now.getDate()).padStart(2, '0') + ' ' +
-                        String(now.getHours()).padStart(2, '0') + ':' +
-                        String(now.getMinutes()).padStart(2, '0') + ':' +
-                        String(now.getSeconds()).padStart(2, '0');
-
-                    // Now, send the POST request with the updated user data
-                    fetch('http://localhost:80/usertodb', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json'
-                        },
-                        body: JSON.stringify(userData)  // Send the updated JSON object
-                    })
-                        .then(response => response.json())
-                        .then(result => {
-                            console.log('Success:', result);
-                        })
-                        .catch(error => {
-                            console.error('Error:', error);
-                        });
-
-                    router
-                    router.push("/homeview");
-                } else {
-                    alert("Login failed. Please check your credentials.");
-                }
-            } catch (error) {
-                console.error("Login error:", error);
-                alert("An error occurred during login.");
-            }
+    const endpoint = "http://localhost/getUserLogin";
+    try {
+        const payload = {
+            username: username.value,
+            password: password.value,
         };
+
+        const response = await fetch(endpoint, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify(payload),
+        });
+
+        const data = await response.json();
+
+        if (response.ok && data.success) {
+            const a=data.result[0]
+            console.log(a)
+            localStorage.setItem("utmwebfc_session", JSON.stringify(data.result[0]));
+            localStorage.setItem("session_id", JSON.stringify(data.result[0].session_id));
+
+            loggedIn.value = true;
+            // router.push("/homeview");
+        } else {
+            alert(data.message || "Login failed. Please try again.");
+        }
+    } catch (error) {
+        console.error("Error during login:", error);
+        alert("An error occurred. Please try again later.");
+    }
+};
+
 
         return {
             username,

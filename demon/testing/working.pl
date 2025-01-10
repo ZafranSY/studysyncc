@@ -20,13 +20,20 @@ Log::Log4perl->init(\ q(
 ));
 my $logger = Log::Log4perl->get_logger();
 
+# Global CORS headers
 hook after_dispatch => sub ($c) {
-    # Allow CORS headers for all methods
+     # Set CORS headers
     $c->res->headers->header('Access-Control-Allow-Origin' => '*');
-    $c->res->headers->header('Access-Control-Allow-Methods' => 'GET, POST, OPTIONS');
-    $c->res->headers->header('Access-Control-Allow-Headers' => 'Content-Type');
+    $c->res->headers->header('Access-Control-Allow-Methods' => 'GET, POST, OPTIONS, PUT, DELETE');
+    $c->res->headers->header('Access-Control-Allow-Headers' => 'Content-Type, Authorization');
 };
 
+
+# Handle preflight OPTIONS request
+options '*' => sub ($c) {
+    $c->res->code(204);  # No Content
+    $c->render(text => '');  # Empty response for OPTIONS request
+};
 # Connect to the database.
 my $database = 'testing';
 my $user     = 'adj2425';
