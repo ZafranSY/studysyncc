@@ -1,4 +1,14 @@
+CREATE DATABASE testing;
+use testing;
 
+-- Create the user adj2425 with access from any host
+CREATE USER 'adj2425'@'%' IDENTIFIED BY 'adj2425';
+
+-- Grant privileges on the database 'testing' to the user
+GRANT ALL PRIVILEGES ON testing.* TO 'adj2425'@'%';
+
+-- Apply changes
+FLUSH PRIVILEGES;
 
 CREATE TABLE sessionSemester (
     semester_id VARCHAR(11) PRIMARY KEY
