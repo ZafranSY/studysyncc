@@ -44,19 +44,37 @@ sub check_session_role {
     return { message => 'Authentication successful' };
 }
 
-sub getRoleName{
+sub getRoleName {
     my ($dbh, $session_id) = @_;
     my $sth = $dbh->prepare('SELECT * FROM user WHERE session_id=?')
         or do return { error => 'Failed to prepare statement: ' . $dbh->errstr };
     $sth->execute($session_id)
         or do return { error => 'Execution failed: ' . $dbh->errstr };
-    $role_id=$sth->fetchrow_hashref->{role_id};
+    my $row = $sth->fetchrow_hashref;
+
+    if ($row) {
+        my $role_id = $row->{role_id};
+    $logger->info("$role_id");
+        # Continue processing with $role_id
+    } else {
+        return { error => 'No data found for the given session_id' };
+    }
     my $sth = $dbh->prepare('SELECT role_name FROM roles WHERE role_id=?')
         or do return { error => 'Failed to prepare statement: ' . $dbh->errstr };
     $sth->execute($role_id)
         or do return { error => 'Execution failed: ' . $dbh->errstr };
     
-    $role_name=$sth->fetchrow_hashref->{role_name};    
+        
+
+    my $row = $sth->fetchrow_hashref;
+
+    if ($row) {
+        my $role_name=$sth->fetchrow_hashref->{role_name};
+    $logger->info("$role_id");
+        # Continue processing with $role_id
+    } else {
+        return { error => 'No data found for the given session_id' };
+    }
     $logger->info("Checking session role for session_id: $session_id, role_name: $role_name");
     return $role_name;
 }
