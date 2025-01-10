@@ -16,8 +16,14 @@
         <div class="search-bar">
           <!-- Icon -->
           <span class="search-icon">
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
-              <path d="M11 2a9 9 0 1 0 6.28 15.28l4.41 4.42 1.41-1.41-4.41-4.42A9 9 0 0 0 11 2zm0 16a7 7 0 1 1 7-7 7 7 0 0 1-7 7z" />
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              viewBox="0 0 24 24"
+              fill="currentColor"
+            >
+              <path
+                d="M11 2a9 9 0 1 0 6.28 15.28l4.41 4.42 1.41-1.41-4.41-4.42A9 9 0 0 0 11 2zm0 16a7 7 0 1 1 7-7 7 7 0 0 1-7 7z"
+              />
             </svg>
           </span>
           <!-- Search Input -->
@@ -31,6 +37,7 @@
       </div>
 
       <!-- Category Cards -->
+      <div v-if="categories.length === 0">No categories found.</div>
       <div class="card-grid">
         <CategoryCard
           v-for="category in filteredCategories"
@@ -38,8 +45,6 @@
           :title="category.title"
           :subtitle="category.subtitle"
           :bgColor="category.bgColor"
-          @click="setCategory(category)"
-          @delete-category="confirmAndRemoveCategory"
         />
       </div>
 
@@ -78,30 +83,65 @@ export default {
   computed: {
     filteredCategories() {
       return this.categories.filter((category) => {
-        const matchesSearch =
-          category.title.toLowerCase().includes(this.searchQuery.toLowerCase()) ||
-          category.subtitle.toLowerCase().includes(this.searchQuery.toLowerCase());
-        return matchesSearch;
+        // Safeguard against undefined or missing properties
+        if (!category || !category.title || !category.subtitle) {
+          return false;
+        }
+        return (
+          category.title
+            .toLowerCase()
+            .includes(this.searchQuery.toLowerCase()) ||
+          category.subtitle
+            .toLowerCase()
+            .includes(this.searchQuery.toLowerCase())
+        );
       });
     },
   },
   mounted() {
-    const semester = JSON.parse(sessionStorage.getItem("semester"));
-    const url = `http://localhost/getCategoryBySemester?semester=${encodeURIComponent(semester)}`;
-    fetch(url)
-      .then((response) => response.json())
+    const session_id = JSON.parse(localStorage.getItem("session_id"));
+    const semester_id = JSON.parse(sessionStorage.getItem("semester"));
+    console.log("Session ID:", session_id);
+    console.log("Semester ID:", semester_id);
+
+    fetch("http://localhost/getCategory", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        session_id,
+        semester_id,
+      }),
+    })
+      .then((response) => {
+        console.log("Raw Response:", response); // Log raw response
+        if (!response.ok) {
+          return response.json().then((err) => {
+            console.error("Backend Error:", err); // Log backend error
+            throw new Error(err.error || "Unknown error occurred");
+          });
+        }
+        return response.json();
+      })
       .then((data) => {
-        this.categories = data.map((category, index) => ({
-          id: index + 1,
-          title: category,
-          subtitle: category,
-          bgColor: this.getRandomColor(),
-        }));
+        console.log("API Data:", data); // Log parsed JSON data
+        this.categories = (data.categoriesPermission || [])
+          .filter((category) => category) // Ensure valid entries
+          .map((category, index) => ({
+            id: index + 1,
+            title: category, // Use the string as the title
+            subtitle: category, // Use the string as the subtitle
+            bgColor: this.getRandomColor(),
+          }));
+        console.log("Transformed Categories:", this.categories);
       })
       .catch((error) => {
-        console.error("Error fetching categories:", error);
+        console.error("Error fetching categories:", error.message);
+        alert(`Error: ${error.message}`);
       });
   },
+
   methods: {
     getRandomColor() {
       const letters = "0123456789ABCDEF";
@@ -132,23 +172,37 @@ export default {
       this.categories.push(newCategoryEntry);
       this.showCategoryModal = false;
     },
-      confirmAndRemoveCategory(categoryTitle) {
-    if (window.confirm(`Are you sure you want to delete "${categoryTitle}"?`)) {
-      const index = this.categories.findIndex((c) => c.title === categoryTitle);
-      if (index !== -1) {
-        this.categories.splice(index, 1);
-        // Optionally send a request to the backend
-        fetch(`http://localhost/deleteCategory?title=${encodeURIComponent(categoryTitle)}`, { method: 'DELETE' })
-          .then((response) => {
-            if (!response.ok) {
-              throw new Error('Failed to delete category');
-            }
-          })
-          .catch((error) => {
-            console.error('Error deleting category:', error);
-            alert('Deletion failed. Please try again.');
-            // Optionally re-add the category if the deletion request fails
-            this.categories.splice(index, 0, { id: index + 1, title: categoryTitle, subtitle: categoryTitle, bgColor: this.getRandomColor() });
+    confirmAndRemoveCategory(categoryTitle) {
+      if (
+        window.confirm(`Are you sure you want to delete "${categoryTitle}"?`)
+      ) {
+        const index = this.categories.findIndex(
+          (c) => c.title === categoryTitle
+        );
+        if (index !== -1) {
+          this.categories.splice(index, 1);
+          // Optionally send a request to the backend
+          fetch(
+            `http://localhost/deleteCategory?title=${encodeURIComponent(
+              categoryTitle
+            )}`,
+            { method: "DELETE" }
+          )
+            .then((response) => {
+              if (!response.ok) {
+                throw new Error("Failed to delete category");
+              }
+            })
+            .catch((error) => {
+              console.error("Error deleting category:", error);
+              alert("Deletion failed. Please try again.");
+              // Optionally re-add the category if the deletion request fails
+              this.categories.splice(index, 0, {
+                id: index + 1,
+                title: categoryTitle,
+                subtitle: categoryTitle,
+                bgColor: this.getRandomColor(),
+              });
             });
         }
       }
