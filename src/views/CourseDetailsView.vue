@@ -5,7 +5,8 @@
       <div class="header-container">
         <div class="header-left">
           <h1>Course File</h1>
-          <h2>{{ categoryTitle }}: {{ categoryDescription }}</h2>
+
+          <h2>{{ semester_id }}: {{ category_name }}</h2>
         </div>
       </div>
 
@@ -140,7 +141,6 @@
     </div>
   </div>
 </template>
-
 <script>
 import NavbarView from "@/components/NavBar.vue";
 import UploadModalLink from "@/components/UploadModalLink.vue";
@@ -157,9 +157,11 @@ export default {
       showModal: false,
       showEditModal: false,
       selectedFile: null,
-      files: [], // Store files data fetched from the API
+      files: [], // Store files fetched from the API
       categoryTitle: "",
       categoryDescription: "",
+      semester_id: null,
+      category_name: null,
       editForm: {
         id: null,
         refName: "",
@@ -181,30 +183,83 @@ export default {
     },
   },
   methods: {
-    navigateToDetails(id) {
-      this.$router.push(`/category/${id}`);
+    // Fetch data based on category and session
+    fetchFiles() {
+      const session_id = JSON.parse(localStorage.getItem("session_id"));
+      this.semester_id = JSON.parse(sessionStorage.getItem("semester"));
+      this.category_name = JSON.parse(sessionStorage.getItem("category"));
+
+      if (!session_id || !this.semester_id || !this.category_name) {
+        console.error("Missing session, semester, or category information.");
+        return;
+      }
+
+      const url = "http://localhost/getLink";
+
+      fetch(url, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          session_id,
+          semester_id: this.semester_id,
+          category_name: this.category_name,
+        }),
+      })
+        .then((response) => {
+          if (!response.ok) {
+            throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+          }
+          return response.json();
+        })
+        .then((data) => {
+          console.log("API Response:", data);
+          if (data.linkViewable) {
+            console.log("Mapped Files:", data.linkViewable);
+            this.files = data.linkViewable.map((file) => ({
+              id: file.gdlink_id || "N/A",
+              refName: file.ref_name || "No Name",
+              linkDescription: file.description || "No Description",
+              linkPosted: file.created_at || "Not Available",
+              owner: file.owner || "Unknown",
+              url: file.link || "#",
+            }));
+          } else {
+            console.warn("No links found for the given category.");
+            this.files = [];
+          }
+        })
+        .catch((error) => {
+          console.error("Error fetching links:", error.message);
+        });
     },
+
     openUploadModal() {
       this.showModal = true;
     },
+
     closeModal() {
       this.showModal = false;
       this.selectedFile = null;
     },
+
     addFile(newFile) {
       this.files.push({
-        id: newFile.refName, // Generate a unique ID based on the Ref Name
+        id: newFile.refName,
         refName: newFile.refName,
         linkDescription: newFile.description,
         linkPosted: newFile.created,
         owner: newFile.owner,
-        url: newFile.url, // This field holds the URL
+        url: newFile.url,
       });
     },
+
     editRecord(file) {
       this.editForm = { ...file };
       this.showEditModal = true;
     },
+
     closeEditModal() {
       this.showEditModal = false;
       this.editForm = {
@@ -215,6 +270,7 @@ export default {
         url: "",
       };
     },
+
     updateRecord() {
       const index = this.files.findIndex(
         (file) => file.id === this.editForm.id
@@ -224,60 +280,29 @@ export default {
       }
       this.closeEditModal();
     },
+
     deleteRecord(id) {
       this.files = this.files.filter((file) => file.id !== id);
     },
+
     goToFile(file) {
       if (!file.url) {
         alert("No URL provided.");
         return;
       }
-
       const validUrl = /^https?:\/\//i.test(file.url)
         ? file.url
         : `http://${file.url}`;
       window.open(validUrl, "_blank");
     },
+
     searchFiles() {
       console.log("Searching for files with query:", this.searchQuery);
     },
   },
   mounted() {
-    const sem = sessionStorage.getItem("link_refName");
-    console.log(sem); // Check the value in sessionStorage
-
-    if (sem) {
-      // Parse the category data and update the page
-      const parsedSem = JSON.parse(sem);
-      console.log(parsedSem); // Check the parsed object
-      this.link_refName = parsedSem.title; // Extract the category title
-      this.categoryDescription = parsedSem.description; // Extract description
-
-      // Now make the API call based on the category
-      const url = `http://127.0.0.1/getlinkbyRefname?link_refName=${encodeURIComponent(
-        parsedSem
-      )}`;
-
-      console.log(url); // Ensure the URL is formed correctly
-
-      // Fetch the data based on link_refName
-      fetch(url)
-        .then((response) => response.json())
-        .then((data) => {
-          this.files = data.map((file) => ({
-            id: file.link_refName, // Use link_refName for unique id
-            refName: file.link_refName,
-            linkDescription: file.link_description,
-            linkPosted: file.link_posted,
-            linkUrl: file.link_url,
-            owner: file.owner,
-          }));
-          console.log(this.files); // Ensure the data is loaded correctly
-        })
-        .catch((error) => {
-          console.error("Error fetching links:", error);
-        });
-    }
+    // Initialize page by fetching data
+    this.fetchFiles();
   },
 };
 </script>
