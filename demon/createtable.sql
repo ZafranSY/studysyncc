@@ -1,3 +1,5 @@
+
+
 CREATE TABLE sessionSemester (
     semester_id VARCHAR(11) PRIMARY KEY
 );
