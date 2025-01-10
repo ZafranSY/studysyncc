@@ -77,8 +77,11 @@ const payload = {
     semester_id: '2022/2023-2',
     category_name: 'PSM 414',
     new_category_name: 'KUCING',
-    username : "12085",
-    password : "S808323",
+    // username : "12085",
+    // password : "S808323",
+    username : "A16CS4016",
+    password : "201608M10112",
+
 };
 
 const endpoint=crud+type

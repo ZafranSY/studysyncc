@@ -51,6 +51,7 @@ CREATE TABLE categoryPermission (
     can_update BOOLEAN DEFAULT FALSE,
     can_delete BOOLEAN DEFAULT FALSE,
     can_create BOOLEAN DEFAULT FALSE,
+    canManageLinkPerm BOOLEAN DEFAULT FALSE,
     FOREIGN KEY (user_email) REFERENCES user(email),
     FOREIGN KEY (role_name) REFERENCES roles(role_name),
     FOREIGN KEY (semester_id) REFERENCES sessionSemester(semester_id) ON UPDATE CASCADE ON DELETE CASCADE,
@@ -76,3 +77,165 @@ CREATE TABLE linkPermission (
     FOREIGN KEY (gdlink_id) REFERENCES gdlinks(gdlink_id) ON UPDATE CASCADE ON DELETE CASCADE,
     CHECK (user_email IS NULL OR role_name IS NULL)
 );
+-- ------------------------------------------
+-- ACADEMIC OFFICER PERM CANNOT BE OVERRIDEN
+-- ------------------------------------------
+DELIMITER //
+CREATE TRIGGER before_insert_link_permission_AcademicOfficerNoOverride
+BEFORE INSERT ON linkPermission
+FOR EACH ROW
+BEGIN
+    -- If the role is "Academic Officer", set all permissions to TRUE and prevent overriding
+    IF NEW.role_name = 'Academic Officer' THEN
+        SET NEW.can_read = TRUE;
+        SET NEW.can_update = TRUE;
+        SET NEW.can_delete = TRUE;
+    ELSE
+        -- If can_read is FALSE, set other permissions to FALSE
+        IF NEW.can_read = FALSE THEN
+            SET NEW.can_update = FALSE;
+            SET NEW.can_delete = FALSE;
+        END IF;
+    END IF;
+END //
+
+CREATE TRIGGER before_update_link_permission_AcademicOfficerNoOverride
+BEFORE UPDATE ON linkPermission
+FOR EACH ROW
+BEGIN
+    -- If the role is "Academic Officer", prevent overriding and ensure all permissions are TRUE
+    IF NEW.role_name = 'Academic Officer' THEN
+        SET NEW.can_read = TRUE;
+        SET NEW.can_update = TRUE;
+        SET NEW.can_delete = TRUE;
+    ELSE
+        -- If can_read is FALSE, set other permissions to FALSE
+        IF NEW.can_read = FALSE THEN
+            SET NEW.can_update = FALSE;
+            SET NEW.can_delete = FALSE;
+        END IF;
+    END IF;
+END //
+
+
+------------------------------------------
+-- can_read FALSE,, ALL WILL BE FALSE
+------------------------------------------
+
+
+CREATE TRIGGER before_insert_category_permission_ReadFalseAllFalse
+BEFORE INSERT ON categoryPermission
+FOR EACH ROW
+BEGIN
+    IF NEW.can_read = FALSE THEN
+        SET NEW.can_update = FALSE;
+        SET NEW.can_delete = FALSE;
+        SET NEW.can_create = FALSE;
+        SET NEW.canManageLinkPerm = FALSE;
+    END IF;
+END //
+
+CREATE TRIGGER before_update_category_permission_ReadFalseAllFalse
+BEFORE UPDATE ON categoryPermission
+FOR EACH ROW
+BEGIN
+    IF NEW.can_read = FALSE THEN
+        SET NEW.can_update = FALSE;
+        SET NEW.can_delete = FALSE;
+        SET NEW.can_create = FALSE;
+        SET NEW.canManageLinkPerm = FALSE;
+    END IF;
+END //
+
+
+------------------------------------------
+-- GDLINK OWNER PERM CANNOT BE OVERRIDEN
+------------------------------------------
+
+
+
+CREATE TRIGGER before_insert_link_permission_NoOverrideOwner
+BEFORE INSERT ON linkPermission
+FOR EACH ROW
+BEGIN
+    -- Check if the user_email is the owner of the gdlink_id
+    DECLARE owner_email VARCHAR(255);
+    SELECT owner INTO owner_email
+    FROM gdlinks
+    WHERE gdlink_id = NEW.gdlink_id;
+    
+    -- If the user is the owner of the gdlink_id, set all permissions to TRUE
+    IF NEW.user_email = owner_email THEN
+        SET NEW.can_read = TRUE;
+        SET NEW.can_update = TRUE;
+        SET NEW.can_delete = TRUE;
+    ELSE
+        -- If can_read is FALSE, set other permissions to FALSE
+        IF NEW.can_read = FALSE THEN
+            SET NEW.can_update = FALSE;
+            SET NEW.can_delete = FALSE;
+        END IF;
+    END IF;
+END //
+
+
+------------------------------------------
+-- No Delete Everyone on both perm table
+------------------------------------------
+
+
+CREATE TRIGGER before_delete_link_permission_NoDeleteEveryone
+BEFORE DELETE ON linkPermission
+FOR EACH ROW
+BEGIN
+    -- Check if the role being deleted is "Everyone"
+    IF OLD.role_name = 'Everyone' THEN
+        SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'Cannot delete the "Everyone" role';
+    END IF;
+END //
+
+
+
+CREATE TRIGGER before_delete_category_permission_NoDeleteEveryone
+BEFORE DELETE ON categoryPermission
+FOR EACH ROW
+BEGIN
+    -- Check if the role being deleted is "Everyone"
+    IF OLD.role_name = 'Everyone' THEN
+        SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'Cannot delete the "Everyone" role';
+    END IF;
+END //
+
+
+------------------------------------------
+-- AUTO PERM FOR LINKS OWNER 
+------------------------------------------
+
+
+CREATE TRIGGER after_insert_gdlinks_grant_owner_permissions
+AFTER INSERT ON gdlinks
+FOR EACH ROW
+BEGIN
+    INSERT INTO linkPermission (category, semester_id, gdlink_id, user_email, role_name, can_read, can_update, can_delete)
+    VALUES (NEW.category, NEW.sessem, NEW.gdlink_id, NEW.owner, NULL, TRUE, TRUE, TRUE);
+END //
+
+
+
+------------------------------------------
+-- AUTO PERMS FOR CATEGORIES, FOR ACADEMIC OFFICER
+------------------------------------------
+
+-- Grant all permissions for the "Academic Officer" role in Categories
+CREATE TRIGGER after_insert_categories_grant_academic_officer_permissions
+AFTER INSERT ON Categories
+FOR EACH ROW
+BEGIN
+    INSERT INTO categoryPermission (category, semester_id, user_email, role_name, can_read, can_update, can_delete, can_create, canManageLinkPerm)
+    VALUES (NEW.category, NEW.semester_id, NULL, 'Academic Officer', TRUE, TRUE, TRUE, TRUE, TRUE);
+END //
+
+
+DELIMITER ;

@@ -24,4 +24,8 @@ Category
 
 
 Permission
--add constarinst,,, if read==0 ,, then set all other to 0 aswell
+-add constarinst,,, if read==0 ,, then set all other to 0 aswell////
+- make it so that if new gdlinks,, then auto set perm///
+
+-academic officer override not working
+-deleting academic officer is illegal is not working
