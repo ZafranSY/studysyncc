@@ -8,6 +8,7 @@
       <!-- Header Section -->
       <div class="header">
         <h1 class="page-title">Home</h1>
+        <h1>{{ semester_id }}</h1>
         <h2 class="section-title">Category</h2>
       </div>
 
@@ -78,6 +79,7 @@ export default {
       searchQuery: "",
       categories: [],
       showCategoryModal: false,
+      semester_id: null, // Add this line
     };
   },
   computed: {
@@ -100,9 +102,9 @@ export default {
   },
   mounted() {
     const session_id = JSON.parse(localStorage.getItem("session_id"));
-    const semester_id = JSON.parse(sessionStorage.getItem("semester"));
+    this.semester_id = JSON.parse(sessionStorage.getItem("semester")); // Assign immediately
     console.log("Session ID:", session_id);
-    console.log("Semester ID:", semester_id);
+    console.log("Semester ID:", this.semester_id);
 
     fetch("http://localhost/getCategory", {
       method: "POST",
@@ -111,7 +113,7 @@ export default {
       },
       body: JSON.stringify({
         session_id,
-        semester_id,
+        semester_id: this.semester_id,
       }),
     })
       .then((response) => {
