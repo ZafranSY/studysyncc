@@ -12,6 +12,27 @@ sub getSemester {
     return \@semesters;
 }
 
+sub getAllCategoriesWithinSemesterCount {
+    my ($dbh,$session_id,$semester_id) = @_;
+    my $sth = $dbh->prepare('SELECT COUNT(*) AS category_count FROM Categories WHERE semester_id = ?')
+        or die 'prepare statement failed: ' . $dbh->errstr();
+    $sth->execute($semester_id) or die 'execution failed: ' . $dbh->errstr();
+    my $row = $sth->fetchrow_hashref;
+    return $row->{category_count};
+}
+
+
+sub getViewableCategoriesWithinSemesterCount {
+    my ($dbh,$session_id,$semester_id) = @_;
+    my $role_name=Authorization::getRoleName($dbh, $session_id);
+    my $email=Authorization::getEmail($dbh, $session_id);
+    my $sth = $dbh->prepare('SELECT COUNT(*) AS category_count FROM categoryPermission where semester_id= ? AND (user_email= ? OR role_name= ? OR role_name=\'Everyone\') AND can_read_category=1  ')
+        or die 'prepare statement failed: ' . $dbh->errstr();
+    $sth->execute($semester_id,$email,$role_name,) or die 'execution failed: ' . $dbh->errstr();
+    my $row = $sth->fetchrow_hashref;
+    return $row->{category_count};
+}
+
 sub CreateSemester {
     my ($dbh, $semester_id) = @_;
     if (!$semester_id || length($semester_id) != 11) {
