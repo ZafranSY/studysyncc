@@ -70,7 +70,7 @@ export default {
             localStorage.setItem("session_id", JSON.stringify(data.result[0].session_id));
 
             loggedIn.value = true;
-            // router.push("/homeview");
+            router.push("/homeview");
         } else {
             alert(data.message || "Login failed. Please try again.");
         }
