@@ -81,7 +81,7 @@ export default {
 };
 </script>
 
-<style scoped>
+<style>
 .semester-card {
   position: relative;
   width: 306px;
