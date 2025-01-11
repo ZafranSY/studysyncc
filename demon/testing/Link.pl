@@ -74,6 +74,92 @@ sub getLink {
     return \@result;
 }
 
+sub getALLlink {
+    my ($dbh,$session_id) = @_;
+    my $role_name=Authorization::getRoleName($dbh, $session_id);
+    my $email=Authorization::getEmail($dbh, $session_id);
+    my $sth = $dbh->prepare('
+            SELECT * from gdlinks 
+                where owner= ?
+                OR gdlink_id IN 
+                    (
+                    select gdlink_id from linkPermission 
+                        where   
+                                (
+                                user_email= ?
+                                OR role_name=\'Everyone\' 
+                                OR role_name=  ? 
+                                )
+                            AND can_read=1
+                    
+                        AND category IN 
+                            (
+                            select DISTINCT category from categoryPermission 
+                                where can_read_category=1 
+                                AND 
+                                    (
+                                    role_name=\'Everyone\' 
+                                    OR role_name=? 
+                                    OR user_email=?
+                                    )   
+                            )
+                    )
+
+                OR "Academic Officer"=?    
+    ')
+        or die 'prepare statement failed: ' . $dbh->errstr();
+    $sth->execute($email, $email, $role_name,$role_name,$email,$role_name)
+        or die 'execution failed: ' . $dbh->errstr();
+
+    my @result;
+    while (my @row = $sth->fetchrow_array) {
+        push @result, \@row;  
+    }
+    
+    return \@result;
+}
+
+
+sub getALLlinkCount {
+    my ($dbh,$session_id) = @_;
+    my $role_name=Authorization::getRoleName($dbh, $session_id);
+    my $email=Authorization::getEmail($dbh, $session_id);
+    my $sth = $dbh->prepare('
+            SELECT COUNT(*) from gdlinks 
+                where owner= ?
+                OR gdlink_id IN 
+                    (
+                    select gdlink_id from linkPermission 
+                        where   
+                                (
+                                user_email= ?
+                                OR role_name=\'Everyone\' 
+                                OR role_name=  ? 
+                                )
+                            AND can_read=1
+                    
+                        AND category IN 
+                            (
+                            select DISTINCT category from categoryPermission 
+                                where can_read_category=1 
+                                AND 
+                                    (
+                                    role_name=\'Everyone\' 
+                                    OR role_name=? 
+                                    OR user_email=?
+                                    )   
+                            )
+                    )
+
+                OR "Academic Officer"=?    
+    ')
+        or die 'prepare statement failed: ' . $dbh->errstr();
+    $sth->execute($email, $email, $role_name,$role_name,$email,$role_name)
+        or die 'execution failed: ' . $dbh->errstr();
+
+    my $row = $sth->fetchrow_hashref;
+    return $row->{'COUNT(*)'};
+}
 
 sub CreateLink {
     my ($dbh,$session_id, $semester_id,$category_name,$ref_name,$desc,$link) = @_;
