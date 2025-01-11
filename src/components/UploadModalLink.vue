@@ -72,8 +72,8 @@ export default {
   methods: {
     async handleSubmit() {
       const session_id = localStorage.getItem("session_id");
-      const semester_id = sessionStorage.getItem("semester_id"); // Make sure this is stored
-      const category_name = sessionStorage.getItem("category_name"); // Make sure this is stored
+      const semester_id = sessionStorage.getItem("semester"); // Make sure this is stored
+      const category_name = sessionStorage.getItem("category"); // Make sure this is stored
 
       const payload = {
         session_id,
