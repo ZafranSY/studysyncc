@@ -170,7 +170,7 @@ post '/getCategory' => sub ($c) {
     $c->render(json => { categoriesPermission => $categoryPermission });
 };
 
-# http://localhost/getAllCategoriesWithinSemesterCount
+# http://localhost/getAllLinksWithinCategoryCount
 # request body =>
 #       session_id : ??  ======= get from localStorage
 #       semester_id : ?? i.e 2024/2025-1
@@ -281,6 +281,29 @@ post '/getLink' => sub ($c) {
     my $category_name   = $payload->{category_name};
     my $linkVisibile = Link::getLink($dbh,$session_id, $semester_id,$category_name);
     $c->render(json => { linkViewable => $linkVisibile });
+};
+
+#  http://localhost/getAllLink             CAN VIEW PERMISSIBLE LINKS ONLY
+#  request body =>
+#        session_id : ??     ======= get from localStorage
+#        semester_id : ??    ======= get from localStorage  
+
+post '/getAllLink' => sub ($c) {
+    my $payload = $c->req->json;
+    my $session_id   = $payload->{session_id};
+    my $linkVisibile = Link::getALLlink($dbh,$session_id);
+    $c->render(json => { allLinks => $linkVisibile });
+};
+
+#  http://localhost/getAllLinkCount             CAN VIEW PERMISSIBLE LINKS ONLY
+#  request body =>
+#        session_id : ??     ======= get from localStorage
+#        semester_id : ??    ======= get from localStorage  
+post '/getAllLinkCount' => sub ($c) {
+    my $payload = $c->req->json;
+    my $session_id   = $payload->{session_id};
+    my $linkVisibile = Link::getALLlinkCount($dbh,$session_id);
+    $c->render(json => { linkCount => $linkVisibile });
 };
 
 

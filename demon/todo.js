@@ -1,35 +1,3 @@
-// ===================================================
-// ===================================================
-//              EXTRAAAA
-// ===================================================
-// ===================================================
-
-
-// SEMESTER CARD
-//  http://localhost/getAllCategoriesWithinSemesterCount
-//  request body =>
-//        session_id : ??  ======= get from localStorage
-//        semester_id : ?? i.e 2024/2025-1
-//  http://localhost/getViewableCategoriesWithinSemesterCount
-//  request body =>
-//        session_id : ??  ======= get from localStorage
-//        semester_id : ?? i.e 2024/2025-1
-
-// CATEGORY CARD
-//  http://localhost/getAllCategoriesWithinSemesterCount
-//  request body =>
-//        session_id : ??  ======= get from localStorage
-//        semester_id : ?? i.e 2024/2025-1
-//        category_name : ??
-
-//  http://localhost/getViewableLinksWithinCategoryCount
-//  request body =>
-//        session_id : ??  ======= get from localStorage
-//        semester_id : ?? i.e 2024/2025-1
-//        category_name : ??
-
-
-
 
 // ===================================================
 // ===================================================
@@ -53,6 +21,21 @@
 
 
 // http://localhost/getSemester
+
+// SEMESTER CARD
+
+//  http://localhost/getAllCategoriesWithinSemesterCount    COUNT OF ALL VIEWABLE CATEGORY IN THAT SEMESTER
+//  request body =>
+//        session_id : ??  ======= get from localStorage
+//        semester_id : ?? i.e 2024/2025-1
+
+
+//  http://localhost/getViewableCategoriesWithinSemesterCount       COUNT OF ALL CATEGORIES
+//  request body =>
+//        session_id : ??  ======= get from localStorage
+//        semester_id : ?? i.e 2024/2025-1
+
+
 
 // http://localhost/createSemester              ACADEMIC OFFICER ONLY
 // request body =>
@@ -88,6 +71,26 @@
 //       session_id : ??     ======= get from localStorage
 //       semester_id : ??    ======= get from localStorage  
 
+
+// CATEGORY CARD
+
+//  http://localhost/getAllLinksWithinCategoryCount    COUNT OF ALL VIEWABLE LINKS IN THAT CATEGORY
+//  request body =>
+//        session_id : ??  ======= get from localStorage
+//        semester_id : ?? i.e 2024/2025-1
+//        category_name : ??
+
+
+
+//  http://localhost/getViewableLinksWithinCategoryCount     COUNT OF ALL LINK  IN THAT CATEGORY
+//  request body =>
+//        session_id : ??  ======= get from localStorage
+//        semester_id : ?? i.e 2024/2025-1
+//        category_name : ??
+
+
+
+
 // http://localhost/createCategory          ACADEMIC OFFICER ONLY
 // request body =>
 //       session_id : ??     ======= get from localStorage
@@ -122,6 +125,18 @@
 //       session_id : ??     ======= get from localStorage
 //       semester_id : ??    ======= get from localStorage  
 //       category_name : ??  ======= get from localStorage
+
+
+//  http://localhost/getAllLink             CAN VIEW PERMISSIBLE LINKS ONLY
+//  request body =>
+//        session_id : ??     ======= get from localStorage
+//        semester_id : ??    ======= get from localStorage  
+
+//  http://localhost/getAllLinkCount             CAN VIEW PERMISSIBLE LINKS ONLY
+//  request body =>
+//        session_id : ??     ======= get from localStorage
+//        semester_id : ??    ======= get from localStorage 
+
 
 // http://localhost/createLink         ONLY FOR ACADEMIC OFFICER & PEOPLE WITH CREATE PERM WITHIN CATEGORY
 // request body =>
