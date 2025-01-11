@@ -20,24 +20,10 @@ async function runTest(METHOD,link,payload) {
 }
 
 
-// eslint-disable-next-line no-unused-vars
-const b=
-{
-    "session_id": "ab",
-    "new_semester_id": "2099/2012-3",
-    "semester_id": "2099/3212-2",
-    "category_name": "PSM 414",
-    "new_category_name": "KUCING",
-    "username" : "12085",
-    "password" : "S808323",
-    "username1" : "A16CS4016",
-    "password1" : "201608M10112",
-}
-
 const host='http://localhost:80'
 let METHOD='post'
-const crud='/'
-const type='updateLink'
+const crud='/delete'
+const type='CategoryPermission'
 
 
 // ONLY for GET method, can leave this alone if POST
@@ -45,7 +31,7 @@ const PARAMTYPE='?semester_id'
 const PARAMVALUE='=2024/2025-1'
 
 const payload = {
-    session_id: 'ab',
+    session_id: '313',
 
     semester_id: '2024/2025-1',
     category_name: 'Meow',
@@ -65,6 +51,13 @@ const payload = {
     new_ref_name : 'white cat' ,
     new_desc : 'orange cat ',
     new_link : 'whatss.com',
+
+    // insert_user_role : "Academic Officer",
+    // insert_user_email : "johnStu@utm.com",
+    can_read_category : false ,
+    can_create_links : false,
+    selected_user_role : 'Everyone',
+    // selected_user_email : 'johnStu@utm.com',
     
 };
 
