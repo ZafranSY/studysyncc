@@ -37,7 +37,7 @@ const b=
 const host='http://localhost:80'
 let METHOD='post'
 const crud='/'
-const type='getALLlinkIdDelete'
+const type='updateLink'
 
 
 // ONLY for GET method, can leave this alone if POST
@@ -46,18 +46,26 @@ const PARAMVALUE='=2024/2025-1'
 
 const payload = {
     session_id: 'ab',
+
     semester_id: '2024/2025-1',
     category_name: 'Meow',
+
     new_semester_id: '2099/2012-3',
     new_category_name: 'Meow',
     // username : "12085",
     // password : "S808323",
     username : "johnAcad",
     password : "johnAcad",
+
     ref_name :"History Black Catto",
     desc : "The detailed untold history",
     link :"google.com",
-    gdlink_id : "11238"
+
+    gdlink_id : "11230",
+    new_ref_name : 'white cat' ,
+    new_desc : 'orange cat ',
+    new_link : 'whatss.com',
+    
 };
 
 const endpoint=crud+type

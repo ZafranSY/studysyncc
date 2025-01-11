@@ -279,40 +279,41 @@ REMARKS
 If available,, it will still say success LOL
 
 =================================================================================================================
-=================================================================================================================
-=================================================================================================================
-=================================================================================================================
-=================================================================================================================
-=================================================================================================================
-=================================================================================================================
-WORK IN PROGRESS
-
 
 
 http://localhost/deleteLink        ONLY FOR ACADEMIC OFFICER & PEOPLE WITH DELETE PERM WITHIN CATEGORY & LINK OWNER
 request body =>
-      session_id : ??     ======= get from localStorage
-      semester_id : ??    ======= get from localStorage
-      category_name : ??  ======= get from localStorage
-      link id       : ??  ======= get from click
+    session_id : 'ab'             ======= get from localStorage
+    semester_id :  2024/2025-1    ======= get from localStorage
+    category_name : 'Meow'        ======= get from localStorage
+    link id       : '11237'       ======= get from click
 
 OUTPUT
-{"result":{"message":"YOU DO NOT HAVE PERMISSION TO DELETE gdlink_id 11233 OR IT DOESNT EXIST"}}
+{"result":{"message":"gdlink_id 11237 in Meow, 2024/2025-1 deleted successfully"}}
 
+OUTPUT
+{"result":{"message":"YOU DO NOT HAVE PERMISSION TO DELETE gdlink_id 11237 OR IT DOESNT EXIST"}}
 
 REMARKS 
 If link doesnt exist , it will say it delete successfully
 
+=================================================================================================================
 
 
 http://localhost/updateLink          ONLY FOR ACADEMIC OFFICER & PEOPLE WITH UPDATE PERM WITHIN CATEGORY & LINK OWNER
 request body =>
-      session_id : ??    ======= get from localStorage
-      semester_id : ??   ======= get from localStorage
-      category_name : ?? ======= get from localStorage
-      link uh this is hard
+    session_id : ??    ======= get from localStorage
+    semester_id : ??   ======= get from localStorage
+    category_name : ?? ======= get from localStorage
+    link uh this is hard
 
+OUTPUT
+{"result":{"message":"gdlink_id 11230 in Meow, 2024/2025-1 edited successfully"}}
 
+OUTPUT
+{"result":{"message":"YOU DO NOT HAVE PERMISSION TO EDIT gdlink_id 84 OR IT DOESNT EXIST"}}
+
+=================================================================================================================
 
 =================================================================================================================
 =================================================================================================================

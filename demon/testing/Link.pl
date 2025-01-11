@@ -394,10 +394,15 @@ sub DeleteLink{
     my @canDeleteId=Link::getALLlinkIdDelete($dbh, $session_id);
 
     my $found = 0;
-    my @arr2d = map { @$_ } @canDeleteId;
-    my @deleteArrayID = map { @$_ } @arr2d;
-    $logger->info(Dumper(\@deleteArrayID)) ;
+    my @fixedArr = map { @$_ } @canDeleteId;
     
+    foreach my $id (@fixedArr) {
+        if ($id == $gdlink_id) {
+            $found = 1;
+            last;  
+        }
+    }
+
     if (!$found) {
         return { message => "YOU DO NOT HAVE PERMISSION TO DELETE gdlink_id $gdlink_id OR IT DOESNT EXIST" };
     } 
@@ -409,7 +414,47 @@ sub DeleteLink{
     if ($result) {
         return { message => "gdlink_id $gdlink_id in $category_name, $semester_id deleted successfully" };
     } else {
-        return { error => "Failed to delete category in gdlink_id $gdlink_id $category_name, $semester_id" };
+        return { error => "Failed to delete gdlink_id $gdlink_id in $category_name, $semester_id" };
+    }
+
+}
+
+sub UpdateLink{
+    my ($dbh,$session_id, $semester_id,$category_name,$new_ref_name,$new_desc,$new_link,$gdlink_id) = @_;
+    my $role_name=Authorization::getRoleName($dbh, $session_id);
+    my $email=Authorization::getEmail($dbh, $session_id);
+    my @canEditId=Link::getALLlinkIdUpdate($dbh, $session_id);
+
+    my $found = 0;
+    my @fixedArr = map { @$_ } @canEditId;
+    
+    foreach my $id (@fixedArr) {
+    if ($id == $gdlink_id) {
+        $found = 1;
+        last;  
+    }
+    }
+
+    if (!$found) {
+        return { message => "YOU DO NOT HAVE PERMISSION TO EDIT gdlink_id $gdlink_id OR IT DOESNT EXIST" };
+    } 
+
+    my $sth_insert = $dbh->prepare('
+                UPDATE gdlinks
+                    SET 
+                        ref_name = ?,
+                        description = ?,
+                        link = ?
+                    WHERE gdlink_id = ?;
+    
+    ') 
+                or die 'prepare statement failed: ' . $dbh->errstr();
+    $result=$sth_insert->execute($new_ref_name,$new_desc,$new_link,$gdlink_id) 
+                or die 'prepare statement failed: ' . $dbh->errstr();
+    if ($result) {
+        return { message => "gdlink_id $gdlink_id in $category_name, $semester_id edited successfully" };
+    } else {
+        return { error => "Failed to edit  gdlink_id $gdlink_id in $category_name, $semester_id" };
     }
 
 }

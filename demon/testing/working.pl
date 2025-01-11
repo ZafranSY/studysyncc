@@ -354,7 +354,8 @@ post '/getALLlinkCreateWhere' => sub ($c) {
 
 
 
-#  http://localhost/createLink         ONLY FOR ACADEMIC OFFICER & PEOPLE WITH CREATE PERM WITHIN CATEGORY#  request body =>
+#  http://localhost/createLink         ONLY FOR ACADEMIC OFFICER & PEOPLE WITH CREATE PERM WITHIN CATEGORY
+#  request body =>
 #        session_id : ??     ======= get from localStorage
 #        semester_id : ??    ======= get from localStorage  
 #        category_name : ??  ======= get from localStorage
@@ -374,7 +375,8 @@ post '/createLink' => sub ($c) {
 };
 
 
-#  http://localhost/deleteLink         ONLY FOR ACADEMIC OFFICER & PEOPLE WITH CREATE PERM WITHIN CATEGORY#  request body =>
+#  http://localhost/deleteLink         ONLY FOR ACADEMIC OFFICER & PEOPLE WITH CREATE PERM WITHIN CATEGORY
+#  request body =>
 #        session_id : ??     ======= get from localStorage
 #        semester_id : ??    ======= get from localStorage  
 #        category_name : ??  ======= get from localStorage
@@ -390,21 +392,27 @@ post '/deleteLink' => sub ($c) {
 };
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+#  http://localhost/updateLink         ONLY FOR ACADEMIC OFFICER & PEOPLE WITH CREATE PERM WITHIN CATEGORY
+#  request body =>
+#        session_id : ??    ======= get from localStorage
+#        semester_id : ??   ======= get from localStorage  
+#        category_name : ?? ======= get from localStorage
+#        new_ref_name : ??  ======= get from form
+#        new_desc : ??      ======= get from form
+#        new_link : ??      ======= get from form
+#        gdlink_id : ????   ======= get when u click the delete button
+post '/updateLink' => sub ($c) {
+    my $payload = $c->req->json;
+    my $session_id   = $payload->{session_id};
+    my $semester_id   = $payload->{semester_id};
+    my $category_name   = $payload->{category_name};
+    my $new_ref_name   = $payload->{new_ref_name};
+    my $new_desc   = $payload->{new_desc};
+    my $new_link   = $payload->{new_link};
+    my $gdlink_id   = $payload->{gdlink_id};
+    my $result = Link::UpdateLink($dbh,$session_id, $semester_id,$category_name,$new_ref_name,$new_desc,$new_link,$gdlink_id);
+    $c->render(json => { result => $result });
+};
 
 
 
