@@ -1,12 +1,8 @@
 <template>
   <div class="main-container">
-    <!-- Navbar Component -->
     <NavbarView />
-    <!-- Main Content -->
     <div class="content-wrapper">
-      <!-- Page Title -->
       <h2 class="page-title">All Links</h2>
-      <!-- Search Bar -->
       <div class="search-container">
         <div class="search-bar-with-icon">
           <i class="search-icon">&#128269;</i>
@@ -19,7 +15,6 @@
           />
         </div>
       </div>
-      <!-- Files Table -->
       <div class="table-container">
         <table class="file-table">
           <thead>
@@ -33,17 +28,16 @@
             </tr>
           </thead>
           <tbody>
-            <!-- Display Rows if Files Exist -->
-            <tr v-for="file in filteredFiles" :key="file.ref_name + file.sessem">
+            <tr v-for="file in filteredFiles" :key="file.refName + file.linkPosted">
               <td>{{ file.category || "N/A" }}</td>
-              <td>{{ file.sessem || "N/A" }}</td>
-              <td>{{ file.ref_name || "N/A" }}</td>
-              <td>{{ file.description || "No description available" }}</td>
-              <td>{{ file.owner || "Unknown owner" }}</td>
+              <td class="session-column">{{ file.linkPosted || "N/A" }}</td> <!-- Updated class -->
+              <td>{{ file.refName || "No Name" }}</td>
+              <td>{{ file.linkDescription || "No Description" }}</td>
+              <td>{{ file.owner || "Unknown" }}</td>
               <td>
                 <a
-                  v-if="file.link"
-                  :href="file.link"
+                  v-if="file.url"
+                  :href="file.url"
                   target="_blank"
                   rel="noopener noreferrer"
                   class="action-btn"
@@ -53,7 +47,6 @@
                 <span v-else>No link</span>
               </td>
             </tr>
-            <!-- No Files Message -->
             <tr v-if="filteredFiles.length === 0">
               <td colspan="6" class="no-files-text">No files found.</td>
             </tr>
@@ -64,9 +57,8 @@
   </div>
 </template>
 
-
 <script>
-import NavbarView from "@/components/NavBar.vue"; // Importing Navbar Component
+import NavbarView from "@/components/NavBar.vue"; // Import Navbar Component
 
 export default {
   components: {
@@ -74,54 +66,75 @@ export default {
   },
   data() {
     return {
-      files: [], // Stores all files
+      files: [], // Stores all fetched files
       filteredFiles: [], // Stores filtered files for search
       searchTerm: "", // Search term entered by user
     };
   },
   methods: {
-  fetchAllFiles() {
-    fetch("http://localhost/getlink")  // Fetch from the backend
-      .then((response) => {
-        if (!response.ok) {
-          throw new Error(`HTTP error! Status: ${response.status}`);
-        }
-        return response.json();  // Convert the response to JSON
-      })
-      .then((data) => {
-        console.log("Fetched files:", data);  // Log the fetched data for debugging
-        // Map files to a proper structure if needed
-        this.files = data.map((file, index) => ({
-          id: index + 1,
-          category: file.category || "N/A",
-          ref_name: file.ref_name || "N/A",
-          sessem: file.sessem || "N/A",
-          description: file.description || "No description available",
-          owner: file.owner || "Unknown owner",
-          link: file.link || null,
-        }));
-        this.filteredFiles = this.files;  // Set filtered files for table display
-      })
-      .catch((error) => {
-        console.error("Error fetching files:", error);
-        alert("Failed to load files.");
-      });
-  },
+    fetchAllFiles() {
+      const session_id = localStorage.getItem("session_id");
+      const semester_id = sessionStorage.getItem("semester_id");
+      const category_name = sessionStorage.getItem("category_name");
 
-  filterFiles() {
-    const term = this.searchTerm.toLowerCase();  // Convert search term to lowercase
-    this.filteredFiles = this.files.filter(
-      (file) =>
-        file.description?.toLowerCase().includes(term) ||
-        file.category?.toLowerCase().includes(term) ||
-        file.ref_name?.toLowerCase().includes(term) ||
-        file.owner?.toLowerCase().includes(term)
-    );
-  },
-},
+      if (!session_id || !semester_id || !category_name) {
+        console.error("Required information is missing.");
+        return;
+      }
 
+      const url = "http://localhost/getAllLink";
+
+      fetch(url, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          session_id: session_id,
+          semester_id: semester_id,
+          category_name: category_name,
+        }),
+      })
+        .then((response) => {
+          if (!response.ok) {
+            throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+          }
+          return response.json();
+        })
+        .then((data) => {
+          if (data.allLinks) {
+            this.files = data.allLinks.map((file) => ({
+              id: file[0] || "N/A",
+              category: file[1] || "N/A",
+              linkPosted: file[2] || "Not Available", // Session
+              refName: file[3] || "No Name",
+              linkDescription: file[4] || "No Description",
+              owner: file[5] || "Unknown",
+              url: file[6] || "#",
+            }));
+            this.filteredFiles = this.files;
+          } else {
+            this.files = [];
+            this.filteredFiles = [];
+          }
+        })
+        .catch((error) => {
+          console.error("Error fetching links:", error.message);
+        });
+    },
+    filterFiles() {
+      const term = this.searchTerm.toLowerCase();
+      this.filteredFiles = this.files.filter(
+        (file) =>
+          file.linkDescription?.toLowerCase().includes(term) ||
+          file.category?.toLowerCase().includes(term) ||
+          file.refName?.toLowerCase().includes(term) ||
+          file.owner?.toLowerCase().includes(term)
+      );
+    },
+  },
   mounted() {
-    this.fetchAllFiles(); // Fetch data when component loads
+    this.fetchAllFiles();
   },
 };
 </script>
@@ -141,12 +154,10 @@ export default {
   font-size: 1.8em;
   margin-bottom: 20px;
   color: #2c3e50;
-  text-align: left; /* Left-align the heading */
 }
 .search-container {
   margin-bottom: 20px;
 }
-
 .search-bar-with-icon {
   display: flex;
   align-items: center;
@@ -155,20 +166,17 @@ export default {
   padding: 10px;
   background-color: white;
 }
-
 .search-icon {
   font-size: 18px;
   margin-right: 10px;
   color: #888;
 }
-
 .search-input {
   width: 100%;
   border: none;
   outline: none;
   font-size: 16px;
 }
-
 .table-container {
   background-color: white;
   padding: 20px;
@@ -189,6 +197,9 @@ export default {
   background-color: #f4f4f4;
   font-weight: 600;
 }
+.file-table td.session-column {
+  white-space: nowrap; /* Prevent line breaks */
+}
 .no-files-text {
   text-align: center;
   color: #666;
@@ -205,4 +216,3 @@ export default {
   display: inline-block;
 }
 </style>
-
