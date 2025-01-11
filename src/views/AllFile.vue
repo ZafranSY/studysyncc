@@ -19,6 +19,7 @@
         <table class="file-table">
           <thead>
             <tr>
+              <th>No.</th> <!-- Added No. column -->
               <th>Category</th>
               <th>Session</th>
               <th>Name</th>
@@ -28,9 +29,10 @@
             </tr>
           </thead>
           <tbody>
-            <tr v-for="file in filteredFiles" :key="file.refName + file.linkPosted">
+            <tr v-for="(file, index) in filteredFiles" :key="file.refName + file.linkPosted">
+              <td>{{ index + 1 }}</td> <!-- Display row number -->
               <td>{{ file.category || "N/A" }}</td>
-              <td class="session-column">{{ file.linkPosted || "N/A" }}</td> <!-- Updated class -->
+              <td class="session-column">{{ file.linkPosted || "N/A" }}</td>
               <td>{{ file.refName || "No Name" }}</td>
               <td>{{ file.linkDescription || "No Description" }}</td>
               <td>{{ file.owner || "Unknown" }}</td>
@@ -48,7 +50,7 @@
               </td>
             </tr>
             <tr v-if="filteredFiles.length === 0">
-              <td colspan="6" class="no-files-text">No files found.</td>
+              <td colspan="7" class="no-files-text">No files found.</td> <!-- Updated colspan to 7 -->
             </tr>
           </tbody>
         </table>
@@ -79,13 +81,14 @@ export default {
 
       if (!session_id || !semester_id || !category_name) {
         console.error("Required information is missing.");
+        alert("Required information is missing. Please log in and select the correct options.");
         return;
       }
 
-      const url = "http://localhost/getAllLink";
+      const url = "http://localhost/getAllLink"; // Ensure the backend is listening on this endpoint
 
       fetch(url, {
-        method: "POST",
+        method: "POST", // Use POST request
         headers: {
           "Content-Type": "application/json",
         },
@@ -104,15 +107,15 @@ export default {
         .then((data) => {
           if (data.allLinks) {
             this.files = data.allLinks.map((file) => ({
-              id: file[0] || "N/A",
+              id: file[0] || "N/A", // Internal ID
               category: file[1] || "N/A",
-              linkPosted: file[2] || "Not Available", // Session
+              linkPosted: file[2] || "Not Available",
               refName: file[3] || "No Name",
               linkDescription: file[4] || "No Description",
               owner: file[5] || "Unknown",
               url: file[6] || "#",
             }));
-            this.filteredFiles = this.files;
+            this.filteredFiles = this.files; // Initialize filtered list
           } else {
             this.files = [];
             this.filteredFiles = [];
@@ -120,6 +123,7 @@ export default {
         })
         .catch((error) => {
           console.error("Error fetching links:", error.message);
+          alert("Failed to load links. Please try again later.");
         });
     },
     filterFiles() {
@@ -134,7 +138,7 @@ export default {
     },
   },
   mounted() {
-    this.fetchAllFiles();
+    this.fetchAllFiles(); // Automatically fetch files when the component is mounted
   },
 };
 </script>
