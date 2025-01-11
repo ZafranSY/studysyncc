@@ -330,6 +330,7 @@ export default {
   justify-content: space-between; /* Align left and right sections */
   align-items: flex-end; /* Align bottom edges of h1 and h2 */
   margin-bottom: 20px;
+  margin-left: 20px;
 }
 
 .header-left {

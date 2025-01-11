@@ -44,7 +44,9 @@
         />
 
         <div class="modal-actions">
-          <button type="button" class="btn cancel" @click="$emit('close')">Cancel</button>
+          <button type="button" class="btn cancel" @click="$emit('close')">
+            Cancel
+          </button>
           <button type="submit" class="btn save">Save</button>
         </div>
       </form>
@@ -54,41 +56,67 @@
 
 <script>
 export default {
-  name: 'UploadModalLink',
+  name: "UploadModalLink",
   props: {
     show: Boolean,
-    file: Object
   },
   data() {
     return {
       formData: {
-        refName: '',
-        description: '',
-        created: '',
-        owner: '',
-        url: ''
-      }
-    }
+        refName: "",
+        description: "",
+        url: "",
+      },
+    };
   },
   methods: {
-    handleSubmit() {
-      this.$emit('save', { ...this.formData })
-      this.$emit('close')
-      this.resetForm()
+    async handleSubmit() {
+      const session_id = localStorage.getItem("session_id");
+      const semester_id = sessionStorage.getItem("semester_id"); // Make sure this is stored
+      const category_name = sessionStorage.getItem("category_name"); // Make sure this is stored
+
+      const payload = {
+        session_id,
+        semester_id,
+        category_name,
+        ref_name: this.formData.refName,
+        desc: this.formData.description,
+        link: this.formData.url,
+      };
+
+      try {
+        const response = await fetch("http://localhost/createLink", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(payload),
+        });
+
+        const result = await response.json();
+        if (response.ok && result.message) {
+          alert(result.message); // Show success message
+        } else {
+          alert(result.error || "Failed to upload link."); // Show error message
+        }
+      } catch (error) {
+        console.error("Error uploading link:", error);
+        alert("An error occurred. Please try again.");
+      }
+
+      this.$emit("close");
+      this.resetForm();
     },
     resetForm() {
       this.formData = {
-        refName: '',
-        description: '',
-        created: '',
-        owner: '',
-        url: ''
-      }
-    }
-  }
-}
+        refName: "",
+        description: "",
+        url: "",
+      };
+    },
+  },
+};
 </script>
-  
 <style scoped>
 /* Modal base */
 .modal {

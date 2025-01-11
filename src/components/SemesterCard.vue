@@ -12,7 +12,7 @@
     </div>
 
     <!-- Edit and Delete Buttons (visible on hover for Academic Officer only) -->
-    <div class="hover-buttons" v-if="hover && role_desc === 'Academic Officer'">
+    <div class="hover-buttons" v-if="hover && role_desc == 'Academic Officer'">
       <button class="edit-button" @click.stop="editSemester">
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
           <path
@@ -71,8 +71,12 @@ export default {
 
       if (sessionData) {
         this.role_desc = sessionData.description;
+        console.log("Role Description:", this.role_desc); // Debug log
       }
     },
+  },
+  mounted() {
+    this.getRole();
   },
 };
 </script>
