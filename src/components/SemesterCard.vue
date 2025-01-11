@@ -1,5 +1,9 @@
 <template>
-  <div class="semester-card" @mouseover="hover = true" @mouseleave="hover = false">
+  <div
+    class="semester-card"
+    @mouseover="hover = true"
+    @mouseleave="hover = false"
+  >
     <div class="card-header" :style="{ backgroundColor: bgColor }">
       <h1 class="title">{{ title }}</h1>
     </div>
@@ -7,16 +11,20 @@
       <p class="subtitle">{{ subtitle }}</p>
     </div>
 
-    <!-- Edit and Delete Buttons (visible on hover) -->
-    <div class="hover-buttons" v-if="hover">
+    <!-- Edit and Delete Buttons (visible on hover for Academic Officer only) -->
+    <div class="hover-buttons" v-if="hover && role_desc === 'Academic Officer'">
       <button class="edit-button" @click.stop="editSemester">
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
-          <path d="M5 21h14v2H5v-2Zm0-4.2L15.8 6 18 8.2 7.2 19H5v-2.2ZM19.7 5l-1.7 1.7-2.3-2.3L17.3 2.7c.4-.4 1-.4 1.4 0l1 1c.4.4.4 1 0 1.4Z" />
+          <path
+            d="M5 21h14v2H5v-2Zm0-4.2L15.8 6 18 8.2 7.2 19H5v-2.2ZM19.7 5l-1.7 1.7-2.3-2.3L17.3 2.7c.4-.4 1-.4 1.4 0l1 1c.4.4.4 1 0 1.4Z"
+          />
         </svg>
       </button>
       <button class="delete-button" @click.stop="deleteSemester">
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
-          <path d="M5 20q-.825 0-1.413-.588Q3 18.825 3 18V5h2V3.5q0-.625.438-1.062Q5.875 2 6.5 2h11q.625 0 1.062.438Q19 2.875 19 3.5V5h2v13q0 .825-.587 1.412Q19.825 20 19 20ZM7 17h2v-9H7Zm4 0h2v-9h-2Zm4 0h2v-9h-2Zm-9-12h10V4h-10Zm0 0V4v1Z" />
+          <path
+            d="M5 20q-.825 0-1.413-.588Q3 18.825 3 18V5h2V3.5q0-.625.438-1.062Q5.875 2 6.5 2h11q.625 0 1.062.438Q19 2.875 19 3.5V5h2v13q0 .825-.587 1.412Q19.825 20 19 20ZM7 17h2v-9H7Zm4 0h2v-9h-2Zm4 0h2v-9h-2Zm-9-12h10V4h-10Zm0 0V4v1Z"
+          />
         </svg>
       </button>
     </div>
@@ -42,6 +50,7 @@ export default {
   data() {
     return {
       hover: false, // Track hover state to show/hide buttons
+      role_desc: null,
     };
   },
   methods: {
@@ -50,9 +59,18 @@ export default {
       this.$emit("edit-semester", this.title); // Emit event for editing
     },
     deleteSemester() {
-      const confirmation = confirm(`Are you sure you want to delete "${this.title}"?`);
+      const confirmation = confirm(
+        `Are you sure you want to delete "${this.title}"?`
+      );
       if (confirmation) {
         this.$emit("delete-semester", this.title); // Emit event for deletion.
+      }
+    },
+    getRole() {
+      const sessionData = JSON.parse(localStorage.getItem("utmwebfc_session"));
+
+      if (sessionData) {
+        this.role_desc = sessionData.description;
       }
     },
   },

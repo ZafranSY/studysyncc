@@ -8,6 +8,13 @@
       <!-- Header Section -->
       <div class="header">
         <h1 class="page-title">Home</h1>
+        <div class="user-info">
+          <div>
+            <span class="user-name">{{ userName }}</span>
+            <span class="user-role">({{ userRole }})</span>
+          </div>
+        </div>
+
         <h2 class="section-title">Semester</h2>
       </div>
 
@@ -16,7 +23,17 @@
         <!-- Search Box with Icon -->
         <div class="search-wrapper">
           <span class="search-icon">
-            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="20"
+              height="20"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
               <circle cx="11" cy="11" r="8"></circle>
               <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
             </svg>
@@ -73,6 +90,8 @@ export default {
       searchQuery: "",
       semesters: [],
       showModal: false,
+      name: null,
+      description: null,
     };
   },
   computed: {
@@ -93,6 +112,12 @@ export default {
     },
   },
   mounted() {
+    const sessionData = JSON.parse(localStorage.getItem("utmwebfc_session"));
+
+    if (sessionData) {
+      this.userName = sessionData.full_name;
+      this.userRole = sessionData.description;
+    }
     fetch("http://localhost/getSemester")
       .then((response) => response.json())
       .then((data) => {
@@ -169,6 +194,47 @@ export default {
   border-bottom: 2px solid #ddd;
   padding-bottom: 10px;
   margin-bottom: 20px;
+}
+
+.page-title {
+  font-size: 28px;
+  font-weight: 500;
+  color: #000;
+}
+
+.user-info {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  margin-top: 10px;
+  margin-bottom: 10px;
+}
+
+.user-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  border: 2px solid #ccc;
+  object-fit: cover;
+}
+
+.user-name {
+  font-size: 18px;
+  font-weight: 500;
+  color: #333;
+}
+
+.user-role {
+  font-size: 16px;
+  font-weight: 400;
+  color: #666;
+  margin-left: 5px;
+}
+
+.section-title {
+  font-size: 18px;
+  font-weight: bold;
+  color: #333;
 }
 
 .page-title {
