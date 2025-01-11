@@ -19,7 +19,8 @@
         <table class="file-table">
           <thead>
             <tr>
-              <th>No.</th> <!-- Added No. column -->
+              <th>No.</th>
+              <!-- Added No. column -->
               <th>Category</th>
               <th>Session</th>
               <th>Name</th>
@@ -29,15 +30,20 @@
             </tr>
           </thead>
           <tbody>
-            <tr v-for="(file, index) in filteredFiles" :key="file.refName + file.linkPosted">
-              <td>{{ index + 1 }}</td> <!-- Display row number -->
+            <tr
+              v-for="(file, index) in filteredFiles"
+              :key="file.refName + file.linkPosted"
+              @click="goToFile(file)"
+            >
+              <td>{{ index + 1 }}</td>
+              <!-- Display row number -->
               <td>{{ file.category || "N/A" }}</td>
               <td class="session-column">{{ file.linkPosted || "N/A" }}</td>
               <td>{{ file.refName || "No Name" }}</td>
               <td>{{ file.linkDescription || "No Description" }}</td>
               <td>{{ file.owner || "Unknown" }}</td>
               <td>
-                <a
+                <!-- <a
                   v-if="file.url"
                   :href="file.url"
                   target="_blank"
@@ -45,12 +51,26 @@
                   class="action-btn"
                 >
                   View File
-                </a>
+                </a> -->
+
+                <button
+                  v-if="file.url"
+                  :href="file.url"
+                  @click="goToFile(file)"
+                  class="icon-button"
+                >
+                  <img
+                    :src="require('@/assets/goto.png')"
+                    alt="Go To"
+                    class="icon"
+                  />
+                </button>
                 <span v-else>No link</span>
               </td>
             </tr>
             <tr v-if="filteredFiles.length === 0">
-              <td colspan="7" class="no-files-text">No files found.</td> <!-- Updated colspan to 7 -->
+              <td colspan="7" class="no-files-text">No files found.</td>
+              <!-- Updated colspan to 7 -->
             </tr>
           </tbody>
         </table>
@@ -75,28 +95,19 @@ export default {
   },
   methods: {
     fetchAllFiles() {
-      const session_id = localStorage.getItem("session_id");
-      const semester_id = sessionStorage.getItem("semester_id");
-      const category_name = sessionStorage.getItem("category_name");
+      const session_id = JSON.parse(localStorage.getItem("session_id"));
+      // const semester_id = JSON.parse(sessionStorage.getItem("semester"));
+      // const category_name = sessionStorage.getItem("category");
+      console.log("session id", session_id);
 
-      if (!session_id || !semester_id || !category_name) {
-        console.error("Required information is missing.");
-        alert("Required information is missing. Please log in and select the correct options.");
-        return;
-      }
-
-      const url = "http://localhost/getAllLink"; // Ensure the backend is listening on this endpoint
+      const url = "http://localhost/getAllLink";
 
       fetch(url, {
-        method: "POST", // Use POST request
+        method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({
-          session_id: session_id,
-          semester_id: semester_id,
-          category_name: category_name,
-        }),
+        body: JSON.stringify({ session_id }),
       })
         .then((response) => {
           if (!response.ok) {
@@ -105,9 +116,10 @@ export default {
           return response.json();
         })
         .then((data) => {
-          if (data.allLinks) {
+          console.log("Backend response:", data.allLinks);
+          if (data.allLinks && data.allLinks.length > 0) {
             this.files = data.allLinks.map((file) => ({
-              id: file[0] || "N/A", // Internal ID
+              id: file[0] || "N/A",
               category: file[1] || "N/A",
               linkPosted: file[2] || "Not Available",
               refName: file[3] || "No Name",
@@ -115,17 +127,20 @@ export default {
               owner: file[5] || "Unknown",
               url: file[6] || "#",
             }));
-            this.filteredFiles = this.files; // Initialize filtered list
+            console.log("Mapped Files:", this.files);
+            this.filteredFiles = this.files;
           } else {
+            console.warn("No links found.");
             this.files = [];
             this.filteredFiles = [];
           }
         })
         .catch((error) => {
           console.error("Error fetching links:", error.message);
-          alert("Failed to load links. Please try again later.");
+          alert("Failed to load links. Please try again.");
         });
     },
+
     filterFiles() {
       const term = this.searchTerm.toLowerCase();
       this.filteredFiles = this.files.filter(
@@ -136,6 +151,16 @@ export default {
           file.owner?.toLowerCase().includes(term)
       );
     },
+    goToFile(file) {
+      if (!file.url) {
+        alert("No URL provided.");
+        return;
+      }
+      const validUrl = /^https?:\/\//i.test(file.url)
+        ? file.url
+        : `http://${file.url}`;
+      window.open(validUrl, "_blank");
+    },
   },
   mounted() {
     this.fetchAllFiles(); // Automatically fetch files when the component is mounted
@@ -144,6 +169,25 @@ export default {
 </script>
 
 <style scoped>
+tr {
+  cursor: pointer;
+}
+.icon {
+  width: 24px; /* Adjust width as needed */
+  height: 24px; /* Adjust height as needed */
+  object-fit: contain; /* Ensures the image fits within the box */
+}
+
+.icon-button {
+  background: none;
+  border: none;
+  padding: 0;
+  margin: 0;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
 .main-container {
   display: flex;
   min-height: 100vh;
