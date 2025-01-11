@@ -203,8 +203,8 @@ sub getALLlinkIdRead {
     while (my @row = $sth->fetchrow_array) {
         push @result, \@row;  
     }
-    
-    return \@result;
+    my @arr2d = map { @$_ } @result;
+    return \@arr2d;
 }
 
 sub getALLlinkIdDelete {
@@ -248,8 +248,8 @@ sub getALLlinkIdDelete {
     while (my @row = $sth->fetchrow_array) {
         push @result, \@row;  
     }
-    
-    return \@result;
+    my @arr2d = map { @$_ } @result;
+    return \@arr2d;
 }
 
 sub getALLlinkIdUpdate {
@@ -293,8 +293,8 @@ sub getALLlinkIdUpdate {
     while (my @row = $sth->fetchrow_array) {
         push @result, \@row;  
     }
-    
-    return \@result;
+    my @arr2d = map { @$_ } @result;
+    return \@arr2d;
 }
 
 sub getALLlinkCreateWhere {
@@ -315,10 +315,6 @@ sub getALLlinkCreateWhere {
     $sth->execute($email, $role_name,$role_name)
         or die 'execution failed: ' . $dbh->errstr();
 
-    $logger->info("$email, $role_name ,$sth");
-    $logger->info(Dumper(\$sth));
-    $logger->info(Dumper($sth));
-    $logger->info(Dumper($sth->rows));
     my @result;
     while (my $row = $sth->fetchrow_hashref) {
         push @result, $row->{category}, $row->{semester_id};  # Store values directly
@@ -392,11 +388,29 @@ sub CreateLink {
 
 
 sub DeleteLink{
-    my ($dbh,$session_id, $semester_id,$category_name,$ref_name,$desc,$link) = @_;
+    my ($dbh,$session_id, $semester_id,$category_name,$gdlink_id) = @_;
     my $role_name=Authorization::getRoleName($dbh, $session_id);
     my $email=Authorization::getEmail($dbh, $session_id);
     my @canDeleteId=Link::getALLlinkIdDelete($dbh, $session_id);
 
+    my $found = 0;
+    my @arr2d = map { @$_ } @canDeleteId;
+    my @deleteArrayID = map { @$_ } @arr2d;
+    $logger->info(Dumper(\@deleteArrayID)) ;
+    
+    if (!$found) {
+        return { message => "YOU DO NOT HAVE PERMISSION TO DELETE gdlink_id $gdlink_id OR IT DOESNT EXIST" };
+    } 
+
+    my $sth_insert = $dbh->prepare('DELETE FROM gdlinks where gdlink_id = ?') 
+                or die 'prepare statement failed: ' . $dbh->errstr();
+    $result=$sth_insert->execute($gdlink_id) 
+                or die 'prepare statement failed: ' . $dbh->errstr();
+    if ($result) {
+        return { message => "gdlink_id $gdlink_id in $category_name, $semester_id deleted successfully" };
+    } else {
+        return { error => "Failed to delete category in gdlink_id $gdlink_id $category_name, $semester_id" };
+    }
 
 }
 1;

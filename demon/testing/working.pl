@@ -385,7 +385,7 @@ post '/deleteLink' => sub ($c) {
     my $semester_id   = $payload->{semester_id};
     my $category_name   = $payload->{category_name};
     my $gdlink_id   = $payload->{gdlink_id};
-    my $result = Link::CreateLink($dbh,$session_id, $semester_id,$category_name,$gdlink_id);
+    my $result = Link::DeleteLink($dbh,$session_id, $semester_id,$category_name,$gdlink_id);
     $c->render(json => { result => $result });
 };
 

@@ -37,7 +37,7 @@ const b=
 const host='http://localhost:80'
 let METHOD='post'
 const crud='/'
-const type='createLink'
+const type='getALLlinkIdDelete'
 
 
 // ONLY for GET method, can leave this alone if POST
@@ -45,7 +45,7 @@ const PARAMTYPE='?semester_id'
 const PARAMVALUE='=2024/2025-1'
 
 const payload = {
-    session_id: '313',
+    session_id: 'ab',
     semester_id: '2024/2025-1',
     category_name: 'Meow',
     new_semester_id: '2099/2012-3',
@@ -57,6 +57,7 @@ const payload = {
     ref_name :"History Black Catto",
     desc : "The detailed untold history",
     link :"google.com",
+    gdlink_id : "11238"
 };
 
 const endpoint=crud+type

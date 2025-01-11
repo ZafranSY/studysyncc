@@ -224,7 +224,7 @@ request body =>
     semester_id : '2024/2025-1'       ======= get from localStorage  
 
 OUTPUT
-{"updateableLinkId":[[84],[163],[164],[165],[166],[11227]]}
+{"readbleLinkId":[84,86,87,88,89,93,94,95,96,101,124,125,126,127,130,131,132,133,158,161,162]}
 
 =================================================================================================================
 
@@ -235,7 +235,7 @@ request body =>
     semester_id : '2024/2025-1'       ======= get from localStorage  
 
 OUTPUT
-{"updateableLinkId":[[84],[163],[164],[165],[166],[11227]]}
+{"updateableLinkId":[84,11228,11229,11230,11231,11232,163,164,165,166]}
 
 =================================================================================================================
 
@@ -245,7 +245,7 @@ request body =>
     semester_id : '2024/2025-1'       ======= get from localStorage   
 
 OUTPUT
-{"updateableLinkId":[[84],[163],[164],[165],[166],[11227]]}
+{"deleteableLinkId":[84,11228,11230,11235,11237,11238,11239,11241,11243,11245,163,164,165,166]}
 
 =================================================================================================================
 
@@ -295,6 +295,15 @@ request body =>
       semester_id : ??    ======= get from localStorage
       category_name : ??  ======= get from localStorage
       link id       : ??  ======= get from click
+
+OUTPUT
+{"result":{"message":"YOU DO NOT HAVE PERMISSION TO DELETE gdlink_id 11233 OR IT DOESNT EXIST"}}
+
+
+REMARKS 
+If link doesnt exist , it will say it delete successfully
+
+
 
 http://localhost/updateLink          ONLY FOR ACADEMIC OFFICER & PEOPLE WITH UPDATE PERM WITHIN CATEGORY & LINK OWNER
 request body =>
