@@ -71,18 +71,34 @@ export default {
   },
   methods: {
     async handleSubmit() {
-      const session_id = localStorage.getItem("session_id");
-      const semester_id = sessionStorage.getItem("semester"); // Make sure this is stored
-      const category_name = sessionStorage.getItem("category"); // Make sure this is stored
+      const session_id = localStorage
+        .getItem("session_id")
+        .replace(/['"]+/g, "");
+      const semester_id = sessionStorage
+        .getItem("semester")
+        .replace(/['"]+/g, "");
+      const category_name = sessionStorage
+        .getItem("category")
+        .replace(/['"]+/g, "");
+
+      // Ensure all values exist
+      if (!session_id || !semester_id || !category_name) {
+        alert(
+          "Missing session, semester, or category data. Please log in again."
+        );
+        return;
+      }
 
       const payload = {
-        session_id,
-        semester_id,
-        category_name,
-        ref_name: this.formData.refName,
-        desc: this.formData.description,
-        link: this.formData.url,
+        session_id: session_id.trim(),
+        semester_id: semester_id.trim(),
+        category_name: category_name.trim(),
+        ref_name: this.formData.refName.trim(),
+        desc: this.formData.description.trim(),
+        link: this.formData.url.trim(),
       };
+
+      console.log("Payload:", payload); // Debugging
 
       try {
         const response = await fetch("http://localhost/createLink", {
@@ -93,20 +109,27 @@ export default {
           body: JSON.stringify(payload),
         });
 
+        // Parse the JSON response
         const result = await response.json();
-        if (response.ok && result.message) {
-          alert(result.message); // Show success message
-        } else {
-          alert(result.error || "Failed to upload link."); // Show error message
-        }
+        console.log("Server Response:", result); // Debugging
+
+        // // Check for success or error in the result
+        // if (response.ok && result.result && result.result.message) {
+        //   alert(result.result.message); // Success message
+        // } else if (result.result && result.result.error) {
+        //   alert(result.result.error); // Server error message
+        // } else {
+        //   alert("Failed to upload link. Please try again."); // Fallback error
+        // }
       } catch (error) {
         console.error("Error uploading link:", error);
-        alert("An error occurred. Please try again.");
+        alert("An unexpected error occurred. Please try again.");
       }
 
       this.$emit("close");
       this.resetForm();
     },
+
     resetForm() {
       this.formData = {
         refName: "",
