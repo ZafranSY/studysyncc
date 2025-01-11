@@ -39,3 +39,19 @@ OR 'Academic Officer' = 'Academic Officer';;
 select * from roles where role_id= (
     select role_id from user where session_id='313'
 )
+
+
+INSERT INTO categoryPermission (category, semester_id, user_email, can_read_category, can_create_links)
+VALUES ();
+
+
+
+
+UPDATE categoryPermission
+SET can_read_category = FALSE,
+    can_create_links=  FALSE
+WHERE 
+    category='PSM 1'    AND
+    semester_id='2024/2025-1' AND
+    user_email='johnStu@utm.com'
+    ;

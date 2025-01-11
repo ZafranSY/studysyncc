@@ -62,6 +62,9 @@ OUTPUT
 OUTPUT
 {"error":"Semester ID 2099/2025-1 already exists"}
 
+OUTPUT
+{"error":"Insufficient role privileges"}
+
 =================================================================================================================
 
 http://localhost/deleteSemester              ACADEMIC OFFICER ONLY
@@ -75,6 +78,9 @@ OUTPUT
 
 OUTPUT
 {"error":"Semester ID 2099/2025-1 doesnt exists, Cannot delete"}
+
+OUTPUT
+{"error":"Insufficient role privileges"}
 
 =================================================================================================================
 
@@ -90,6 +96,9 @@ OUTPUT
 
 OUTPUT
 {"error":"Semester ID 2099/2025-1 doesnt exists, Cannot Update"}
+
+OUTPUT
+{"error":"Insufficient role privileges"}
 
 
 =================================================================================================================
@@ -148,6 +157,9 @@ OUTPUT
 OUTPUT
 {"error":"Category KUCHING in 2024/2025-1 already exists"}
 
+OUTPUT
+{"error":"Insufficient role privileges"}
+
 =================================================================================================================
 
 http://localhost/deleteCategory          ACADEMIC OFFICER ONLY
@@ -163,6 +175,9 @@ OUTPUT
 OUTPUT
 {"error":"Category KUCHING in 2024/2025-1 doesnt exists, Cannot Delete"}
 
+OUTPUT
+{"error":"Insufficient role privileges"}
+
 =================================================================================================================
 
 http://localhost/updateCategory          ACADEMIC OFFICER ONLY
@@ -177,6 +192,9 @@ OUTPUT
 
 OUTPUT
 {"error":"Category KUCHING in 2024/2025-1 doesnt exists, Cannot Update"}
+
+OUTPUT
+{"error":"Insufficient role privileges"}
 
 =================================================================================================================
 =================================================================================================================
@@ -321,11 +339,112 @@ OUTPUT
 =================================================================================================================
 =================================================================================================================
 
-http://localhost/getCategoryPermission
-http://localhost/updateCategoryPermission
-http://localhost/deleteCategoryPermission
-http://localhost/createCategoryPermission
 
+http://localhost/getCategoryPermission              ONLY FOR ACADEMIC OFFICER 
+request body =>
+    session_id : 313               ======= get from localStorage
+    semester_id : '2024/2025-1'    ======= get from localStorage       
+    category_name : 'PSM 1'        ======= get from click
+
+OUTPUT
+{"categoriesPermission":[{"can_create_links":0,"can_read_category":1,"category":"PSM 1","category_perm_id":1,"role_name":"Everyone","semester_id":"2024/2025-1","user_email":null},{"can_create_links":1,"can_read_category":1,"category":"PSM 1","category_perm_id":14,"role_name":null,"semester_id":"2024/2025-1","user_email":"johnPeng@utm.com"},{"can_create_links":1,"can_read_category":1,"category":"PSM 1","category_perm_id":17,"role_name":null,"semester_id":"2024/2025-1","user_email":"tonianwar@utm.my"}]}
+
+OUTPUT
+{"error":"Insufficient role privileges"}
+
+=================================================================================================================
+
+http://localhost/createCategoryPermission
+request body =>
+    session_id : 313                ======= get from localStorage
+    semester_id : '2024/2025-1'     ======= get from localStorage       
+    category_name : 'PSM 1'         ======= get from click
+    insert_user_role : 'Student'    ======= get from fill form     
+    insert_user_email :             ======= get from fill form     
+    can_read_category : 'true'        ======= get from fill form,,, boolean (true/false)
+    can_create_links : 'true'         ======= get from fill form,,, boolean (true/false)
+
+WARNING,, can only have insert_user_role OR insert_user_email only
+
+OUTPUT
+{"result":{"error":"Insufficient role privileges"}}
+
+OUTPUT
+{"result":{"error":"Only one of insert_user_email or insert_user_role can be updated at a time","success":false}}
+
+OUTPUT
+{"result":{"message":"Category Permission for role Pelajar FSKSM created successfully"}}
+
+OUTPUT
+{"result":{"error":"Category Permission for role Pelajar FSKSM already exists in category PSM 1, 2024/2025-1 . Try editing existing Perm instead"}}
+
+OUTPUT
+{"result":{"message":"Category Permission for email johnStu@utm.com created successfully"}}
+
+OUTPUT
+{"result":{"error":"Category Permission for email johnStu@utm.com already exists in category PSM 1, 2024/2025-1 . Try editing existing Perm instead"}}
+
+=================================================================================================================
+
+http://localhost/updateCategoryPermission
+    session_id : 313                ======= get from localStorage
+    semester_id : '2024/2025-1'     ======= get from localStorage       
+    category_name : 'PSM 1'         ======= get from click
+    selected_user_role : 'Student'    ======= get from fill form     
+    selected_user_email :             ======= get from fill form     
+    can_read_category : 'true'        ======= get from fill form,,, boolean (true/false)
+    can_create_links : 'true'         ======= get from fill form,,, boolean (true/false)
+
+WARNING
+can only update if and only if   EITHER selected_user_email OR selected_user_role    , cannot update if both have value, 
+
+OUTPUT
+{"result":{"error":"Insufficient role privileges"}}
+
+OUTPUT
+{"result":"Only one of user_email or user_role can be updated at a time"}
+
+OUTPUT
+{"result":{"error":"Category Permission for role Academic Officer does not exists in category Meow, 2024/2025-1 . CANNOT update Perm . Try inserting instead."}}
+
+OUTPUT
+{"result":{"message":"Category Permission for role Academic Officer updated successfully"}}
+
+OUTPUT
+{"result":{"error":"Category Permission for user johnStud@utm.com does not exists in category Meow, 2024/2025-1 . CANNOT update Perm . Try inserting instead."}}
+
+OUTPUT
+{"result":{"message":"Category Permission for user johnStu@utm.com updated successfully"}}
+
+
+
+http://localhost/deleteCategoryPermission
+    session_id : 313                ======= get from localStorage
+    semester_id : '2024/2025-1'     ======= get from localStorage       
+    category_name : 'Meow'         ======= get from click
+    selected_user_role : 'Student'    ======= get from fill form     
+    selected_user_email :             ======= get from fill form     
+
+WARNING
+can only delete if and only if   EITHER selected_user_email OR selected_user_role    , cannot update if both have value, 
+
+OUTPUT
+{"result":{"error":"Insufficient role privileges"}}
+
+OUTPUT
+{"result":"Only one of user_email or user_role can be updated at a time"}
+
+OUTPUT
+{"result":{"message":"Category Permission for role Academic Officer  for Meow ,2024/2025-1 deleted successfully"}}
+
+OUTPUT
+{"result":{"message":"Category Permission for user johnStu@utm.com  for Meow ,2024/2025-1 deleted successfully"}}
+
+REMARKS
+if the permission doesnt exist,, it will still output deleted successfully
+
+REMARKS
+role "Everyone" CANNOT be deleted
 
 =================================================================================================================
 =================================================================================================================
@@ -339,5 +458,15 @@ http://localhost/deleteLinkPermission
 http://localhost/createLinkPermission
 
 
+
+=================================================================================================================
+=================================================================================================================
+                        EXTRA OPTION MENU
+=================================================================================================================
+=================================================================================================================
+FOR ACADEMIC OFFICER ,, AND OWNER OF A LINK
+
+http://localhost/getAvailableRole
+http://localhost/getAvailableUserEmail
 
 

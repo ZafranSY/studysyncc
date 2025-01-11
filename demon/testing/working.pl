@@ -418,17 +418,164 @@ post '/updateLink' => sub ($c) {
 
 
 
-# http://localhost/getCategoryPermissionAll
+# http://localhost/getCategoryPermission
 # request body =>
 #       session_id : ??     ======= get from localStorage
 #       semester_id : ??    ======= get from localStorage       
-post '/getCategoryPermissionAll' => sub ($c) {
+#       category_name : ??    ======= get from click       
+post '/getCategoryPermission' => sub ($c) {
     my $payload = $c->req->json;
     my $session_id   = $payload->{session_id};
     my $semester_id   = $payload->{semester_id};
-    my $categoryPermission = CategoryPermission::getCategoryPermission($dbh,$session_id, $semester_id);
+    my $category_name   = $payload->{category_name};
+    my $required_rolename = 'Academic Officer'; 
+    my $auth_result = Authorization::check_session_role($dbh, $session_id, $required_rolename);
+    
+    if ($auth_result->{error}) {
+        $c->render(json => $auth_result);
+        return;
+    }
+
+    my $categoryPermission = CategoryPermission::getCategoryPermission($dbh,$session_id, $semester_id,$category_name);
     $c->render(json => { categoriesPermission => $categoryPermission });
 };
+
+
+# http://localhost/createCategoryPermission
+# request body =>
+#       session_id : ??     ======= get from localStorage
+#       semester_id : ??    ======= get from localStorage       
+#       category_name : ??    ======= get from click     
+#       insert_user_role : ????    ======= get from fill form     
+#       insert_user_email : ????   ======= get from fill form     
+#       can_read_category : ????   ======= get from fill form,,, boolean (0/1 true/false)
+#       can_create_links : ????   ======= get from fill form,,, boolean (0/1 true/false)
+post '/createCategoryPermission' => sub ($c) {
+    my $payload = $c->req->json;
+    my $session_id   = $payload->{session_id};
+    my $semester_id   = $payload->{semester_id};
+    my $category_name   = $payload->{category_name};
+    my $insert_user_role     = $payload->{insert_user_role};
+    my $insert_user_email    = $payload->{insert_user_email};
+    my $can_read_category    = $payload->{can_read_category};
+    my $can_create_links    = $payload->{can_create_links};
+    my $required_rolename = 'Academic Officer'; 
+    my $auth_result = Authorization::check_session_role($dbh, $session_id, $required_rolename);
+    
+
+    if ($auth_result->{error}) {
+        $c->render(json => {result =>$auth_result});
+        return;
+    }
+    
+    if ($insert_user_email && $insert_user_role) {
+        $c->render(json => { result => "Only one of insert_user_email or insert_user_role can be updated at a time" });
+        return;
+    }
+
+    my $result;
+    if($insert_user_role){
+        $result = CategoryPermission::CreateCategoryPermissionRole($dbh,$session_id, $semester_id,$category_name,$insert_user_role,$can_read_category,$can_create_links);
+    }
+    if($insert_user_email){
+        $result = CategoryPermission::CreateCategoryPermissionUser($dbh,$session_id, $semester_id,$category_name,$insert_user_email,$can_read_category,$can_create_links);
+    }
+    
+
+    $c->render(json => { result => $result });
+};
+
+
+
+
+# http://localhost/updateCategoryPermission
+# request body =>
+#       session_id : ??     ======= get from localStorage
+#       semester_id : ??    ======= get from localStorage       
+#       category_name : ??    ======= get from click     
+#       selected_user_role : ????    ======= get from click
+#       selected_user_email : ????   ======= get from click
+#       can_read_category : ????   ======= get from fill form,,, boolean (0/1 true/false)
+#       can_create_links : ????   ======= get from fill form,,, boolean (0/1 true/false)
+post '/updateCategoryPermission' => sub ($c) {
+    my $payload = $c->req->json;
+    my $session_id   = $payload->{session_id};
+    my $semester_id   = $payload->{semester_id};
+    my $category_name   = $payload->{category_name};
+    my $user_role     = $payload->{selected_user_role};
+    my $user_email    = $payload->{selected_user_email};
+    my $can_read_category    = $payload->{can_read_category};
+    my $can_create_links    = $payload->{can_create_links};
+    my $required_rolename = 'Academic Officer'; 
+    my $auth_result = Authorization::check_session_role($dbh, $session_id, $required_rolename);
+    
+
+    if ($auth_result->{error}) {
+        $c->render(json => {result =>$auth_result});
+        return;
+    }
+    
+    if ($user_email && $user_role) {
+        $c->render(json => { result => "Only one of user_email or user_role can be updated at a time" });
+        return;
+    }
+
+    my $result;
+    if($user_role){
+        $result = CategoryPermission::UpdateCategoryPermissionRole($dbh,$session_id, $semester_id,$category_name,$user_role,$can_read_category,$can_create_links);
+    }
+    if($user_email){
+        $result = CategoryPermission::UpdateCategoryPermissionUser($dbh,$session_id, $semester_id,$category_name,$user_email,$can_read_category,$can_create_links);
+    }
+    
+
+    $c->render(json => { result => $result });
+};
+
+
+
+# http://localhost/deleteCategoryPermission
+# request body =>
+#       session_id : ??     ======= get from localStorage
+#       semester_id : ??    ======= get from localStorage       
+#       category_name : ??    ======= get from click     
+#       selected_user_role : ????    ======= get from click
+#       selected_user_email : ????   ======= get from click
+post '/deleteCategoryPermission' => sub ($c) {
+    my $payload = $c->req->json;
+    my $session_id   = $payload->{session_id};
+    my $semester_id   = $payload->{semester_id};
+    my $category_name   = $payload->{category_name};
+    my $user_role     = $payload->{selected_user_role};
+    my $user_email    = $payload->{selected_user_email};
+
+    my $required_rolename = 'Academic Officer'; 
+    my $auth_result = Authorization::check_session_role($dbh, $session_id, $required_rolename);
+    
+
+    if ($auth_result->{error}) {
+        $c->render(json => {result =>$auth_result});
+        return;
+    }
+    
+    if ($user_email && $user_role) {
+        $c->render(json => { result => "Only one of user_email or user_role can be updated at a time" });
+        return;
+    }
+
+    my $result;
+    if($user_role){
+        $result = CategoryPermission::DeleteCategoryPermissionRole($dbh,$session_id, $semester_id,$category_name,$user_role);
+    }
+    if($user_email){
+        $result = CategoryPermission::DeleteCategoryPermissionUser($dbh,$session_id, $semester_id,$category_name,$user_email);
+    }
+    
+
+    $c->render(json => { result => $result });
+};
+
+
 
 
 
