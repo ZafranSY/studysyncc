@@ -215,16 +215,18 @@ export default {
         })
         .then((data) => {
           console.log("API Response:", data);
+
           if (data.linkViewable) {
-            console.log("Mapped Files:", data.linkViewable);
+            // Properly map the nested array structure
             this.files = data.linkViewable.map((file) => ({
-              id: file.gdlink_id || "N/A",
-              refName: file.ref_name || "No Name",
-              linkDescription: file.description || "No Description",
-              linkPosted: file.created_at || "Not Available",
-              owner: file.owner || "Unknown",
-              url: file.link || "#",
+              id: file[0] || "N/A",
+              refName: file[1] || "No Name",
+              linkDescription: file[4] || "No Description",
+              linkPosted: file[2] || "Not Available",
+              owner: file[5] || "Unknown",
+              url: file[6] || "#",
             }));
+            console.log("Mapped Files:", this.files);
           } else {
             console.warn("No links found for the given category.");
             this.files = [];
