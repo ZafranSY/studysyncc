@@ -2,11 +2,10 @@ import { createRouter, createWebHistory } from "vue-router";
 
 const routes = [
   {
-    path: "/about",
-    name: "about",
+    path: "/",
+    name: "landingPage",
     component: () =>
-      import(/* webpackChunkName: "about" */ "../views/AboutView.vue"),
-    meta: { requiresAuth: true },
+      import(/* webpackChunkName: "about" */ "../views/LandingPage.vue"),
   },
   {
     path: "/login",
