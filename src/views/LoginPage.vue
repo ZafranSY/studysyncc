@@ -125,25 +125,27 @@ header {
     width: 100%;
 }
 
-/* Container Styles */
+/* Modify the container to take full height excluding header */
 .container {
     display: flex;
     justify-content: center;
     align-items: center;
     width: 100%;
-    height: 100%;
+    height: calc(100vh - 3vh); /* Subtract header height */
+    margin-top: 3vh; /* Add margin to account for fixed header */
 }
-
 /* Login Box Styles */
 .login-box-bg {
     background-color: #ede9e9;
-    border: 1px solid black;
-    border-radius: 1px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
     padding: 30px;
     box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
     width: 40vw;
-    height: 50vh;
+    max-width: 500px;
+    min-height: 50vh;
     display: flex;
+    flex-direction: column;
     justify-content: center;
     align-items: center;
 }
