@@ -20,32 +20,6 @@ async function runTest(METHOD,link,payload) {
 }
 
 
-// METHOD =>
-//      GET     (if crud = /get)
-//      POST    (else)
-
-// crud =>
-//      /create
-//      /get
-//      /update
-//      /delete
-
-//  type =>
-//       Semester
-//       Category
-//       CategoryPermission
-//                      All
-//                      Read
-//                      Create
-//                      
-//
-//
-
-//  PARAM       (if crud = /get)
-//      PARAMTYPE
-//      PARAMVALUE
-//  IF MULTIPLE RIP IDK 
-
 // eslint-disable-next-line no-unused-vars
 const b=
 {
@@ -61,9 +35,9 @@ const b=
 }
 
 const host='http://localhost:80'
-let METHOD='POST'
+let METHOD='post'
 const crud='/'
-const type='getALLlinkCreateWhere'
+const type='createLink'
 
 
 // ONLY for GET method, can leave this alone if POST
@@ -73,147 +47,26 @@ const PARAMVALUE='=2024/2025-1'
 const payload = {
     session_id: '313',
     semester_id: '2024/2025-1',
-    category_name: 'PSM 1',
+    category_name: 'Meow',
     new_semester_id: '2099/2012-3',
-    new_category_name: 'KUCING',
+    new_category_name: 'Meow',
     // username : "12085",
     // password : "S808323",
     username : "johnAcad",
-    password : "201608M10112",
-    ref_name :"My Marks ",
-    desc : "Marks for all subject",
+    password : "johnAcad",
+    ref_name :"History Black Catto",
+    desc : "The detailed untold history",
     link :"google.com",
 };
 
 const endpoint=crud+type
 let link=host+endpoint
 
-if(METHOD=='GET'){
+if(METHOD=='GET'||METHOD=='get'){
     link+= PARAMTYPE+PARAMVALUE
     runTest(METHOD,link);
 }
 
 else
     runTest(METHOD,link,payload);
-
-
-// ===================================================
-// ===================================================
-//                  LOGIN
-// ===================================================
-// ===================================================
-
-// http://localhost/getUserLogin
-// request body =>
-//       username : ??  
-//       password : ?? 
-
-
-
-
-// ===================================================
-// ===================================================
-//                  SEMESTER        IMAN
-// ===================================================
-// ===================================================
-
-
-// http://localhost/getSemester
-
-// http://localhost/createSemester
-// request body =>
-//       session_id : ??  ======= get from localStorage
-//       semester_id : ?? ======= get from fill form
-
-// http://localhost/deleteSemester
-// request body =>
-//       session_id : ??  ======= get from localStorage
-//       semester_id : ?? ======= get from click
-
-// http://localhost/updateSemester
-// request body =>
-//       session_id : ??  ======= get from localStorage
-//       semester_id : ?? ======= get from click
-//       new_semester_id : ====== get from fill form
-
-
-
-
-// ===================================================
-// ===================================================
-//                  CATEGORY            TIVENESH
-// ===================================================
-// ===================================================
-
-
-
-// http://localhost/getCategory             CAN VIEW PERMISSIBLE CATEGORY ONLY
-// request body =>
-//       session_id : ??     ======= get from localStorage
-//       semester_id : ??    ======= get from localStorage  
-
-// http://localhost/createCategory          ACADEMIC OFFICER ONLY
-// request body =>
-//       session_id : ??     ======= get from localStorage
-//       semester_id : ??    ======= get from localStorage
-//       category_name : ??  ======= get from fill form
-
-// http://localhost/deleteCategory          ACADEMIC OFFICER ONLY
-// request body =>
-//       session_id : ??     ======= get from localStorage
-//       semester_id : ??    ======= get from localStorage
-//       category_name : ??  ======= get from click
-
-// http://localhost/updateCategory          ACADEMIC OFFICER ONLY
-// request body =>
-//       session_id : ??  ======= get from localStorage
-//       semester_id : ?? ======= get from localStorage
-//       category_name : ?? ===== get from click
-//       new_category_name : ==== get from fill form
-
-
-// ===================================================
-// ===================================================
-//              LINKS 
-// ===================================================
-// ===================================================
-
-
-// http://localhost/getLink             CAN VIEW PERMISSIBLE LINKS ONLY
-// request body =>
-//       session_id : ??     ======= get from localStorage
-//       semester_id : ??    ======= get from localStorage  
-//       category_name : ??  ======= get from localStorage
-
-// http://localhost/createLink         ONLY FOR ACADEMIC OFFICER & PEOPLE WITH CREATE PERM WITHIN CATEGORY
-// request body =>
-//        session_id : ??     ======= get from localStorage
-//        semester_id : ??    ======= get from localStorage  
-//        category_name : ??  ======= get from localStorage
-//        ref_name : ??       ======= get from fill form
-//        desc : ??           ======= get from fill form
-//        link : ??           ======= get from fill form
-
-// http://localhost/deleteLink        ONLY FOR ACADEMIC OFFICER & PEOPLE WITH DELETE PERM WITHIN CATEGORY & LINK OWNER
-// request body =>
-//       session_id : ??     ======= get from localStorage
-//       semester_id : ??    ======= get from localStorage
-//       category_name : ??  ======= get from localStorage
-//       link id       : ??  ======= get from click
-
-// http://localhost/updateLink          ONLY FOR ACADEMIC OFFICER & PEOPLE WITH UPDATE PERM WITHIN CATEGORY & LINK OWNER
-// request body =>
-//       session_id : ??    ======= get from localStorage
-//       semester_id : ??   ======= get from localStorage
-//       category_name : ?? ======= get from localStorage
-//       link uh this is hard
-
-
-
-// ===================================================
-// ===================================================
-//              CATEGORY PERMISSION
-// ===================================================
-// ===================================================
-
 

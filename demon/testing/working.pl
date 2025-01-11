@@ -343,8 +343,7 @@ post '/getALLlinkIdUpdate' => sub ($c) {
 
 #  http://localhost/getALLlinkCreateWhere             CAN VIEW UPDATABLE LINKS ID ONLY
 #  request body =>
-#        session_id : ??     ======= get from localStorage
-#        semester_id : ??    ======= get from localStorage  
+#        session_id : ??     ======= get from localStorage  
 post '/getALLlinkCreateWhere' => sub ($c) {
     my $payload = $c->req->json;
     my $session_id   = $payload->{session_id};
