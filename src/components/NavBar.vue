@@ -10,9 +10,13 @@
 
       <div class="menu-section">
         <div class="menu-header">MAIN</div>
-        <router-link to="/allfile" class="menu-item">
+        <router-link to="/homeview" class="menu-item">
           <span>🏠</span>
-          All
+          Home
+        </router-link>
+        <router-link to="/allfile" class="menu-item">
+          <span>📂</span>
+          All Link
         </router-link>
         <a href="#" class="menu-item">
           <span>⭐</span>
