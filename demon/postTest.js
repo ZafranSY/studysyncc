@@ -63,7 +63,7 @@ const b=
 const host='http://localhost:80'
 let METHOD='POST'
 const crud='/'
-const type='getALLlinkIdDelete'
+const type='getALLlinkCreateWhere'
 
 
 // ONLY for GET method, can leave this alone if POST
@@ -71,7 +71,7 @@ const PARAMTYPE='?semester_id'
 const PARAMVALUE='=2024/2025-1'
 
 const payload = {
-    session_id: 'ab',
+    session_id: '313',
     semester_id: '2024/2025-1',
     category_name: 'PSM 1',
     new_semester_id: '2099/2012-3',

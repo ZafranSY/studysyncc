@@ -297,6 +297,39 @@ sub getALLlinkIdUpdate {
     return \@result;
 }
 
+sub getALLlinkCreateWhere {
+    my ($dbh,$session_id) = @_;
+    my $role_name=Authorization::getRoleName($dbh, $session_id);
+    my $email=Authorization::getEmail($dbh, $session_id);
+    my $sth = $dbh->prepare('
+            select DISTINCT category,semester_id from categoryPermission 
+                where ((can_read_category=1 AND can_create_links=1) AND 
+                            (user_email= ?  
+                            OR role_name=\'Everyone\' or 
+                            role_name= ? ) 
+                            )
+                OR \'Academic Officer\' = ? ;
+
+    ')
+        or die 'prepare statement failed: ' . $dbh->errstr();
+    $sth->execute($email, $role_name,$role_name)
+        or die 'execution failed: ' . $dbh->errstr();
+
+    $logger->info("$email, $role_name ,$sth");
+    $logger->info(Dumper(\$sth));
+    $logger->info(Dumper($sth));
+    $logger->info(Dumper($sth->rows));
+    my @result;
+    while (my $row = $sth->fetchrow_hashref) {
+        push @result, $row->{category}, $row->{semester_id};  # Store values directly
+    }
+
+
+
+    
+    return \@result;
+}
+
 sub CreateLink {
     my ($dbh,$session_id, $semester_id,$category_name,$ref_name,$desc,$link) = @_;
     $role_name=Authorization::getRoleName($dbh, $session_id);

@@ -154,6 +154,11 @@
 //        semester_id : ??    ======= get from localStorage  
 
 
+//  http://localhost/getALLlinkCreateWhere             CAN VIEW THE CREATE BUTTON AT WHERE RETURN CATEGORY AND SSEM ONLY
+//  request body =>
+//        session_id : ??     ======= get from localStorage
+//        semester_id : ??    ======= get from localStorage  
+
 // http://localhost/createLink         ONLY FOR ACADEMIC OFFICER & PEOPLE WITH CREATE PERM WITHIN CATEGORY
 // request body =>
 //        session_id : ??     ======= get from localStorage

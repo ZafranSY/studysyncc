@@ -341,6 +341,17 @@ post '/getALLlinkIdUpdate' => sub ($c) {
     $c->render(json => { updateableLinkId => $linkVisibile });
 };
 
+#  http://localhost/getALLlinkCreateWhere             CAN VIEW UPDATABLE LINKS ID ONLY
+#  request body =>
+#        session_id : ??     ======= get from localStorage
+#        semester_id : ??    ======= get from localStorage  
+post '/getALLlinkCreateWhere' => sub ($c) {
+    my $payload = $c->req->json;
+    my $session_id   = $payload->{session_id};
+    my $linkVisibile = Link::getALLlinkCreateWhere($dbh,$session_id);
+    $c->render(json => { createAbleLinkWhere => $linkVisibile });
+};
+
 
 
 
