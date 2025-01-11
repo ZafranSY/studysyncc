@@ -132,10 +132,26 @@
 //        session_id : ??     ======= get from localStorage
 //        semester_id : ??    ======= get from localStorage  
 
-//  http://localhost/getAllLinkCount             CAN VIEW PERMISSIBLE LINKS ONLY
+//  http://localhost/getAllLinkCount             CAN VIEW COUNT OF PERMISSIBLE LINKS ONLY
 //  request body =>
 //        session_id : ??     ======= get from localStorage
 //        semester_id : ??    ======= get from localStorage 
+
+
+//  http://localhost/getALLlinkIdRead            CAN VIEW PERMISSIBLE LINKS ID ONLY
+//  request body =>
+//        session_id : ??     ======= get from localStorage
+//        semester_id : ??    ======= get from localStorage  
+
+//  http://localhost/getALLlinkIdDelete             CAN VIEW DELETEABLE LINKS ID ONLY
+//  request body =>
+//        session_id : ??     ======= get from localStorage
+//        semester_id : ??    ======= get from localStorage  
+
+//  http://localhost/getALLlinkIdUpdate             CAN VIEW UPDATABLE LINKS ID ONLY
+//  request body =>
+//        session_id : ??     ======= get from localStorage
+//        semester_id : ??    ======= get from localStorage  
 
 
 // http://localhost/createLink         ONLY FOR ACADEMIC OFFICER & PEOPLE WITH CREATE PERM WITHIN CATEGORY

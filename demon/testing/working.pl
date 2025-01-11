@@ -307,6 +307,43 @@ post '/getAllLinkCount' => sub ($c) {
 };
 
 
+#  http://localhost/getALLlinkIdRead            CAN VIEW PERMISSIBLE LINKS ID ONLY
+#  request body =>
+#        session_id : ??     ======= get from localStorage
+#        semester_id : ??    ======= get from localStorage  
+post '/getALLlinkIdRead' => sub ($c) {
+    my $payload = $c->req->json;
+    my $session_id   = $payload->{session_id};
+    my $linkVisibile = Link::getALLlinkIdRead($dbh,$session_id);
+    $c->render(json => { readbleLinkId => $linkVisibile });
+};
+
+
+#  http://localhost/getALLlinkIdDelete             CAN VIEW DELETEABLE LINKS ID ONLY
+#  request body =>
+#        session_id : ??     ======= get from localStorage
+#        semester_id : ??    ======= get from localStorage  
+post '/getALLlinkIdDelete' => sub ($c) {
+    my $payload = $c->req->json;
+    my $session_id   = $payload->{session_id};
+    my $linkVisibile = Link::getALLlinkIdDelete($dbh,$session_id);
+    $c->render(json => { deleteableLinkId => $linkVisibile });
+};
+
+#  http://localhost/getALLlinkIdUpdate             CAN VIEW UPDATABLE LINKS ID ONLY
+#  request body =>
+#        session_id : ??     ======= get from localStorage
+#        semester_id : ??    ======= get from localStorage  
+post '/getALLlinkIdUpdate' => sub ($c) {
+    my $payload = $c->req->json;
+    my $session_id   = $payload->{session_id};
+    my $linkVisibile = Link::getALLlinkIdUpdate($dbh,$session_id);
+    $c->render(json => { updateableLinkId => $linkVisibile });
+};
+
+
+
+
 #  http://localhost/createLink         ONLY FOR ACADEMIC OFFICER & PEOPLE WITH CREATE PERM WITHIN CATEGORY#  request body =>
 #        session_id : ??     ======= get from localStorage
 #        semester_id : ??    ======= get from localStorage  
@@ -327,8 +364,20 @@ post '/createLink' => sub ($c) {
 };
 
 
-
-
+#  http://localhost/deleteLink         ONLY FOR ACADEMIC OFFICER & PEOPLE WITH CREATE PERM WITHIN CATEGORY#  request body =>
+#        session_id : ??     ======= get from localStorage
+#        semester_id : ??    ======= get from localStorage  
+#        category_name : ??  ======= get from localStorage
+#        gdlink_id : ????    ======= get when u click the delete button
+post '/deleteLink' => sub ($c) {
+    my $payload = $c->req->json;
+    my $session_id   = $payload->{session_id};
+    my $semester_id   = $payload->{semester_id};
+    my $category_name   = $payload->{category_name};
+    my $gdlink_id   = $payload->{gdlink_id};
+    my $result = Link::CreateLink($dbh,$session_id, $semester_id,$category_name,$gdlink_id);
+    $c->render(json => { result => $result });
+};
 
 
 

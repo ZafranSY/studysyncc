@@ -63,7 +63,7 @@ const b=
 const host='http://localhost:80'
 let METHOD='POST'
 const crud='/'
-const type='getAllLinkCount'
+const type='getALLlinkIdDelete'
 
 
 // ONLY for GET method, can leave this alone if POST

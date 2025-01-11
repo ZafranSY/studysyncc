@@ -161,6 +161,142 @@ sub getALLlinkCount {
     return $row->{'COUNT(*)'};
 }
 
+sub getALLlinkIdRead {
+    my ($dbh,$session_id) = @_;
+    my $role_name=Authorization::getRoleName($dbh, $session_id);
+    my $email=Authorization::getEmail($dbh, $session_id);
+    my $sth = $dbh->prepare('
+            SELECT gdlink_id from gdlinks 
+                where owner= ?
+                OR gdlink_id IN 
+                    (
+                    select gdlink_id from linkPermission 
+                        where   
+                                (
+                                user_email= ?
+                                OR role_name=\'Everyone\' 
+                                OR role_name=  ? 
+                                )
+                            AND can_read=1
+                            
+                    
+                        AND category IN 
+                            (
+                            select DISTINCT category from categoryPermission 
+                                where can_read_category=1 
+                                AND 
+                                    (
+                                    role_name=\'Everyone\' 
+                                    OR role_name=? 
+                                    OR user_email=?
+                                    )   
+                            )
+                    )
+
+                OR "Academic Officer"=?    
+    ')
+        or die 'prepare statement failed: ' . $dbh->errstr();
+    $sth->execute($email, $email, $role_name,$role_name,$email,$role_name)
+        or die 'execution failed: ' . $dbh->errstr();
+
+    my @result;
+    while (my @row = $sth->fetchrow_array) {
+        push @result, \@row;  
+    }
+    
+    return \@result;
+}
+
+sub getALLlinkIdDelete {
+    my ($dbh,$session_id) = @_;
+    my $role_name=Authorization::getRoleName($dbh, $session_id);
+    my $email=Authorization::getEmail($dbh, $session_id);
+    my $sth = $dbh->prepare('
+            SELECT gdlink_id from gdlinks 
+                where owner= ?
+                OR gdlink_id IN 
+                    (
+                    select gdlink_id from linkPermission 
+                        where   
+                                (
+                                user_email= ?
+                                OR role_name=\'Everyone\' 
+                                OR role_name=  ? 
+                                )
+                            AND can_read=1
+                            AND can_delete=1
+                        AND category IN 
+                            (
+                            select DISTINCT category from categoryPermission 
+                                where can_read_category=1 
+                                AND 
+                                    (
+                                    role_name=\'Everyone\' 
+                                    OR role_name=? 
+                                    OR user_email=?
+                                    )   
+                            )
+                    )
+
+                OR "Academic Officer"=?    
+    ')
+        or die 'prepare statement failed: ' . $dbh->errstr();
+    $sth->execute($email, $email, $role_name,$role_name,$email,$role_name)
+        or die 'execution failed: ' . $dbh->errstr();
+
+    my @result;
+    while (my @row = $sth->fetchrow_array) {
+        push @result, \@row;  
+    }
+    
+    return \@result;
+}
+
+sub getALLlinkIdUpdate {
+    my ($dbh,$session_id) = @_;
+    my $role_name=Authorization::getRoleName($dbh, $session_id);
+    my $email=Authorization::getEmail($dbh, $session_id);
+    my $sth = $dbh->prepare('
+            SELECT gdlink_id from gdlinks 
+                where owner= ?
+                OR gdlink_id IN 
+                    (
+                    select gdlink_id from linkPermission 
+                        where   
+                                (
+                                user_email= ?
+                                OR role_name=\'Everyone\' 
+                                OR role_name=  ? 
+                                )
+                            AND can_read=1
+                            AND can_update=1
+                        AND category IN 
+                            (
+                            select DISTINCT category from categoryPermission 
+                                where can_read_category=1 
+                                AND 
+                                    (
+                                    role_name=\'Everyone\' 
+                                    OR role_name=? 
+                                    OR user_email=?
+                                    )   
+                            )
+                    )
+
+                OR "Academic Officer"=?    
+    ')
+        or die 'prepare statement failed: ' . $dbh->errstr();
+    $sth->execute($email, $email, $role_name,$role_name,$email,$role_name)
+        or die 'execution failed: ' . $dbh->errstr();
+
+    my @result;
+    while (my @row = $sth->fetchrow_array) {
+        push @result, \@row;  
+    }
+    
+    return \@result;
+}
+
 sub CreateLink {
     my ($dbh,$session_id, $semester_id,$category_name,$ref_name,$desc,$link) = @_;
     $role_name=Authorization::getRoleName($dbh, $session_id);
@@ -222,45 +358,12 @@ sub CreateLink {
 }
 
 
-sub DeleteCategory {
-    my ($dbh, $semester_id, $category) = @_;
-    
-    my $sth_check = $dbh->prepare('SELECT 1 FROM Categories WHERE semester_id = ? AND category = ? ') 
-                or die 'prepare statement failed: ' . $dbh->errstr();
-    $sth_check->execute($semester_id,$category) 
-                or die 'prepare statement failed: ' . $dbh->errstr();
-    my $exists = $sth_check->fetchrow_array;
-    if (!$exists) {
-        return { error => "Category $category in $semester_id doesnt exists, Cannot Delete" };
-    }
-    my $sth_insert = $dbh->prepare('DELETE FROM Categories where semester_id = ? AND category = ?') 
-                or die 'prepare statement failed: ' . $dbh->errstr();
-    $result=$sth_insert->execute($semester_id,$category) 
-                or die 'prepare statement failed: ' . $dbh->errstr();
-    if ($result) {
-        return { message => "Category $category on $semester_id deleted successfully" };
-    } else {
-        return { error => "Failed to delete category $category on $semester_id" };
-    }
-}
+sub DeleteLink{
+    my ($dbh,$session_id, $semester_id,$category_name,$ref_name,$desc,$link) = @_;
+    my $role_name=Authorization::getRoleName($dbh, $session_id);
+    my $email=Authorization::getEmail($dbh, $session_id);
+    my @canDeleteId=Link::getALLlinkIdDelete($dbh, $session_id);
 
-sub UpdateCategory {
-    my ($dbh, $semester_id,$category,$new_category_name) = @_;
-    
-    my $sth_check = $dbh->prepare('SELECT 1 FROM Categories WHERE semester_id = ? AND category = ?') or die 'prepare statement failed: ' . $dbh->errstr();
-    $sth_check->execute($semester_id,$category) 
-                or die 'prepare statement failed: ' . $dbh->errstr();
-    my $exists = $sth_check->fetchrow_array;
-    if (!$exists) {
-        return { error => "Category $category in $semester_id doesnt exists, Cannot Update" };
-    }
-    my $sth_insert = $dbh->prepare('UPDATE Categories SET category=? where semester_id = ? AND category = ?') or die 'prepare statement failed: ' . $dbh->errstr();
-    $result=$sth_insert->execute($new_category_name,$semester_id,$category) 
-                or die 'prepare statement failed: ' . $dbh->errstr();
-    if ($result) {
-        return { message => "Category updated from $category on $semester_id to $new_category_name successfully" };
-    } else {
-        return { error => "Failed to Update semester from $category on $semester_id to $new_category_name" };
-    }
+
 }
 1;
