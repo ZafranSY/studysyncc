@@ -112,6 +112,9 @@ export default {
         // Parse the JSON response
         const result = await response.json();
         console.log("Server Response:", result); // Debugging
+        if (response.ok && result.result && result.result.message) {
+          location.reload();
+        }
 
         // // Check for success or error in the result
         // if (response.ok && result.result && result.result.message) {

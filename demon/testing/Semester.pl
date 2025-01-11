@@ -35,6 +35,8 @@ sub getViewableCategoriesWithinSemesterCount {
 
 sub CreateSemester {
     my ($dbh, $semester_id) = @_;
+    $semester_id =~ s/^\s+|\s+$//g;
+
     if (!$semester_id || length($semester_id) != 11) {
         return { error => 'Invalid semester_id. It must be 11 characters.' };
     }
