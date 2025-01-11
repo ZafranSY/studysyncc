@@ -3,7 +3,7 @@
     <!-- Navbar -->
     <nav class="navbar">
       <div class="navbar-logo">
-        <img src="/images/utm_logo.png" alt="UTM Logo" />
+        <img src="https://i.imgur.com/VbGFqnd.png" alt="UTM Logo" />
       </div>
       <div class="navbar-links">
         <router-link to="/login" class="login-button">Log In</router-link>
