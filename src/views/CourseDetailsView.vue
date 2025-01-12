@@ -26,8 +26,8 @@
                         <tr>
                             <th>Ref Name</th>
                             <th>Description</th>
-                            <th>Created</th>
                             <th>Owner</th>
+                            <th>Link</th>
                             <th>Action</th>
                         </tr>
                     </thead>
@@ -38,15 +38,18 @@
                                 {{ file.refName }}
                             </td>
                             <td>{{ file.linkDescription }}</td>
-                            <td>{{ file.linkPosted }}</td>
                             <td>{{ file.owner }}</td>
+                            <td>{{ file.link }}</td>
                             <td>
-                                <button @click="editRecord(file)" class="icon-button">
+                                <!-- Edit Button (only shown if checkCanUpdate is true) -->
+                                <button v-if="checkCanUpdate(file.id)" @click="editRecord(file)" class="icon-button">
                                     <img :src="require('@/assets/edit.png')" alt="Edit" class="icon" />
                                 </button>
+
                                 <button @click="deleteRecord(file.id)" class="icon-button">
                                     <img :src="require('@/assets/delete.png')" alt="Delete" class="icon" />
                                 </button>
+
                                 <button @click="goToFile(file)" class="icon-button">
                                     <img :src="require('@/assets/goto.png')" alt="Go To" class="icon" />
                                 </button>
@@ -124,6 +127,7 @@ export default {
                 owner: localStorage.getItem('email').replace(/['"]+/g, ""),
                 url: "",
             },
+            canUpdateCache: {},
         };
     },
     computed: {
@@ -131,9 +135,9 @@ export default {
             return !this.searchQuery
                 ? this.files
                 : this.files.filter((file) =>
-                    file.linkDescription
-                        .toLowerCase()
-                        .includes(this.searchQuery.toLowerCase())
+                    file.linkDescription.toLowerCase().includes(this.searchQuery.toLowerCase())
+                    || file.refName.toLowerCase().includes(this.searchQuery.toLowerCase())
+                    || file.owner.toLowerCase().includes(this.searchQuery.toLowerCase())
                 );
         },
     },
@@ -177,7 +181,7 @@ export default {
                             id: file[0] || "N/A",
                             refName: file[3] || "No Name",
                             linkDescription: file[4] || "No Description",
-                            linkPosted: file[2] || "Not Available",
+                            link: file[6] || "Not Available",
                             owner: file[5] || "Unknown",
                             url: file[6] || "#",
                         }));
@@ -206,7 +210,6 @@ export default {
                 id: '?',
                 refName: newFile.refName,
                 linkDescription: newFile.description,
-                linkPosted: newFile.created,
                 owner: newFile.owner,
                 url: newFile.url,
             });
@@ -226,6 +229,7 @@ export default {
                 owner: "",
                 url: "",
             };
+            location.reload();
         },
 
         async updateRecord() {
@@ -241,8 +245,8 @@ export default {
             }
 
             // Determine if the user has permission to update
-            const userRole = this.getUserRole(); 
-            const canUpdate = this.checkCanUpdate(); 
+            const userRole = this.getUserRole();
+            const canUpdate = this.checkCanUpdate();
 
             if (userRole !== '"Academic Officer"' && !canUpdate) {
                 alert("You do not have permission to update this link." + userRole + "  ow," + canUpdate);
@@ -255,7 +259,7 @@ export default {
                 category_name: categoryName.replace(/['"]+/g, ""),
                 new_ref_name: this.editForm.refName,
                 new_desc: this.editForm.linkDescription,
-                new_link: this.editForm.url, 
+                new_link: this.editForm.url,
                 gdlink_id: this.editForm.id,
             };
 
@@ -272,10 +276,10 @@ export default {
 
                 if (response.ok) {
                     alert('' + data.result.message);
-                    
+
                     this.closeEditModal();
                 } else {
-                    
+
                     alert('Error updating the link: ' + (data.message || 'Unknown error'));
                 }
             } catch (error) {
@@ -283,43 +287,73 @@ export default {
             }
         },
         getUserRole() {
-            
-            const role = localStorage.getItem('role'); 
+
+            const role = localStorage.getItem('role');
             if (role === 'Academic_officer') {
                 return 'Academic_officer';
             }
             return {
                 canUpdateCategory: (categoryName) => {
-                    
+
                     const permissions = JSON.parse(localStorage.getItem('permissions')) || [];
                     return permissions.includes(categoryName);
                 },
             };
         },
         checkCanDelete() {
-            
-            return this.editForm.owner === localStorage.getItem('email').replace(/['"]+/g, "");
-        },
-        checkCanUpdate() {
-            
             return this.editForm.owner === localStorage.getItem('email').replace(/['"]+/g, "");
         },
 
+        async checkCanUpdate(linkIdToCheck) {
+            const sessionId = sessionStorage.getItem('session_id');
+            const semesterId = sessionStorage.getItem('semester_id');
+            if (!sessionId || !semesterId) {
+                return false;
+            }
+            const requestBody = {
+                session_id: sessionId,
+                semester_id: semesterId,
+            };
+            try {
+                // Make the API request to get updatable links
+                const response = await fetch("http://localhost/getALLlinkIdUpdate", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify(requestBody),
+                });
+                const data = await response.json();
+                if (response.ok && data.updateableLinkId) {
+                    const updateableLinkIds = data.updateableLinkId;
+                    return updateableLinkIds.includes(linkIdToCheck);
+                } else {
+                    alert('Error retrieving updatable link IDs.');
+                    return false;
+                }
+            } catch (error) {
+                console.error("Error checking update permissions:", error);
+                alert("An error occurred while checking update permissions.");
+                return false;
+            }
+        },
+        
+
         async deleteRecord(id) {
-            
+
             const sessionId = localStorage.getItem('session_id');
             const semesterId = sessionStorage.getItem('semester');
             const categoryName = sessionStorage.getItem('category');
 
-            
+
             if (!sessionId || !semesterId || !categoryName) {
                 alert("Missing necessary data for the request.");
                 return;
             }
 
-            
-            const userRole = this.getUserRole(); 
-            const canDelete = this.checkCanDelete(); 
+
+            const userRole = this.getUserRole();
+            const canDelete = this.checkCanDelete();
 
             if (userRole !== '"Academic Officer"' && !canDelete) {
                 alert("You do not have permission to delete this link." + userRole + "  ow," + canDelete);
@@ -330,7 +364,7 @@ export default {
                 session_id: sessionId.replace(/['"]+/g, ""),
                 semester_id: semesterId.replace(/['"]+/g, ""),
                 category_name: categoryName.replace(/['"]+/g, ""),
-                gdlink_id: id, 
+                gdlink_id: id,
             };
 
             try {
@@ -346,7 +380,8 @@ export default {
 
                 if (response.ok) {
                     alert('Link deleted successfully: ' + data.result.message);
-                    
+                    location.reload();
+
                 } else {
                     // Display error message if response is not ok
                     alert('Error deleting the link: ' + (data.message || 'Unknown error'));
