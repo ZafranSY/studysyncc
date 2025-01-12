@@ -175,7 +175,7 @@ export default {
                         // Properly map the nested array structure
                         this.files = data.linkViewable.map((file) => ({
                             id: file[0] || "N/A",
-                            refName: file[1] || "No Name",
+                            refName: file[3] || "No Name",
                             linkDescription: file[4] || "No Description",
                             linkPosted: file[2] || "Not Available",
                             owner: file[5] || "Unknown",
@@ -346,7 +346,7 @@ export default {
 
                 if (response.ok) {
                     alert('Link deleted successfully: ' + data.result.message);
-                    this.files = this.files.filter((file) => file.id !== id); 
+                    
                 } else {
                     // Display error message if response is not ok
                     alert('Error deleting the link: ' + (data.message || 'Unknown error'));
