@@ -19,7 +19,6 @@ async function runTest(METHOD, link, payload) {
 }
 
 // eslint-disable-next-line no-unused-vars
-<<<<<<< HEAD
 const b =
 {
     "session_id": "ab",
@@ -37,35 +36,14 @@ const host = 'http://localhost:80'
 let METHOD = 'post'
 const crud = '/update'
 const type = 'LinkPermission'
-=======
-const b = {
-  session_id: "ab",
-  new_semester_id: "2099/2012-3",
-  semester_id: "2099/3212-2",
-  category_name: "PSM 414",
-  new_category_name: "KUCING",
-  username: "12085",
-  password: "S808323",
-  username1: "A16CS4016",
-  password1: "201608M10112",
-};
->>>>>>> 09305ebc27c64356c96b8c2d2bc96dcf4bbe3d5a
 
-const host = "http://localhost:80";
-let METHOD = "post";
-const crud = "/get";
-const type = "ViewableLinksWithinCategoryCount";
 
 // ONLY for GET method, can leave this alone if POST
 const PARAMTYPE = "?semester_id";
 const PARAMVALUE = "=2024/2025-1";
 
 const payload = {
-<<<<<<< HEAD
     session_id: '313',
-=======
-  session_id: "ab",
->>>>>>> 09305ebc27c64356c96b8c2d2bc96dcf4bbe3d5a
 
   semester_id: "2024/2025-1",
   category_name: "PSM 1",
@@ -81,7 +59,6 @@ const payload = {
   desc: "The detailed untold history",
   link: "google.com",
 
-<<<<<<< HEAD
     gdlink_id: "84",
     new_ref_name: 'white cat',
     new_desc: 'orange cat ',
@@ -100,21 +77,6 @@ const payload = {
     can_update : 0,
     can_delete : 1,
 
-=======
-  gdlink_id: "11230",
-  new_ref_name: "white cat",
-  new_desc: "orange cat ",
-  new_link: "whatss.com",
-
-  selected_user_role: "Student",
-  selected_user_email: "johnStu@utm.cm",
-
-  insert_user_role: "Student",
-  insert_user_email: "johnStu@utm.cm",
->>>>>>> 09305ebc27c64356c96b8c2d2bc96dcf4bbe3d5a
-
-  can_read_category: "true",
-  can_create_links: "true",
 };
 
 const endpoint = crud + type;
