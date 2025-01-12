@@ -8,7 +8,9 @@
       <h1 class="title">{{ title }}</h1>
     </div>
     <div class="card-footer">
-      <p class="subtitle">{{ subtitle }} : {{ this.viewableCategoryCount }}</p>
+      <p class="subtitle">
+        {{ subtitle }} : {{ this.viewableCategoryCount }} viewable Category
+      </p>
     </div>
 
     <!-- Edit and Delete Buttons (visible on hover for Academic Officer only) -->
