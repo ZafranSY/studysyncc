@@ -51,12 +51,12 @@
                                 </button>
 
                                 <!-- Gear Button -->
-                                <button @click="openSettingsModal" class="icon-button">
+                                <button @click="openSettingsModal" class="icon-button" v-if="ownerOrAcadOff(file.owner)">
                                     <img :src="require('@/assets/gear.png')" alt="Settings" class="icon" />
                                 </button>
 
                                 <!-- LinkPermissionPopup Modal -->
-                                <LinkPermissionPopup :show="showSettingsModal" @close="closeSettingsModal" />
+                                <LinkPermissionPopup :show="showSettingsModal" @close="closeSettingsModal"  />
                                 <button @click="goToFile(file)" class="icon-button">
                                     <img :src="require('@/assets/goto.png')" alt="Go To" class="icon" />
                                 </button>
@@ -160,10 +160,14 @@ export default {
                     || file.owner.toLowerCase().includes(this.searchQuery.toLowerCase())
                 );
         },
+        
     },
     methods: {
 
-
+        ownerOrAcadOff(a){
+            
+            return localStorage.getItem('role')==='Academic Officer' || localStorage.getItem('email').replace(/['"]+/g, "")==a;
+        },
         // Fetch data based on category and session
         fetchFiles() {
             const session_id = JSON.parse(localStorage.getItem("session_id"));
