@@ -71,7 +71,7 @@
                                 required />
 
                             <label for="owner">Owner:</label>
-                            
+
                             <input v-model="editForm.owner" id="owner" placeholder=this.owner disabled />
 
                             <label for="url">URL:</label>
@@ -88,8 +88,8 @@
                 </div>
             </div>
 
-            <!-- <div v-if="checkCanCreate()" class="add-button" @click="openUploadModal"> -->
-            <div class="add-button" @click="openUploadModal">
+            <div v-if="checkCanCreate()" class="add-button" @click="openUploadModal">
+            <!-- <div class="add-button" @click="openUploadModal"> -->
                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
                     <path d="M13 11h8v2h-8v8h-2v-8H3v-2h8V3h2v8Z" />
                 </svg>
@@ -326,24 +326,20 @@ export default {
                 return false;
             }
 
-            let found=false;
-            let cat=sessionStorage.getItem('category');
-            let sem=sessionStorage.getItem('semester');
-            console.log(`Category: ${cat}, Semester ID: ${sem}`);
-            for (let i = 0; i < this.createAbleLinkWherearr.length; i++) {
-                const item = this.createAbleLinkWherearr[i];
-                console.log(`Category: ${item.category}, Semester ID: ${item.semester_id}`);
-                console.log(`Index: ${i}`);
-                if(item.category==cat && item.semester_id==sem){
-                    console.log(`Index: ${i}`);
-                    found=1;
-                }
-            }
+            let found = false;
+            let cat = sessionStorage.getItem('category').replace(/['"]+/g, "");
+            let sem = sessionStorage.getItem('semester').replace(/['"]+/g, "");
             
+
+            for (let i = 0; i < this.createAbleLinkWherearr.length; i+=2) {
+                if(this.createAbleLinkWherearr[i]==cat &&this.createAbleLinkWherearr[i+1]==sem)
+                    found=true
+            }
+
             return found;
         },
 
-        getUpdatableLink() {
+        async getUpdatableLink() {
             const session_id = JSON.parse(localStorage.getItem("session_id"));
             this.semester_id = JSON.parse(sessionStorage.getItem("semester"));
 
@@ -354,37 +350,36 @@ export default {
 
             const url = "http://localhost/getALLlinkIdUpdate";
 
-            fetch(url, {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify({
-                    session_id,
-                    semester_id: this.semester_id,
-                }),
-            })
-                .then((response) => {
-                    if (!response.ok) {
-                        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-                    }
-                    return response.json();
-                })
-                .then((data) => {
-                    console.log("API Response UPDATE PERM:", data);
-
-                    if (data.updateableLinkId) {
-                        this.updateableLinkIdarr = data.updateableLinkId;
-                    } else {
-                        console.warn("No links found for the given category.");
-                    }
-                })
-                .catch((error) => {
-                    console.error("Error fetching links:", error.message);
+            try {
+                const response = await fetch(url, {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify({
+                        session_id,
+                        semester_id: this.semester_id,
+                    }),
                 });
+
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+
+                const data = await response.json();
+                console.log("API Response UPDATE PERM:", data);
+
+                if (data.updateableLinkId) {
+                    this.updateableLinkIdarr = data.updateableLinkId;
+                } else {
+                    console.warn("No links found for the given category.");
+                }
+            } catch (error) {
+                console.error("Error fetching links:", error.message);
+            }
         },
 
-        getDeletableLink() {
+        async getDeletableLink() {
             const session_id = JSON.parse(localStorage.getItem("session_id"));
             this.semester_id = JSON.parse(sessionStorage.getItem("semester"));
 
@@ -395,37 +390,36 @@ export default {
 
             const url = "http://localhost/getALLlinkIdDelete";
 
-            fetch(url, {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify({
-                    session_id,
-                    semester_id: this.semester_id,
-                }),
-            })
-                .then((response) => {
-                    if (!response.ok) {
-                        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-                    }
-                    return response.json();
-                })
-                .then((data) => {
-                    console.log("API Response DELETE PERM:", data);
-
-                    if (data.deleteableLinkId) {
-                        this.deleteableLinkIdarr = data.deleteableLinkId;
-                    } else {
-                        console.warn("No links found for the given category.");
-                    }
-                })
-                .catch((error) => {
-                    console.error("Error fetching links:", error.message);
+            try {
+                const response = await fetch(url, {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify({
+                        session_id,
+                        semester_id: this.semester_id,
+                    }),
                 });
+
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+
+                const data = await response.json();
+                console.log("API Response DELETE PERM:", data);
+
+                if (data.deleteableLinkId) {
+                    this.deleteableLinkIdarr = data.deleteableLinkId;
+                } else {
+                    console.warn("No links found for the given category.");
+                }
+            } catch (error) {
+                console.error("Error fetching links:", error.message);
+            }
         },
 
-        getCategoryAddPerm() {
+        async getCategoryAddPerm() {
             const session_id = JSON.parse(localStorage.getItem("session_id"));
             this.semester_id = JSON.parse(sessionStorage.getItem("semester"));
 
@@ -436,40 +430,33 @@ export default {
 
             const url = "http://localhost/getALLlinkCreateWhere";
 
-            fetch(url, {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify({
-                    session_id,
-                    semester_id: this.semester_id,
-                }),
-            })
-                .then((response) => {
-                    if (!response.ok) {
-                        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-                    }
-                    return response.json();
-                })
-                .then((data) => {
-                    console.log("API Response CATEGORY ADD PERM WHERE:", data);
-
-                    if (data.createAbleLinkWhere) {
-                        this.createAbleLinkWherearr = [];
-                        for (let i = 0; i < data.createAbleLinkWhere.length; i += 2) {
-                            this.createAbleLinkWherearr.push({
-                                category: data.createAbleLinkWhere[i],
-                                semester_id: data.createAbleLinkWhere[i + 1]
-                            });
-                        }
-                    } else {
-                        console.warn("No links found for the given category.");
-                    }
-                })
-                .catch((error) => {
-                    console.error("Error fetching links:", error.message);
+            try {
+                const response = await fetch(url, {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify({
+                        session_id,
+                        semester_id: this.semester_id,
+                    }),
                 });
+
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+
+                const data = await response.json();
+                console.log("API Response CATEGORY ADD PERM WHERE:", data);
+
+                if (data.createAbleLinkWhere) {
+                    this.createAbleLinkWherearr = data.createAbleLinkWhere;
+                } else {
+                    console.warn("No links found for the given category.");
+                }
+            } catch (error) {
+                console.error("Error fetching links:", error.message);
+            }
         },
 
 
@@ -544,10 +531,10 @@ export default {
     async mounted() {
         // Initialize page by fetching data
         await this.fetchFiles();
+        await this.getCategoryAddPerm();
         await this.getUpdatableLink();
         await this.getDeletableLink();
-        await this.getCategoryAddPerm();
-        console.log("CAN CREATE ? "+this.checkCanCreate());
+
     },
 };
 </script>
