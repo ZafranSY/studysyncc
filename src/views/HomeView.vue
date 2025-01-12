@@ -295,7 +295,7 @@ export default {
   width: 64px;
   height: 64px;
   border-radius: 50%;
-  background-color: #007bff;
+  background-color: #4b0808;
   color: white;
   font-size: 32px;
   border: none;

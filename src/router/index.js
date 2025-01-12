@@ -39,6 +39,15 @@ const routes = [
       this.$router.push(`/course-files/${id}`);
     },
   },
+
+  {
+    path: "/category/:title/student",
+    name: "CourseDetailsStudent",
+    component: () => import("@/views/CourseDetailViewStudent.vue"),
+    meta: { requiresAuth: true, allowedRoles: ["Pelajar FSKSM"] },
+  },
+
+  
   {
     path: "/allfile",
     name: "AllFile",
