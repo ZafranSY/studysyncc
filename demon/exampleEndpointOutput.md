@@ -542,6 +542,8 @@ OUTPUT
 OUTPUT
 {"result":{"error":"Cannot add permission johnStu@utm.cm for email that doesnt exist. "}}
 
+=================================================================================================================
+
 http://localhost/deleteLinkPermission
 
 
