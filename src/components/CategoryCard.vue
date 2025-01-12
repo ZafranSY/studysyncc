@@ -10,7 +10,7 @@
     </div>
     <div class="card-footer">
       <p class="subtitle">
-        {{ subtitle }}: {{ this.viewAbleLinkCount }} Viewable Link
+        {{ subtitle }} : {{ this.viewAbleLinkCount }} ViewAble Link
       </p>
     </div>
 
@@ -76,22 +76,23 @@ export default {
     async fetchViewAbleLinkCount() {
       const session_id = localStorage
         .getItem("session_id")
-        ?.replace(/['"]+/g, "");
+        ?.replace(/['"]+/g, ""); // Clean up session_id from localStorage
 
       const semester = sessionStorage
         .getItem("semester")
-        ?.replace(/['"]+/g, "");
-      // console.log("category ", this.title);
-      // console.log("session_ id ", session_id);
+        ?.replace(/['"]+/g, ""); // Clean up semester_id from sessionStorage
 
+      // Build the payload to send to the server
       const payload = {
         session_id: session_id.trim(),
         semester_id: semester.trim(),
         category_name: this.title,
       };
-      console.log("Payload sent:", payload);
+
+      console.log("Payload sent:", payload); // Debug: Log the payload being sent
 
       try {
+        // Make the POST request to fetch the viewable link count
         const response = await fetch(
           "http://localhost/getViewableLinksWithinCategoryCount",
           {
@@ -102,26 +103,26 @@ export default {
             body: JSON.stringify(payload),
           }
         );
+
         const result = await response.json();
-        console.log("Server response:", result);
+        console.log("Server response:", result); // Debug: Log the server response
 
+        // Check and assign the result if valid
         if (response.ok && typeof result === "number") {
-          this.viewAbleLinkCount = result; // Assign count for this card
+          this.viewAbleLinkCount = result; // Update viewable link count
+        } else if (result.error) {
+          console.error("Server error:", result.error);
+          alert(result.error); // Alert the error message from the server
         }
-
-        // } else if (result.error) {
-        //   console.error("Error from server:", result.error);
-        //   alert(result.error);
-        // } else {
-        //   console.error("Unexpected server response:", result);
-        //   alert("Failed to fetch viewable link count.");
-        // }
       } catch (error) {
-        console.error("Error fetching viewable link count:", error);
+        // Catch and log any fetch errors
+        console.error("Fetch error:", error);
+        alert("An error occurred while fetching the viewable link count.");
       }
     },
   },
   mounted() {
+    // Fetch the viewable link count when the component mounts
     this.fetchViewAbleLinkCount();
   },
 };
