@@ -24,7 +24,7 @@
           v-model="formData.created"
           id="created"
           type="datetime-local"
-          required
+          :disabled=true
         />
 
         <label for="owner">Owner:</label>
@@ -32,7 +32,7 @@
           v-model="formData.owner"
           id="owner"
           placeholder="Enter Owner"
-          required
+          :disabled=true
         />
 
         <label for="url">URL:</label>
@@ -40,7 +40,7 @@
           v-model="formData.url"
           id="url"
           placeholder="Enter URL"
-          required
+          
         />
 
         <div class="modal-actions">
@@ -66,26 +66,56 @@ export default {
         refName: "",
         description: "",
         url: "",
+        created: "", // For storing the current datetime
+        owner: localStorage.getItem("email").replace(/['"]+/g, "") ,   
       },
+      timer: null, // Reference for the interval
     };
   },
+  watch: {
+    show(newVal) {
+      // Start or stop the timer based on modal visibility
+      if (newVal) {
+        this.startTimer();
+      } else {
+        this.stopTimer();
+      }
+    },
+  },
+  mounted() {
+    if (this.show) {
+      this.startTimer();
+    }
+  },
+  beforeUnmount() {
+    this.stopTimer(); // Clear timer when component is destroyed
+  },
   methods: {
-    async handleSubmit() {
-      const session_id = localStorage
-        .getItem("session_id")
-        .replace(/['"]+/g, "");
-      const semester_id = sessionStorage
-        .getItem("semester")
-        .replace(/['"]+/g, "");
-      const category_name = sessionStorage
-        .getItem("category")
-        .replace(/['"]+/g, "");
-
-      // Ensure all values exist
-      if (!session_id || !semester_id || !category_name) {
-        alert(
-          "Missing session, semester, or category data. Please log in again."
+        startTimer() {
+    this.updateTime(); // Set the initial value
+    this.timer = setInterval(this.updateTime, 1000); // Update every second
+    },
+        updateTime() {
+        const now = new Date();
+        const localDateTime = new Date(
+            now.getTime() - now.getTimezoneOffset() * 60000
         );
+        this.formData.created = localDateTime.toISOString().slice(0, 16); // Format as "yyyy-MM-ddTHH:mm"
+        },
+    stopTimer() {
+      if (this.timer) {
+        clearInterval(this.timer);
+        this.timer = null;
+      }
+    },
+    
+    async handleSubmit() {
+      const session_id = localStorage.getItem("session_id")?.replace(/['"]+/g, "");
+      const semester_id = sessionStorage.getItem("semester")?.replace(/['"]+/g, "");
+      const category_name = sessionStorage.getItem("category")?.replace(/['"]+/g, "");
+
+      if (!session_id || !semester_id || !category_name) {
+        alert("Missing session, semester, or category data. Please log in again.");
         return;
       }
 
@@ -96,9 +126,10 @@ export default {
         ref_name: this.formData.refName.trim(),
         desc: this.formData.description.trim(),
         link: this.formData.url.trim(),
+        created: this.formData.created.trim(),
       };
 
-      console.log("Payload:", payload); // Debugging
+      console.log("Payload:", payload);
 
       try {
         const response = await fetch("http://localhost/createLink", {
@@ -109,21 +140,11 @@ export default {
           body: JSON.stringify(payload),
         });
 
-        // Parse the JSON response
         const result = await response.json();
-        console.log("Server Response:", result); // Debugging
+        console.log("Server Response:", result);
         if (response.ok && result.result && result.result.message) {
           location.reload();
         }
-
-        // // Check for success or error in the result
-        // if (response.ok && result.result && result.result.message) {
-        //   alert(result.result.message); // Success message
-        // } else if (result.result && result.result.error) {
-        //   alert(result.result.error); // Server error message
-        // } else {
-        //   alert("Failed to upload link. Please try again."); // Fallback error
-        // }
       } catch (error) {
         console.error("Error uploading link:", error);
         alert("An unexpected error occurred. Please try again.");
@@ -132,17 +153,19 @@ export default {
       this.$emit("close");
       this.resetForm();
     },
-
     resetForm() {
       this.formData = {
         refName: "",
         description: "",
         url: "",
+        created: "",
+        owner: "",
       };
     },
   },
 };
 </script>
+
 <style scoped>
 /* Modal base */
 .modal {

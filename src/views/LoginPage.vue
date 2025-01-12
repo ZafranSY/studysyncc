@@ -79,6 +79,14 @@ export default {
             "session_id",
             JSON.stringify(data.result[0].session_id)
           );
+          localStorage.setItem(
+            "email",
+            JSON.stringify(data.result[0].email)
+          );
+          localStorage.setItem(
+            "role",
+            JSON.stringify(data.result[0].description)
+          );
 
           loggedIn.value = true;
           router.push("/homeview");

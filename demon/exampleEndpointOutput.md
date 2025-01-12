@@ -320,10 +320,13 @@ If link doesnt exist , it will say it delete successfully
 
 http://localhost/updateLink          ONLY FOR ACADEMIC OFFICER & PEOPLE WITH UPDATE PERM WITHIN CATEGORY & LINK OWNER
 request body =>
-    session_id : ??    ======= get from localStorage
-    semester_id : ??   ======= get from localStorage
-    category_name : ?? ======= get from localStorage
-    link uh this is hard
+#        session_id : ??    ======= get from localStorage
+#        semester_id : ??   ======= get from localStorage  
+#        category_name : ?? ======= get from localStorage
+#        new_ref_name : ??  ======= get from form
+#        new_desc : ??      ======= get from form
+#        new_link : ??      ======= get from form
+#        gdlink_id : ????   ======= get when u click the delete button
 
 OUTPUT
 {"result":{"message":"gdlink_id 11230 in Meow, 2024/2025-1 edited successfully"}}

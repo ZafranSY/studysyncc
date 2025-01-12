@@ -97,8 +97,8 @@
               <input
                 v-model="editForm.owner"
                 id="owner"
-                placeholder="Enter Owner"
-                required
+                placeholder=this.owner
+                disabled
               />
 
               <label for="url">URL:</label>
@@ -166,7 +166,7 @@ export default {
         id: null,
         refName: "",
         linkDescription: "",
-        owner: "",
+        owner: localStorage.getItem('email').replace(/['"]+/g, "") ,
         url: "",
       },
     };
@@ -248,7 +248,7 @@ export default {
 
     addFile(newFile) {
       this.files.push({
-        id: newFile.refName,
+        id: '?',
         refName: newFile.refName,
         linkDescription: newFile.description,
         linkPosted: newFile.created,
@@ -273,15 +273,81 @@ export default {
       };
     },
 
-    updateRecord() {
-      const index = this.files.findIndex(
-        (file) => file.id === this.editForm.id
-      );
-      if (index !== -1) {
-        this.files.splice(index, 1, { ...this.editForm });
-      }
-      this.closeEditModal();
-    },
+    async updateRecord() {
+    // Get necessary values from localStorage
+    const sessionId = localStorage.getItem('session_id');
+    const semesterId = sessionStorage.getItem('semester');
+    const categoryName = sessionStorage.getItem('category');
+
+    // Check if any of the required values are missing
+    if (!sessionId || !semesterId || !categoryName) {
+      alert("Missing necessary data for the request.");
+      return;
+    }
+
+    // Determine if the user has permission to update
+    const userRole = this.getUserRole(); // Function that checks if the user is an academic officer or has update permissions
+    const isOwner = this.checkIfOwner(); // Function that checks if the current user is the link owner
+
+    if (userRole !== '"Academic Officer"' &&  !isOwner) {
+      alert("You do not have permission to update this link."+userRole+"  ow,"+isOwner);
+      return;
+    }
+
+    // Create the request payload
+    const requestBody = {
+      session_id: sessionId.replace(/['"]+/g, ""),
+      semester_id: semesterId.replace(/['"]+/g, ""),
+      category_name: categoryName.replace(/['"]+/g, ""),
+      new_ref_name :this.editForm.refName,
+      new_desc:this.editForm.linkDescription,
+      new_link: this.editForm.url, // The updated link data
+      gdlink_id : this.editForm.id,
+    };
+
+    // Make the API request
+    try {
+      const response = await fetch('http://localhost/updateLink', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(requestBody),
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        // Display the success message from the response
+        alert('' + data.result.message);
+        // Proceed with further actions like closing the modal or updating the state
+        this.closeEditModal();
+    } else {
+        // Display error message if response is not ok
+        alert('Error updating the link: ' + (data.message || 'Unknown error'));
+    }
+    } catch (error) {
+      alert('Request failed: ' + error.message);
+    }
+  },
+  getUserRole() {
+    // Function to check user role (this could be from localStorage, or a global state)
+    const role = localStorage.getItem('role'); // Example role check
+    if (role === 'Academic_officer') {
+      return 'Academic_officer';
+    }
+    return {
+      canUpdateCategory: (categoryName) => {
+        // Check if the user has permission to update this category (e.g., from localStorage or state)
+        const permissions = JSON.parse(localStorage.getItem('permissions')) || [];
+        return permissions.includes(categoryName);
+      },
+    };
+  },
+  checkIfOwner() {
+    // Function to check if the current user is the link owner
+    return this.editForm.owner === localStorage.getItem('email').replace(/['"]+/g, ""); // Assuming 'owner' is stored in the editForm
+  },
 
     deleteRecord(id) {
       this.files = this.files.filter((file) => file.id !== id);
