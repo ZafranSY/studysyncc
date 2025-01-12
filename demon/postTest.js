@@ -35,8 +35,8 @@ const b =
 
 const host = 'http://localhost:80'
 let METHOD = 'post'
-const crud = '/'
-const type = 'getALLlinkIdDelete'
+const crud = '/get'
+const type = 'AllEmails'
 
 
 // ONLY for GET method, can leave this alone if POST
@@ -64,6 +64,16 @@ const payload = {
     new_ref_name: 'white cat',
     new_desc: 'orange cat ',
     new_link: 'whatss.com',
+
+    selected_user_role : 'Student' ,
+    selected_user_email :  'johnStu@utm.cm' ,
+
+    insert_user_role : 'Student' ,    
+    insert_user_email :   'johnStu@utm.cm'   ,
+
+    can_read_category : 'true',
+    can_create_links : 'true',
+
 
 };
 

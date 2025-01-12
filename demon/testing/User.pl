@@ -159,4 +159,30 @@ sub GetUserData {
     # Return the result in the desired format
     return { result => \@result, success => 1 };
 }
+
+
+sub getAllRoles {
+    my $dbh = shift(@_);
+    my $sth = $dbh->prepare('SELECT * FROM roles')
+        or die 'prepare statement failed: ' . $dbh->errstr();
+    $sth->execute() or die 'execution failed: ' . $dbh->errstr();
+    my @rolelist;
+    while (my $row = $sth->fetchrow_hashref) {
+        push @rolelist, $row->{role_name};
+    }
+    return \@rolelist;
+}
+
+sub getAllEmails {
+    my $dbh = shift(@_);
+    my $sth = $dbh->prepare('SELECT * FROM user')
+        or die 'prepare statement failed: ' . $dbh->errstr();
+    $sth->execute() or die 'execution failed: ' . $dbh->errstr();
+    my @emaillist;
+    while (my $row = $sth->fetchrow_hashref) {
+        push @emaillist, $row->{email};
+    }
+    return \@emaillist;
+}
+
 1;
