@@ -1,121 +1,210 @@
-    <template>
-        <div v-if="show" class="modal-overlay">
-        <div class="modal-content">
-            <div class="modal-header">
-            <h3>Link Permissions Table</h3>
-            <button class="close-btn" @click="close">✖</button>
-            </div>
-    
-            <div class="table-container">
-            <table class="permissions-table">
-                <thead>
-                <tr>
-                    <th>Link Perm ID</th>
-                    <th>Category</th>
-                    <th>Semester ID</th>
-                    <th>Google Link ID</th>
-                    <th>User Email</th>
-                    <th>Role Name</th>
-                    <th>Can Read</th>
-                    <th>Can Update</th>
-                    <th>Can Delete</th>
-                </tr>
-                </thead>
-                <tbody>
-                <tr v-for="(row, index) in permissions" :key="index">
-                    <td>{{ row.link_perm_id }}</td>
-                    <td>{{ row.category }}</td>
-                    <td>{{ row.semester_id }}</td>
-                    <td>{{ row.gdlink_id }}</td>
-                    <td>{{ row.user_email || "Everyone" }}</td>
-                    <td>{{ row.role_name }}</td>
-                    <!-- Editable Checkboxes for Permissions -->
-                    <td>
-                    <input type="checkbox" v-model="row.can_read" />
-                    </td>
-                    <td>
-                    <input type="checkbox" v-model="row.can_update" />
-                    </td>
-                    <td>
-                    <input type="checkbox" v-model="row.can_delete" />
-                    </td>
-                </tr>
-                </tbody>
-            </table>
-            </div>
-    
-            <div class="modal-actions">
-            <!-- Cancel Button -->
-            <button class="btn cancel" @click="close">Cancel</button>
-            <!-- Update Button -->
-            <button class="btn save" @click="updatePermissions">Update</button>
-            </div>
+<template>
+    <div v-if="show" class="modal-overlay">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h3>Link Permissions Table</h3>
+          <button class="close-btn" @click="close">✖</button>
         </div>
+  
+        <div class="table-container">
+          <table class="permissions-table">
+            <thead>
+              <tr>
+                <th>Link Perm ID</th>
+                <th>Category</th>
+                <th>Semester ID</th>
+                <th>Google Link ID</th>
+                <th>User Email</th>
+                <th>Role Name</th>
+                <th>Can Read</th>
+                <th>Can Update</th>
+                <th>Can Delete</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              <!-- Existing Permissions Rows -->
+              <tr v-for="(row, index) in permissions" :key="index">
+                <td>{{ row.link_perm_id }}</td>
+                <td>{{ row.category }}</td>
+                <td>{{ row.semester_id }}</td>
+                <td>{{ row.gdlink_id }}</td>
+                <td>{{ row.user_email || "Everyone" }}</td>
+                <td>{{ row.role_name }}</td>
+                <td>
+                  <input type="checkbox" v-model="row.can_read" />
+                </td>
+                <td>
+                  <input type="checkbox" v-model="row.can_update" />
+                </td>
+                <td>
+                  <input type="checkbox" v-model="row.can_delete" />
+                </td>
+                <td>
+                  <button class="btn update" @click="updatePermission(row)">Update</button>
+                  <button class="btn delete" @click="deletePermission(row)">Delete</button>
+                </td>
+              </tr>
+  
+              <!-- Add New Permission Row -->
+              <tr v-if="isAddingNew">
+                <!-- Hide Link Perm ID, Category, Semester ID, and Google Link ID in the Add Form -->
+                <td colspan="4" class="empty-col">Adding new permission...</td>
+                <td><input v-model="newPermission.user_email" placeholder="Enter User Email" /></td>
+                <td>
+                  <select v-model="newPermission.role_name">
+                    <option disabled value="">Select Role</option>
+                    <option v-for="role in roles" :key="role" :value="role">{{ role }}</option>
+                  </select>
+                </td>
+                <td><input type="checkbox" v-model="newPermission.can_read" /></td>
+                <td><input type="checkbox" v-model="newPermission.can_update" /></td>
+                <td><input type="checkbox" v-model="newPermission.can_delete" /></td>
+                <td>
+                  <button class="btn save" @click="saveNewPermission">Save</button>
+                </td>
+              </tr>
+            </tbody>
+          </table>
         </div>
-    </template>
-    
-    
-    <script>
-    export default {
-        name: "LinkPermissionPopup",
-        props: {
-        show: {
-            type: Boolean,
-            default: false, // Default to false to hide modal initially
+  
+        <div class="modal-actions">
+          <button class="btn add" @click="addRow">Add New Permission</button>
+          <button class="btn cancel" @click="close">Cancel</button>
+        </div>
+      </div>
+    </div>
+  </template>
+  
+  <script>
+  export default {
+    name: "LinkPermissionPopup",
+    props: {
+      show: {
+        type: Boolean,
+        default: false,
+      },
+    },
+    data() {
+      return {
+        permissions: [],
+        roles: [],
+        isAddingNew: false,
+        newPermission: {
+          user_email: "",
+          role_name: "",
+          can_read: false,
+          can_update: false,
+          can_delete: false,
         },
-        },
-        data() {
-        return {
-            permissions: [], // Store permissions fetched from API
+      };
+    },
+    methods: {
+      fetchPermissions() {
+        fetch("http://localhost/getLinkPermissions")
+          .then((response) => response.json())
+          .then((data) => {
+            this.permissions = data.permissions || [];
+          })
+          .catch((error) => {
+            console.error("Failed to fetch link permissions:", error);
+          });
+      },
+  
+      fetchRoles() {
+        fetch("http://localhost/getAllRoles")
+          .then((response) => response.json())
+          .then((data) => {
+            this.roles = data.result || [];
+          })
+          .catch((error) => {
+            console.error("Failed to fetch roles:", error);
+          });
+      },
+  
+      addRow() {
+        this.isAddingNew = true;
+      },
+  
+      async saveNewPermission() {
+        try {
+          const response = await fetch("http://localhost/addLinkPermission", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify(this.newPermission),
+          });
+  
+          if (!response.ok) {
+            throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+          }
+  
+          const result = await response.json();
+          alert(result.message || "Permission added successfully!");
+          this.permissions.push({ ...this.newPermission });
+          this.isAddingNew = false;
+          this.resetForm();
+        } catch (error) {
+          console.error("Error adding permission:", error);
+          alert("Failed to add permission.");
+        }
+      },
+  
+      resetForm() {
+        this.newPermission = {
+          user_email: "",
+          role_name: "",
+          can_read: false,
+          can_update: false,
+          can_delete: false,
         };
-        },
-        methods: {
-        fetchPermissions() {
-            const url = "http://localhost/getLinkPermissions"; // API endpoint
-            fetch(url)
-            .then((response) => response.json())
-            .then((data) => {
-                this.permissions = data.permissions || [];
-            })
-            .catch((error) => {
-                console.error("Failed to fetch link permissions:", error);
-            });
-        },
-        close() {
-            console.log("Close button clicked!");
-            this.$emit("close"); // Emits the "close" event to close the modal
-        },
-        async updatePermissions() {
-            const url = "http://localhost/updateLinkPermissions";
-            try {
-            const response = await fetch(url, {
-                method: "POST",
-                headers: {
-                "Content-Type": "application/json",
-                },
-                body: JSON.stringify({
-                permissions: this.permissions, // Send updated permissions
-                }),
-            });
-    
-            if (!response.ok) {
-                throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-            }
-    
-            const result = await response.json();
-            alert(result.message || "Permissions updated successfully!");
-            this.close(); // Close modal after successful update
-            } catch (error) {
-            console.error("Error updating permissions:", error);
-            alert("Failed to update permissions.");
-            }
-        },
-        },
-        mounted() {
-        this.fetchPermissions();
-        },
-    };
-    </script>
+      },
+  
+      async updatePermission(row) {
+        try {
+          await fetch("http://localhost/updateLinkPermissions", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify(row),
+          });
+          alert("Permission updated successfully!");
+        } catch (error) {
+          console.error("Error updating permission:", error);
+          alert("Failed to update permission.");
+        }
+      },
+  
+      async deletePermission(row) {
+        try {
+          await fetch(`http://localhost/deleteLinkPermission/${row.link_perm_id}`, {
+            method: "DELETE",
+          });
+          this.permissions = this.permissions.filter(
+            (perm) => perm.link_perm_id !== row.link_perm_id
+          );
+          alert("Permission deleted successfully!");
+        } catch (error) {
+          console.error("Error deleting permission:", error);
+          alert("Failed to delete permission.");
+        }
+      },
+  
+      close() {
+        this.isAddingNew = false;
+        this.resetForm();
+        this.$emit("close");
+      },
+    },
+    mounted() {
+      this.fetchPermissions();
+      this.fetchRoles();
+    },
+  };
+  </script>
+  
     
     <style scoped>
     .modal {
