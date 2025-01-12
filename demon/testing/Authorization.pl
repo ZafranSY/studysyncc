@@ -71,4 +71,21 @@ sub getEmail {
     return $email;
 }
 
+
+sub isLinkOwner {
+    my ($dbh, $gdlink_id,$email) = @_;
+    my $sth = $dbh->prepare('SELECT * FROM gdlinks WHERE gdlink_id=?')
+        or do return { error => 'Failed to prepare statement: ' . $dbh->errstr };
+    $sth->execute($gdlink_id)
+        or do return { error => 'Execution failed: ' . $dbh->errstr };
+    my $oe=$sth->fetchrow_hashref;
+    my $owner_email=$oe->{owner};
+    $logger->info("$email,, $owner_email");
+    if($owner_email eq $email){
+        return {success => ' gdlink owner'}
+    }
+    return { error => 'Not gdlinks owner' };
+    
+}
+
 1;

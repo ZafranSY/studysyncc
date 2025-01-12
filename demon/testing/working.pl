@@ -8,6 +8,7 @@ require("./Link.pl");
 require("./Semester.pl");
 require("./Categories.pl");
 require("./Authorization.pl");
+require("./LinkPermission.pl");
 require("./CategoryPermission.pl");
 
 use Log::Log4perl;
@@ -72,7 +73,7 @@ get '/getSemester' => sub ($c) {
 
 # http://localhost/getAllCategoriesWithinSemesterCount
 # request body =>
-#       session_id : ??  ======= get from localStorage
+#       session_id : ??  ======= get from localStorage/sessionStorage
 #       semester_id : ?? i.e 2024/2025-1
 
 post '/getAllCategoriesWithinSemesterCount' => sub ($c) {
@@ -85,7 +86,7 @@ post '/getAllCategoriesWithinSemesterCount' => sub ($c) {
 
 # http://localhost/getViewableCategoriesWithinSemesterCount
 # request body =>
-#       session_id : ??  ======= get from localStorage
+#       session_id : ??  ======= get from localStorage/sessionStorage
 #       semester_id : ?? i.e 2024/2025-1
 post '/getViewableCategoriesWithinSemesterCount' => sub ($c) {
     my $payload = $c->req->json;
@@ -97,7 +98,7 @@ post '/getViewableCategoriesWithinSemesterCount' => sub ($c) {
 
 # http://localhost/createSemester
 # request body =>
-#       session_id : ??  ======= get from localStorage
+#       session_id : ??  ======= get from localStorage/sessionStorage
 #       semester_id : ?? i.e 2024/2025-1
 post '/createSemester' => sub ($c) {
     my $payload = $c->req->json;
@@ -123,7 +124,7 @@ post '/createSemester' => sub ($c) {
 
 # http://localhost/deleteSemester
 # request body =>
-#       session_id : ??  ======= get from localStorage
+#       session_id : ??  ======= get from localStorage/sessionStorage
 #       semester_id : ?? i.e 2024/2025-1  
 post '/deleteSemester' => sub ($c) {
     my $payload = $c->req->json;
@@ -143,7 +144,7 @@ post '/deleteSemester' => sub ($c) {
 
 # http://localhost/updateSemester
 # request body =>
-#       session_id : ??  ======= get from localStorage
+#       session_id : ??  ======= get from localStorage/sessionStorage
 #       semester_id : ?? i.e 2024/2025-1   
 #       new_semester_id : ?? i.e 2024/2025-1
 post '/updateSemester' => sub ($c) {
@@ -166,8 +167,8 @@ post '/updateSemester' => sub ($c) {
 
 # http://localhost/getCategory
 # request body =>
-#       session_id : ??     ======= get from localStorage
-#       semester_id : ??    ======= get from localStorage       
+#       session_id : ??     ======= get from localStorage/sessionStorage
+#       semester_id : ??    ======= get from localStorage/sessionStorage       
 post '/getCategory' => sub ($c) {
     my $payload = $c->req->json;
     my $session_id   = $payload->{session_id};
@@ -178,7 +179,7 @@ post '/getCategory' => sub ($c) {
 
 # http://localhost/getAllLinksWithinCategoryCount
 # request body =>
-#       session_id : ??  ======= get from localStorage
+#       session_id : ??  ======= get from localStorage/sessionStorage
 #       semester_id : ?? i.e 2024/2025-1
 #       category_name : ??
 
@@ -193,7 +194,7 @@ post '/getAllLinksWithinCategoryCount' => sub ($c) {
 
 # http://localhost/getViewableLinksWithinCategoryCount
 # request body =>
-#       session_id : ??  ======= get from localStorage
+#       session_id : ??  ======= get from localStorage/sessionStorage
 #       semester_id : ?? i.e 2024/2025-1
 #       category_name : ??
 post '/getViewableLinksWithinCategoryCount' => sub ($c) {
@@ -208,8 +209,8 @@ post '/getViewableLinksWithinCategoryCount' => sub ($c) {
 
 # http://localhost/createCategory
 # request body =>
-#       session_id : ??     ======= get from localStorage
-#       semester_id : ??    ======= get from localStorage
+#       session_id : ??     ======= get from localStorage/sessionStorage
+#       semester_id : ??    ======= get from localStorage/sessionStorage
 #       category_name : ??
 post '/createCategory' => sub ($c) {
     my $payload = $c->req->json;
@@ -230,8 +231,8 @@ post '/createCategory' => sub ($c) {
 
 # http://localhost/deleteCategory
 # request body =>
-#       session_id : ??     ======= get from localStorage
-#       semester_id : ??    ======= get from localStorage
+#       session_id : ??     ======= get from localStorage/sessionStorage
+#       semester_id : ??    ======= get from localStorage/sessionStorage
 #       category_name : ??
 post '/deleteCategory' => sub ($c) {
     my $payload = $c->req->json;
@@ -252,8 +253,8 @@ post '/deleteCategory' => sub ($c) {
 
 # http://localhost/updateCategory
 # request body =>
-#       session_id : ??  ======= get from localStorage
-#       semester_id : ?? ======= get from localStorage
+#       session_id : ??  ======= get from localStorage/sessionStorage
+#       semester_id : ?? ======= get from localStorage/sessionStorage
 #       category_name : ??
 #       new_category_name : ?? i.e 2024/2025-1
 post '/updateCategory' => sub ($c) {
@@ -277,9 +278,9 @@ post '/updateCategory' => sub ($c) {
 
 #  http://localhost/getLink             CAN VIEW PERMISSIBLE LINKS ONLY
 #  request body =>
-#        session_id : ??     ======= get from localStorage
-#        semester_id : ??    ======= get from localStorage  
-#        category_name : ??  ======= get from localStorage
+#        session_id : ??     ======= get from localStorage/sessionStorage
+#        semester_id : ??    ======= get from localStorage/sessionStorage  
+#        category_name : ??  ======= get from localStorage/sessionStorage
 post '/getLink' => sub ($c) {
     my $payload = $c->req->json;
     my $session_id   = $payload->{session_id};
@@ -291,8 +292,8 @@ post '/getLink' => sub ($c) {
 
 #  http://localhost/getAllLink             CAN VIEW PERMISSIBLE LINKS ONLY
 #  request body =>
-#        session_id : ??     ======= get from localStorage
-#        semester_id : ??    ======= get from localStorage  
+#        session_id : ??     ======= get from localStorage/sessionStorage
+#        semester_id : ??    ======= get from localStorage/sessionStorage  
 
 post '/getAllLink' => sub ($c) {
     my $payload = $c->req->json;
@@ -303,8 +304,8 @@ post '/getAllLink' => sub ($c) {
 
 #  http://localhost/getAllLinkCount             CAN VIEW PERMISSIBLE LINKS ONLY
 #  request body =>
-#        session_id : ??     ======= get from localStorage
-#        semester_id : ??    ======= get from localStorage  
+#        session_id : ??     ======= get from localStorage/sessionStorage
+#        semester_id : ??    ======= get from localStorage/sessionStorage  
 post '/getAllLinkCount' => sub ($c) {
     my $payload = $c->req->json;
     my $session_id   = $payload->{session_id};
@@ -315,8 +316,8 @@ post '/getAllLinkCount' => sub ($c) {
 
 #  http://localhost/getALLlinkIdRead            CAN VIEW PERMISSIBLE LINKS ID ONLY
 #  request body =>
-#        session_id : ??     ======= get from localStorage
-#        semester_id : ??    ======= get from localStorage  
+#        session_id : ??     ======= get from localStorage/sessionStorage
+#        semester_id : ??    ======= get from localStorage/sessionStorage  
 post '/getALLlinkIdRead' => sub ($c) {
     my $payload = $c->req->json;
     my $session_id   = $payload->{session_id};
@@ -327,8 +328,8 @@ post '/getALLlinkIdRead' => sub ($c) {
 
 #  http://localhost/getALLlinkIdDelete             CAN VIEW DELETEABLE LINKS ID ONLY
 #  request body =>
-#        session_id : ??     ======= get from localStorage
-#        semester_id : ??    ======= get from localStorage  
+#        session_id : ??     ======= get from localStorage/sessionStorage
+#        semester_id : ??    ======= get from localStorage/sessionStorage  
 post '/getALLlinkIdDelete' => sub ($c) {
     my $payload = $c->req->json;
     my $session_id   = $payload->{session_id};
@@ -338,8 +339,8 @@ post '/getALLlinkIdDelete' => sub ($c) {
 
 #  http://localhost/getALLlinkIdUpdate             CAN VIEW UPDATABLE LINKS ID ONLY
 #  request body =>
-#        session_id : ??     ======= get from localStorage
-#        semester_id : ??    ======= get from localStorage  
+#        session_id : ??     ======= get from localStorage/sessionStorage
+#        semester_id : ??    ======= get from localStorage/sessionStorage  
 post '/getALLlinkIdUpdate' => sub ($c) {
     my $payload = $c->req->json;
     my $session_id   = $payload->{session_id};
@@ -349,7 +350,7 @@ post '/getALLlinkIdUpdate' => sub ($c) {
 
 #  http://localhost/getALLlinkCreateWhere             CAN VIEW UPDATABLE LINKS ID ONLY
 #  request body =>
-#        session_id : ??     ======= get from localStorage  
+#        session_id : ??     ======= get from localStorage/sessionStorage  
 post '/getALLlinkCreateWhere' => sub ($c) {
     my $payload = $c->req->json;
     my $session_id   = $payload->{session_id};
@@ -362,9 +363,9 @@ post '/getALLlinkCreateWhere' => sub ($c) {
 
 #  http://localhost/createLink         ONLY FOR ACADEMIC OFFICER & PEOPLE WITH CREATE PERM WITHIN CATEGORY
 #  request body =>
-#        session_id : ??     ======= get from localStorage
-#        semester_id : ??    ======= get from localStorage  
-#        category_name : ??  ======= get from localStorage
+#        session_id : ??     ======= get from localStorage/sessionStorage
+#        semester_id : ??    ======= get from localStorage/sessionStorage  
+#        category_name : ??  ======= get from localStorage/sessionStorage
 #        ref_name : ??       ======= get from fill form
 #        desc : ??           ======= get from fill form
 #        link : ??           ======= get from fill form
@@ -383,9 +384,9 @@ post '/createLink' => sub ($c) {
 
 #  http://localhost/deleteLink         ONLY FOR ACADEMIC OFFICER & PEOPLE WITH CREATE PERM WITHIN CATEGORY
 #  request body =>
-#        session_id : ??     ======= get from localStorage
-#        semester_id : ??    ======= get from localStorage  
-#        category_name : ??  ======= get from localStorage
+#        session_id : ??     ======= get from localStorage/sessionStorage
+#        semester_id : ??    ======= get from localStorage/sessionStorage  
+#        category_name : ??  ======= get from localStorage/sessionStorage
 #        gdlink_id : ????    ======= get when u click the delete button
 post '/deleteLink' => sub ($c) {
     my $payload = $c->req->json;
@@ -400,9 +401,9 @@ post '/deleteLink' => sub ($c) {
 
 #  http://localhost/updateLink         ONLY FOR ACADEMIC OFFICER & PEOPLE WITH CREATE PERM WITHIN CATEGORY
 #  request body =>
-#        session_id : ??    ======= get from localStorage
-#        semester_id : ??   ======= get from localStorage  
-#        category_name : ?? ======= get from localStorage
+#        session_id : ??    ======= get from localStorage/sessionStorage
+#        semester_id : ??   ======= get from localStorage/sessionStorage  
+#        category_name : ?? ======= get from localStorage/sessionStorage
 #        new_ref_name : ??  ======= get from form
 #        new_desc : ??      ======= get from form
 #        new_link : ??      ======= get from form
@@ -426,8 +427,8 @@ post '/updateLink' => sub ($c) {
 
 # http://localhost/getCategoryPermission
 # request body =>
-#       session_id : ??     ======= get from localStorage
-#       semester_id : ??    ======= get from localStorage       
+#       session_id : ??     ======= get from localStorage/sessionStorage
+#       semester_id : ??    ======= get from localStorage/sessionStorage       
 #       category_name : ??    ======= get from click       
 post '/getCategoryPermission' => sub ($c) {
     my $payload = $c->req->json;
@@ -449,8 +450,8 @@ post '/getCategoryPermission' => sub ($c) {
 
 # http://localhost/createCategoryPermission
 # request body =>
-#       session_id : ??     ======= get from localStorage
-#       semester_id : ??    ======= get from localStorage       
+#       session_id : ??     ======= get from localStorage/sessionStorage
+#       semester_id : ??    ======= get from localStorage/sessionStorage       
 #       category_name : ??    ======= get from click     
 #       insert_user_role : ????    ======= get from fill form     
 #       insert_user_email : ????   ======= get from fill form     
@@ -496,8 +497,8 @@ post '/createCategoryPermission' => sub ($c) {
 
 # http://localhost/updateCategoryPermission
 # request body =>
-#       session_id : ??     ======= get from localStorage
-#       semester_id : ??    ======= get from localStorage       
+#       session_id : ??     ======= get from localStorage/sessionStorage
+#       semester_id : ??    ======= get from localStorage/sessionStorage       
 #       category_name : ??    ======= get from click     
 #       selected_user_role : ????    ======= get from click
 #       selected_user_email : ????   ======= get from click
@@ -542,8 +543,8 @@ post '/updateCategoryPermission' => sub ($c) {
 
 # http://localhost/deleteCategoryPermission
 # request body =>
-#       session_id : ??     ======= get from localStorage
-#       semester_id : ??    ======= get from localStorage       
+#       session_id : ??     ======= get from localStorage/sessionStorage
+#       semester_id : ??    ======= get from localStorage/sessionStorage       
 #       category_name : ??    ======= get from click     
 #       selected_user_role : ????    ======= get from click
 #       selected_user_email : ????   ======= get from click
@@ -582,11 +583,133 @@ post '/deleteCategoryPermission' => sub ($c) {
 };
 
 
+# http://localhost/getLinkPermission
+# request body =>
+#       session_id : ??     ======= get from localStorage/sessionStorage
+#       gdlink_id : ??    ======= get from click       
+post '/getLinkPermission' => sub ($c) {
+    my $payload = $c->req->json;
+    my $session_id   = $payload->{session_id};
+    my $gdlink_id   = $payload->{gdlink_id};
 
+    my $role_name=Authorization::getRoleName($dbh, $session_id);
+    my $email=Authorization::getEmail($dbh, $session_id);
+
+    my $isOwner=Authorization::isLinkOwner($dbh,$gdlink_id,$email);
+
+    if($isOwner->{success} or $role_name eq 'Academic Officer'){
+
+        my $linkPermission = LinkPermission::getLinkPermission($dbh, $gdlink_id);
+        $c->render(json => {result=>$linkPermission });
+        return;
+    }
+
+    $c->render(json => { error => 'No permission .' });
+};
+
+# http://localhost/createLinkPermission
+# request body =>
+#       session_id : ??     ======= get from localStorage/sessionStorage
+#       semester_id : ??    ======= get from localStorage/sessionStorage       
+#       category_name : ??    ======= get from localStorage/sessionStorage     
+#       gdlink_id : ??    ======= get from click     
+#       insert_user_role : ????    ======= get from fill form     
+#       insert_user_email : ????   ======= get from fill form     
+#       can_read : ????   ======= get from fill form,,, boolean (0/1 true/false)
+#       can_update : ????   ======= get from fill form,,, boolean (0/1 true/false)
+#       can_delete : ????   ======= get from fill form,,, boolean (0/1 true/false)
+post '/createLinkPermission' => sub ($c) {
+    my $payload = $c->req->json;
+    my $session_id   = $payload->{session_id};
+    my $semester_id   = $payload->{semester_id};
+    my $category_name   = $payload->{category_name};
+    my $gdlink_id   = $payload->{gdlink_id};
+    my $insert_user_role     = $payload->{insert_user_role};
+    my $insert_user_email    = $payload->{insert_user_email};
+    my $can_read    = $payload->{can_read};
+    my $can_update    = $payload->{can_update};
+    my $can_delete    = $payload->{can_delete};
+
+    my $role_name=Authorization::getRoleName($dbh, $session_id);
+    my $email=Authorization::getEmail($dbh, $session_id);
+
+    my $isOwner=Authorization::isLinkOwner($dbh,$gdlink_id,$email);
+
+    if($isOwner->{success} or $role_name eq 'Academic Officer'){
+
+        if ($insert_user_email && $insert_user_role) {
+            $c->render(json => { result => "Only one of insert_user_email or insert_user_role can be updated at a time" });
+            return;
+        }
+
+        my $result;
+        if($insert_user_role){
+            $result = LinkPermission::CreateLinkPermissionRole($dbh, $semester_id,$category_name,$gdlink_id,$insert_user_role,$can_read,$can_update,$can_delete);
+        }
+        if($insert_user_email){
+            $result = LinkPermission::CreateLinkPermissionUser($dbh, $semester_id,$category_name,$gdlink_id,$insert_user_email,$can_read,$can_update,$can_delete);
+        }
+
+        $c->render(json => {result=>$result });
+        return;
+    }
+
+    $c->render(json => { error => 'No permission .' });
+};
+
+# http://localhost/updateLinkPermission
+# request body =>
+#       session_id : ??     ======= get from localStorage/sessionStorage
+#       semester_id : ??    ======= get from localStorage/sessionStorage       
+#       category_name : ??    ======= get from localStorage/sessionStorage     
+#       gdlink_id : ??    ======= get from click     
+#       selected_user_role : ????    ======= get from fill form     
+#       selected_user_email : ????   ======= get from fill form     
+#       can_read : ????   ======= get from fill form,,, boolean (0/1 true/false)
+#       can_update : ????   ======= get from fill form,,, boolean (0/1 true/false)
+#       can_delete : ????   ======= get from fill form,,, boolean (0/1 true/false)
+post '/updateLinkPermission' => sub ($c) {
+    my $payload = $c->req->json;
+    my $session_id   = $payload->{session_id};
+    # my $semester_id   = $payload->{semester_id};
+    # my $category_name   = $payload->{category_name};
+    my $gdlink_id   = $payload->{gdlink_id};
+    my $insert_user_role     = $payload->{selected_user_role};
+    my $insert_user_email    = $payload->{selected_user_email};
+    my $can_read    = $payload->{can_read};
+    my $can_update    = $payload->{can_update};
+    my $can_delete    = $payload->{can_delete};
+
+    my $role_name=Authorization::getRoleName($dbh, $session_id);
+    my $email=Authorization::getEmail($dbh, $session_id);
+
+    my $isOwner=Authorization::isLinkOwner($dbh,$gdlink_id,$email);
+
+    if($isOwner->{success} or $role_name eq 'Academic Officer'){
+
+        if ($insert_user_email && $insert_user_role) {
+            $c->render(json => { result => "Only one of insert_user_email or insert_user_role can be updated at a time" });
+            return;
+        }
+
+        my $result;
+        if($insert_user_role){
+            $result = LinkPermission::UpdateLinkPermissionRole($dbh, $gdlink_id,$insert_user_role,$can_read,$can_update,$can_delete);
+        }
+        if($insert_user_email){
+            $result = LinkPermission::UpdateLinkPermissionUser($dbh, $gdlink_id,$insert_user_email,$can_read,$can_update,$can_delete);
+        }
+
+        $c->render(json => {result=>$result });
+        return;
+    }
+
+    $c->render(json => { error => 'No permission .' });
+};
 
 #  http://localhost/getAllRoles         FOR EVERYONE
 #  request body =>
-#        session_id : ??     ======= get from localStorage
+#        session_id : ??     ======= get from localStorage/sessionStorage
 post '/getAllRoles' => sub ($c) {
     my $payload = $c->req->json;
     my $result = User::getAllRoles($dbh);
@@ -595,7 +718,7 @@ post '/getAllRoles' => sub ($c) {
 
 #  http://localhost/getAllRoles       
 #  request body =>
-#        session_id : ??     ======= get from localStorage
+#        session_id : ??     ======= get from localStorage/sessionStorage
 
 post '/getAllEmails' => sub ($c) {
     my $payload = $c->req->json;

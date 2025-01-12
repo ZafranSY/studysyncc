@@ -31,7 +31,7 @@ OUTPUT
 
 http://localhost/getAllCategoriesWithinSemesterCount    COUNT OF ALL VIEWABLE CATEGORY IN THAT SEMESTER
 request body =>
-    session_id  : 313                   ======= get from localStorage
+    session_id  : 313                   ======= get from localStorage/sessionStorage
     semester_id : '2024/2025-1'
 
 Output
@@ -43,7 +43,7 @@ Output
 
 http://localhost/getViewableCategoriesWithinSemesterCount       COUNT OF ALL CATEGORIES
 request body =>
-    session_id : 313                    ======= get from localStorage
+    session_id : 313                    ======= get from localStorage/sessionStorage
     semester_id : '2024/2025-1'
 
 OUTPUT
@@ -53,7 +53,7 @@ OUTPUT
 
 http://localhost/createSemester              ACADEMIC OFFICER ONLY
 request body =>
-    session_id : 313                ======= get from localStorage
+    session_id : 313                ======= get from localStorage/sessionStorage
     semester_id : 2099/2025-1       ======= get from fill form
 
 OUTPUT
@@ -69,7 +69,7 @@ OUTPUT
 
 http://localhost/deleteSemester              ACADEMIC OFFICER ONLY
 request body =>
-    session_id : 313                ======= get from localStorage
+    session_id : 313                ======= get from localStorage/sessionStorage
     semester_id : '2099/2025-1'     ======= get from click
 WARNING : DELETING SEMESTER ALSO DELETE ALL THINGS INSIDE OF IT
 
@@ -86,7 +86,7 @@ OUTPUT
 
 http://localhost/updateSemester              ACADEMIC OFFICER ONLY
 request body =>
-    session_id :          313           ======= get from localStorage
+    session_id :          313           ======= get from localStorage/sessionStorage
     semester_id :         2099/2025-1   ======= get from click
     new_semester_id :     2099/2012-3   ====== get from fill form
 
@@ -111,8 +111,8 @@ OUTPUT
 
 http://localhost/getCategory             CAN VIEW PERMISSIBLE CATEGORY ONLY
 request body =>
-    session_id : 313                ======= get from localStorage
-    semester_id : 2024/2025-1       ======= get from localStorage  
+    session_id : 313                ======= get from localStorage/sessionStorage
+    semester_id : 2024/2025-1       ======= get from localStorage/sessionStorage  
 
 OUTPUT
 {"categoriesPermission":["PSM 1","Research","Timetable","Course Coordination","Course Files"]}
@@ -123,8 +123,8 @@ CATEGORY CARD
 
 http://localhost/getAllLinksWithinCategoryCount    COUNT OF ALL VIEWABLE LINKS IN THAT CATEGORY
 request body =>
-    session_id : 313             ======= get from localStorage
-    semester_id : '2024/2025-1'     ======= get from localStorage
+    session_id : 313             ======= get from localStorage/sessionStorage
+    semester_id : '2024/2025-1'     ======= get from localStorage/sessionStorage
     category_name : 'PSM 1'         ======= get from category card or something
 
 OUTPUT
@@ -135,8 +135,8 @@ OUTPUT
 
 http://localhost/getViewableLinksWithinCategoryCount     COUNT OF ALL LINK  IN THAT CATEGORY
 request body =>
-    session_id :  313               ======= get from localStorage
-    semester_id : '2024/2025-1'     ======= get from localStorage
+    session_id :  313               ======= get from localStorage/sessionStorage
+    semester_id : '2024/2025-1'     ======= get from localStorage/sessionStorage
     category_name : 'PSM 1'         ======= get from category card or something
 
 OUTPUT
@@ -147,8 +147,8 @@ OUTPUT
 
 http://localhost/createCategory          ACADEMIC OFFICER ONLY
 request body =>
-    session_id : 313                  ======= get from localStorage
-    semester_id : '2024/2025-1'       ======= get from localStorage
+    session_id : 313                  ======= get from localStorage/sessionStorage
+    semester_id : '2024/2025-1'       ======= get from localStorage/sessionStorage
     category_name : 'Kuching'         ======= get from fill form
 
 OUTPUT
@@ -164,8 +164,8 @@ OUTPUT
 
 http://localhost/deleteCategory          ACADEMIC OFFICER ONLY
 request body =>
-    session_id : 313                  ======= get from localStorage
-    semester_id : '2024/2025-1'       ======= get from localStorage
+    session_id : 313                  ======= get from localStorage/sessionStorage
+    semester_id : '2024/2025-1'       ======= get from localStorage/sessionStorage
     category_name : 'Kuching'         ======= get from click
  WARNING : DELETING CATEGORY ALSO DELETE ALL THINGS INSIDE OF IT
 
@@ -182,8 +182,8 @@ OUTPUT
 
 http://localhost/updateCategory          ACADEMIC OFFICER ONLY
 request body =>
-    session_id : 313                  ======= get from localStorage
-    semester_id : '2024/2025-1'       ======= get from localStorage
+    session_id : 313                  ======= get from localStorage/sessionStorage
+    semester_id : '2024/2025-1'       ======= get from localStorage/sessionStorage
     category_name : 'Kuching'         ======= get from click
     new_category_name : 'Meow'        ======= get from fill form
 
@@ -205,9 +205,9 @@ OUTPUT
 
 http://localhost/getLink             CAN VIEW PERMISSIBLE LINKS ONLY
 request body =>
-    session_id : 313                  ======= get from localStorage
-    semester_id : '2024/2025-1'       ======= get from localStorage
-    category_name : 'PSM 1'           ======= get from localStorage
+    session_id : 313                  ======= get from localStorage/sessionStorage
+    semester_id : '2024/2025-1'       ======= get from localStorage/sessionStorage
+    category_name : 'PSM 1'           ======= get from localStorage/sessionStorage
 
 OUTPUT
 {"linkViewable":[[84,"PSM 1","2024/2025-1","Marks Rubric","PSM 1 marking sheets","johnAcad@utm.com","http://google.com"],[85,"PSM 1","2024/2025-1","List of Approved Titles","PSM Titles approved by the board","johnAcad@utm.com","http://google.com"],[86,"PSM 1","2024/2025-1","List of Candidates","Candidates List","johnAcad@utm.com","http://google.com"]]}
@@ -218,7 +218,7 @@ OUTPUT
 
 http://localhost/getAllLink             CAN VIEW PERMISSIBLE LINKS ONLY
 request body =>
-    session_id : ab     ======= get from localStorage
+    session_id : ab     ======= get from localStorage/sessionStorage
 
 
 OUTPUT
@@ -228,8 +228,8 @@ OUTPUT
 
 http://localhost/getAllLinkCount             CAN VIEW COUNT OF PERMISSIBLE LINKS ONLY
 request body =>
-    session_id : 313                  ======= get from localStorage
-    semester_id : '2024/2025-1'       ======= get from localStorage
+    session_id : 313                  ======= get from localStorage/sessionStorage
+    semester_id : '2024/2025-1'       ======= get from localStorage/sessionStorage
 
 OUTPUT
 {"linkCount":87}
@@ -238,8 +238,8 @@ OUTPUT
 
 http://localhost/getALLlinkIdRead            CAN VIEW PERMISSIBLE LINKS ID ONLY
 request body =>
-    session_id : ab                  ======= get from localStorage
-    semester_id : '2024/2025-1'       ======= get from localStorage  
+    session_id : ab                  ======= get from localStorage/sessionStorage
+    semester_id : '2024/2025-1'       ======= get from localStorage/sessionStorage  
 
 OUTPUT
 {"readbleLinkId":[84,86,87,88,89,93,94,95,96,101,124,125,126,127,130,131,132,133,158,161,162]}
@@ -249,8 +249,8 @@ OUTPUT
 
 http://localhost/getALLlinkIdDelete             CAN VIEW DELETEABLE LINKS ID ONLY
 request body =>
-    session_id : ab                  ======= get from localStorage
-    semester_id : '2024/2025-1'       ======= get from localStorage  
+    session_id : ab                  ======= get from localStorage/sessionStorage
+    semester_id : '2024/2025-1'       ======= get from localStorage/sessionStorage  
 
 OUTPUT
 {"deleteableLinkId":[84,11228,11229,11230,11231,11232,163,164,165,166]}
@@ -259,8 +259,8 @@ OUTPUT
 
 http://localhost/getALLlinkIdUpdate             CAN VIEW UPDATABLE LINKS ID ONLY
 request body =>
-    session_id : ab                   ======= get from localStorage
-    semester_id : '2024/2025-1'       ======= get from localStorage   
+    session_id : ab                   ======= get from localStorage/sessionStorage
+    semester_id : '2024/2025-1'       ======= get from localStorage/sessionStorage   
 
 OUTPUT
 {"updateableLinkId":[84,11228,11230,11235,11237,11238,11239,11241,11243,11245,163,164,165,166]}
@@ -269,8 +269,8 @@ OUTPUT
 
 http://localhost/getALLlinkCreateWhere             CAN VIEW THE CREATE BUTTON AT WHERE RETURN CATEGORY AND SSEM ONLY
 request body =>
-    session_id : ab                   ======= get from localStorage
-    semester_id : '2024/2025-1'       ======= get from localStorage   
+    session_id : ab                   ======= get from localStorage/sessionStorage
+    semester_id : '2024/2025-1'       ======= get from localStorage/sessionStorage   
 
 OUTPUT
 {"createAbleLinkWhere":["PSM 1","2024/2025-1","Research","2024/2025-1","Training","2024/2025-1","Timetable","2024/2025-1","Course Coordination","2024/2025-1","Course Files","2024/2025-1","PSM 2","2024/2025-2","Course Coordination","2024/2025-2","Timetable","2024/2025-2","Course Files","2024/2025-2","Workshop","2024/2025-2","Internship","2024/2025-2","Personal","2024/2025-2","Meow","2024/2025-1"]}     
@@ -280,9 +280,9 @@ OUTPUT
 
 http://localhost/createLink         ONLY FOR ACADEMIC OFFICER & PEOPLE WITH CREATE PERM WITHIN CATEGORY
 request body =>
-    session_id : ab                         ======= get from localStorage
-    semester_id : '2024/2025-1'             ======= get from localStorage   
-    category_name : 'Meow'                  ======= get from localStorage
+    session_id : ab                         ======= get from localStorage/sessionStorage
+    semester_id : '2024/2025-1'             ======= get from localStorage/sessionStorage   
+    category_name : 'Meow'                  ======= get from localStorage/sessionStorage
     ref_name : 'History Black Catto'        ======= get from fill form
     desc : 'The detailed untold history'    ======= get from fill form
     link : 'https://google.com'             ======= get from fill form
@@ -301,9 +301,9 @@ If available,, it will still say success LOL
 
 http://localhost/deleteLink        ONLY FOR ACADEMIC OFFICER & PEOPLE WITH DELETE PERM WITHIN CATEGORY & LINK OWNER
 request body =>
-    session_id : 'ab'             ======= get from localStorage
-    semester_id :  2024/2025-1    ======= get from localStorage
-    category_name : 'Meow'        ======= get from localStorage
+    session_id : 'ab'             ======= get from localStorage/sessionStorage
+    semester_id :  2024/2025-1    ======= get from localStorage/sessionStorage
+    category_name : 'Meow'        ======= get from localStorage/sessionStorage
     link id       : '11237'       ======= get from click
 
 OUTPUT
@@ -320,9 +320,9 @@ If link doesnt exist , it will say it delete successfully
 
 http://localhost/updateLink          ONLY FOR ACADEMIC OFFICER & PEOPLE WITH UPDATE PERM WITHIN CATEGORY & LINK OWNER
 request body =>
-    session_id : ??    ======= get from localStorage
-    semester_id : ??   ======= get from localStorage  
-    category_name : ?? ======= get from localStorage
+    session_id : ??    ======= get from localStorage/sessionStorage
+    semester_id : ??   ======= get from localStorage/sessionStorage  
+    category_name : ?? ======= get from localStorage/sessionStorage
     new_ref_name : ??  ======= get from form
     new_desc : ??      ======= get from form
     new_link : ??      ======= get from form
@@ -345,8 +345,8 @@ OUTPUT
 
 http://localhost/getCategoryPermission              ONLY FOR ACADEMIC OFFICER 
 request body =>
-    session_id : 313               ======= get from localStorage
-    semester_id : '2024/2025-1'    ======= get from localStorage       
+    session_id : 313               ======= get from localStorage/sessionStorage
+    semester_id : '2024/2025-1'    ======= get from localStorage/sessionStorage       
     category_name : 'PSM 1'        ======= get from click
 
 OUTPUT
@@ -359,8 +359,8 @@ OUTPUT
 
 http://localhost/createCategoryPermission
 request body =>
-    session_id : 313                ======= get from localStorage
-    semester_id : '2024/2025-1'     ======= get from localStorage       
+    session_id : 313                ======= get from localStorage/sessionStorage
+    semester_id : '2024/2025-1'     ======= get from localStorage/sessionStorage       
     category_name : 'PSM 1'         ======= get from click
     insert_user_role : 'Student'    ======= get from fill form     
     insert_user_email :             ======= get from fill form     
@@ -396,8 +396,8 @@ OUTPUT
 =================================================================================================================
 
 http://localhost/updateCategoryPermission
-    session_id : 313                ======= get from localStorage
-    semester_id : '2024/2025-1'     ======= get from localStorage       
+    session_id : 313                ======= get from localStorage/sessionStorage
+    semester_id : '2024/2025-1'     ======= get from localStorage/sessionStorage       
     category_name : 'PSM 1'         ======= get from click
     selected_user_role : 'Student'    ======= get from fill form     
     selected_user_email :             ======= get from fill form     
@@ -431,11 +431,14 @@ OUTPUT
 OUTPUT
 {"result":{"error":"Cannot edit permission johnStu@utm.cm for user that doesnt exist. "}}
 
+WARNING
+if doesnt exist then it still said success???
+
 =================================================================================================================
 
 http://localhost/deleteCategoryPermission
-    session_id : 313                ======= get from localStorage
-    semester_id : '2024/2025-1'     ======= get from localStorage       
+    session_id : 313                ======= get from localStorage/sessionStorage
+    semester_id : '2024/2025-1'     ======= get from localStorage/sessionStorage       
     category_name : 'Meow'         ======= get from click
     selected_user_role : 'Student'    ======= get from fill form     
     selected_user_email :             ======= get from fill form     
@@ -468,9 +471,76 @@ role "Everyone" CANNOT be deleted
 =================================================================================================================
 
 http://localhost/getLinkPermission
-http://localhost/updateLinkPermission
-http://localhost/deleteLinkPermission
+    session_id : 313                ======= get from localStorage/sessionStorage
+    gdlink_id : 11335     ======= get from localStorage/sessionStorage  
+
+OUTPUT
+{"error":"No permission ."}
+
+OUTPUT
+{"result":[[196,"Personal","2099/2012-3",11335,null,"Everyone",1,0,0]]}
+1 0 0 ,, is can_read,can_update,can_delete
+
+=================================================================================================================
+
 http://localhost/createLinkPermission
+request body =>
+    session_id : ??     ======= get from localStorage/sessionStorage
+    semester_id : ??    ======= get from localStorage/sessionStorage       
+    category_name : ??    ======= get from localStorage/sessionStorage     
+    gdlink_id : ??    ======= get from click     
+    insert_user_role : ????    ======= get from fill form     
+    insert_user_email : ????   ======= get from fill form     
+    can_read : ????   ======= get from fill form,,, boolean (0/1 true/false)
+    can_update : ????   ======= get from fill form,,, boolean (0/1 true/false)
+    can_delete : ????   ======= get from fill form,,, boolean (0/1 true/false)
+
+OUTPUT
+{"error":"No permission ."}
+
+OUTPUT
+{"result":"Only one of insert_user_email or insert_user_role can be updated at a time"}
+
+OUTPUT
+{"result":{"error":"Cannot add permission johnStu@utm.cm for email that doesnt exist. "}}
+
+OUTPUT
+{"result":{"error":"Cannot add permission Acadmic Officer for roles that doesnt exist. "}}
+
+OUTPUT
+{"result":{"message":"Category Permission for role Academic Officer created successfully"}}
+
+OUTPUT
+{"result":{"error":"Category Permission for role Academic Officer already exists in in gdlink id 84 . Try editing existing Perm instead"}}
+
+OUTPUT
+{"result":{"message":"Category Permission for email johnStu@utm.com created successfully"}}
+
+OUTPUT
+{"result":{"error":"Category Permission for email johnStu@utm.com already exists in gdlink id 84 . Try editing existing Perm instead"}}
+
+=================================================================================================================
+
+
+http://localhost/updateLinkPermission
+
+OUTPUT
+{"error":"No permission ."}
+
+OUTPUT
+{"result":"Only one of insert_user_email or insert_user_role can be updated at a time"}
+
+
+{"result":{"message":"Link Permission for email johnStu@utm.com updated successfully"}}
+
+
+{"result":{"message":"Link Permission for role Academic Officer updated successfully"}}
+
+{"result":{"error":"Cannot add permission Academic Oficer for roles that doesnt exist. "}}
+
+{"result":{"error":"Cannot add permission johnStu@utm.cm for email that doesnt exist. "}}
+
+http://localhost/deleteLinkPermission
 
 
 

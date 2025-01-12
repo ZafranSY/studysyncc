@@ -35,8 +35,8 @@ const b =
 
 const host = 'http://localhost:80'
 let METHOD = 'post'
-const crud = '/get'
-const type = 'AllEmails'
+const crud = '/update'
+const type = 'LinkPermission'
 
 
 // ONLY for GET method, can leave this alone if POST
@@ -44,7 +44,7 @@ const PARAMTYPE = "?semester_id";
 const PARAMVALUE = "=2024/2025-1";
 
 const payload = {
-    session_id: 'ab',
+    session_id: '313',
 
     semester_id: "2024/2025-1",
     category_name: "Meow",
@@ -60,19 +60,23 @@ const payload = {
     desc: "The detailed untold history",
     link: "google.com",
 
-    gdlink_id: "11230",
+    gdlink_id: "84",
     new_ref_name: 'white cat',
     new_desc: 'orange cat ',
     new_link: 'whatss.com',
 
-    selected_user_role : 'Student' ,
-    selected_user_email :  'johnStu@utm.cm' ,
+    selected_user_role : 'Pensyarah' ,
+    // selected_user_email :  'johnStu@utm.cm' ,
 
-    insert_user_role : 'Student' ,    
-    insert_user_email :   'johnStu@utm.cm'   ,
+    insert_user_role : 'Pensyarah' ,    
+    insert_user_email :   'johnStu@utm.com'   ,
 
     can_read_category : 'true',
     can_create_links : 'true',
+
+    can_read : 1,
+    can_update : 0,
+    can_delete : 1,
 
 
 };
