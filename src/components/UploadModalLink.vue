@@ -142,13 +142,15 @@ export default {
 
         const result = await response.json();
         console.log("Server Response:", result);
-        if (response.ok && result.result && result.result.message) {
+        if (response.ok) {
+            alert(result.result.error||result.result.message)
           location.reload();
         }
       } catch (error) {
         console.error("Error uploading link:", error);
         alert("An unexpected error occurred. Please try again.");
       }
+      
 
       this.$emit("close");
       this.resetForm();

@@ -241,26 +241,24 @@ export default {
             }
 
             // Determine if the user has permission to update
-            const userRole = this.getUserRole(); // Function that checks if the user is an academic officer or has update permissions
-            const isOwner = this.checkIfOwner(); // Function that checks if the current user is the link owner
+            const userRole = this.getUserRole(); 
+            const canUpdate = this.checkCanUpdate(); 
 
-            if (userRole !== '"Academic Officer"' && !isOwner) {
-                alert("You do not have permission to update this link." + userRole + "  ow," + isOwner);
+            if (userRole !== '"Academic Officer"' && !canUpdate) {
+                alert("You do not have permission to update this link." + userRole + "  ow," + canUpdate);
                 return;
             }
 
-            // Create the request payload
             const requestBody = {
                 session_id: sessionId.replace(/['"]+/g, ""),
                 semester_id: semesterId.replace(/['"]+/g, ""),
                 category_name: categoryName.replace(/['"]+/g, ""),
                 new_ref_name: this.editForm.refName,
                 new_desc: this.editForm.linkDescription,
-                new_link: this.editForm.url, // The updated link data
+                new_link: this.editForm.url, 
                 gdlink_id: this.editForm.id,
             };
 
-            // Make the API request
             try {
                 const response = await fetch('http://localhost/updateLink', {
                     method: 'POST',
@@ -273,12 +271,11 @@ export default {
                 const data = await response.json();
 
                 if (response.ok) {
-                    // Display the success message from the response
                     alert('' + data.result.message);
-                    // Proceed with further actions like closing the modal or updating the state
+                    
                     this.closeEditModal();
                 } else {
-                    // Display error message if response is not ok
+                    
                     alert('Error updating the link: ' + (data.message || 'Unknown error'));
                 }
             } catch (error) {
@@ -286,26 +283,77 @@ export default {
             }
         },
         getUserRole() {
-            // Function to check user role (this could be from localStorage, or a global state)
-            const role = localStorage.getItem('role'); // Example role check
+            
+            const role = localStorage.getItem('role'); 
             if (role === 'Academic_officer') {
                 return 'Academic_officer';
             }
             return {
                 canUpdateCategory: (categoryName) => {
-                    // Check if the user has permission to update this category (e.g., from localStorage or state)
+                    
                     const permissions = JSON.parse(localStorage.getItem('permissions')) || [];
                     return permissions.includes(categoryName);
                 },
             };
         },
-        checkIfOwner() {
-            // Function to check if the current user is the link owner
-            return this.editForm.owner === localStorage.getItem('email').replace(/['"]+/g, ""); // Assuming 'owner' is stored in the editForm
+        checkCanDelete() {
+            
+            return this.editForm.owner === localStorage.getItem('email').replace(/['"]+/g, "");
+        },
+        checkCanUpdate() {
+            
+            return this.editForm.owner === localStorage.getItem('email').replace(/['"]+/g, "");
         },
 
-        deleteRecord(id) {
-            this.files = this.files.filter((file) => file.id !== id);
+        async deleteRecord(id) {
+            
+            const sessionId = localStorage.getItem('session_id');
+            const semesterId = sessionStorage.getItem('semester');
+            const categoryName = sessionStorage.getItem('category');
+
+            
+            if (!sessionId || !semesterId || !categoryName) {
+                alert("Missing necessary data for the request.");
+                return;
+            }
+
+            
+            const userRole = this.getUserRole(); 
+            const canDelete = this.checkCanDelete(); 
+
+            if (userRole !== '"Academic Officer"' && !canDelete) {
+                alert("You do not have permission to delete this link." + userRole + "  ow," + canDelete);
+                return;
+            }
+
+            const requestBody = {
+                session_id: sessionId.replace(/['"]+/g, ""),
+                semester_id: semesterId.replace(/['"]+/g, ""),
+                category_name: categoryName.replace(/['"]+/g, ""),
+                gdlink_id: id, 
+            };
+
+            try {
+                const response = await fetch('http://localhost/deleteLink', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(requestBody),
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    alert('Link deleted successfully: ' + data.result.message);
+                    this.files = this.files.filter((file) => file.id !== id); 
+                } else {
+                    // Display error message if response is not ok
+                    alert('Error deleting the link: ' + (data.message || 'Unknown error'));
+                }
+            } catch (error) {
+                alert('Request failed: ' + error.message);
+            }
         },
 
         goToFile(file) {
