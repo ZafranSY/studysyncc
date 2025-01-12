@@ -41,12 +41,12 @@
                             <td>{{ file.owner }}</td>
                             <td>{{ file.link }}</td>
                             <td>
-                                <!-- Edit Button (only shown if checkCanUpdate is true) -->
                                 <button v-if="checkCanUpdate(file.id)" @click="editRecord(file)" class="icon-button">
                                     <img :src="require('@/assets/edit.png')" alt="Edit" class="icon" />
                                 </button>
 
-                                <button @click="deleteRecord(file.id)" class="icon-button">
+                                <button v-if="checkCanDelete(file.id)" @click="deleteRecord(file.id)"
+                                    class="icon-button">
                                     <img :src="require('@/assets/delete.png')" alt="Delete" class="icon" />
                                 </button>
 
@@ -71,6 +71,7 @@
                                 required />
 
                             <label for="owner">Owner:</label>
+                            
                             <input v-model="editForm.owner" id="owner" placeholder=this.owner disabled />
 
                             <label for="url">URL:</label>
@@ -87,6 +88,7 @@
                 </div>
             </div>
 
+            <!-- <div v-if="checkCanCreate()" class="add-button" @click="openUploadModal"> -->
             <div class="add-button" @click="openUploadModal">
                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
                     <path d="M13 11h8v2h-8v8h-2v-8H3v-2h8V3h2v8Z" />
@@ -127,7 +129,9 @@ export default {
                 owner: localStorage.getItem('email').replace(/['"]+/g, ""),
                 url: "",
             },
-            canUpdateCache: {},
+            updateableLinkIdarr: [],
+            deleteableLinkIdarr: [],
+            createAbleLinkWherearr: []
         };
     },
     computed: {
@@ -246,7 +250,7 @@ export default {
 
             // Determine if the user has permission to update
             const userRole = this.getUserRole();
-            const canUpdate = this.checkCanUpdate();
+            const canUpdate = this.checkCanUpdate(this.editForm.id);
 
             if (userRole !== '"Academic Officer"' && !canUpdate) {
                 alert("You do not have permission to update this link." + userRole + "  ow," + canUpdate);
@@ -300,44 +304,175 @@ export default {
                 },
             };
         },
-        checkCanDelete() {
-            return this.editForm.owner === localStorage.getItem('email').replace(/['"]+/g, "");
+        checkCanDelete(linkIdToCheck) {
+            if (!this.deleteableLinkIdarr || this.deleteableLinkIdarr.length === 0) {
+                return false;
+            }
+            let result = this.deleteableLinkIdarr.includes(linkIdToCheck);
+            return result;
         },
 
-        async checkCanUpdate(linkIdToCheck) {
-            const sessionId = sessionStorage.getItem('session_id');
-            const semesterId = sessionStorage.getItem('semester_id');
-            if (!sessionId || !semesterId) {
+        checkCanUpdate(linkIdToCheck) {
+            if (!this.updateableLinkIdarr || this.updateableLinkIdarr.length === 0) {
                 return false;
             }
-            const requestBody = {
-                session_id: sessionId,
-                semester_id: semesterId,
-            };
-            try {
-                // Make the API request to get updatable links
-                const response = await fetch("http://localhost/getALLlinkIdUpdate", {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json",
-                    },
-                    body: JSON.stringify(requestBody),
-                });
-                const data = await response.json();
-                if (response.ok && data.updateableLinkId) {
-                    const updateableLinkIds = data.updateableLinkId;
-                    return updateableLinkIds.includes(linkIdToCheck);
-                } else {
-                    alert('Error retrieving updatable link IDs.');
-                    return false;
-                }
-            } catch (error) {
-                console.error("Error checking update permissions:", error);
-                alert("An error occurred while checking update permissions.");
-                return false;
-            }
+            let result = this.updateableLinkIdarr.includes(linkIdToCheck);
+            return result;
         },
-        
+
+        checkCanCreate() {
+            if (!this.createAbleLinkWherearr) {
+                console.log("no")
+                return false;
+            }
+
+            let found=false;
+            let cat=sessionStorage.getItem('category');
+            let sem=sessionStorage.getItem('semester');
+            console.log(`Category: ${cat}, Semester ID: ${sem}`);
+            for (let i = 0; i < this.createAbleLinkWherearr.length; i++) {
+                const item = this.createAbleLinkWherearr[i];
+                console.log(`Category: ${item.category}, Semester ID: ${item.semester_id}`);
+                console.log(`Index: ${i}`);
+                if(item.category==cat && item.semester_id==sem){
+                    console.log(`Index: ${i}`);
+                    found=1;
+                }
+            }
+            
+            return found;
+        },
+
+        getUpdatableLink() {
+            const session_id = JSON.parse(localStorage.getItem("session_id"));
+            this.semester_id = JSON.parse(sessionStorage.getItem("semester"));
+
+            if (!session_id || !this.semester_id || !this.category_name) {
+                console.error("Missing session, semester, or category information.");
+                return;
+            }
+
+            const url = "http://localhost/getALLlinkIdUpdate";
+
+            fetch(url, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                    session_id,
+                    semester_id: this.semester_id,
+                }),
+            })
+                .then((response) => {
+                    if (!response.ok) {
+                        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                    }
+                    return response.json();
+                })
+                .then((data) => {
+                    console.log("API Response UPDATE PERM:", data);
+
+                    if (data.updateableLinkId) {
+                        this.updateableLinkIdarr = data.updateableLinkId;
+                    } else {
+                        console.warn("No links found for the given category.");
+                    }
+                })
+                .catch((error) => {
+                    console.error("Error fetching links:", error.message);
+                });
+        },
+
+        getDeletableLink() {
+            const session_id = JSON.parse(localStorage.getItem("session_id"));
+            this.semester_id = JSON.parse(sessionStorage.getItem("semester"));
+
+            if (!session_id || !this.semester_id || !this.category_name) {
+                console.error("Missing session, semester, or category information.");
+                return;
+            }
+
+            const url = "http://localhost/getALLlinkIdDelete";
+
+            fetch(url, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                    session_id,
+                    semester_id: this.semester_id,
+                }),
+            })
+                .then((response) => {
+                    if (!response.ok) {
+                        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                    }
+                    return response.json();
+                })
+                .then((data) => {
+                    console.log("API Response DELETE PERM:", data);
+
+                    if (data.deleteableLinkId) {
+                        this.deleteableLinkIdarr = data.deleteableLinkId;
+                    } else {
+                        console.warn("No links found for the given category.");
+                    }
+                })
+                .catch((error) => {
+                    console.error("Error fetching links:", error.message);
+                });
+        },
+
+        getCategoryAddPerm() {
+            const session_id = JSON.parse(localStorage.getItem("session_id"));
+            this.semester_id = JSON.parse(sessionStorage.getItem("semester"));
+
+            if (!session_id || !this.semester_id || !this.category_name) {
+                console.error("Missing session, semester, or category information.");
+                return;
+            }
+
+            const url = "http://localhost/getALLlinkCreateWhere";
+
+            fetch(url, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                    session_id,
+                    semester_id: this.semester_id,
+                }),
+            })
+                .then((response) => {
+                    if (!response.ok) {
+                        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                    }
+                    return response.json();
+                })
+                .then((data) => {
+                    console.log("API Response CATEGORY ADD PERM WHERE:", data);
+
+                    if (data.createAbleLinkWhere) {
+                        this.createAbleLinkWherearr = [];
+                        for (let i = 0; i < data.createAbleLinkWhere.length; i += 2) {
+                            this.createAbleLinkWherearr.push({
+                                category: data.createAbleLinkWhere[i],
+                                semester_id: data.createAbleLinkWhere[i + 1]
+                            });
+                        }
+                    } else {
+                        console.warn("No links found for the given category.");
+                    }
+                })
+                .catch((error) => {
+                    console.error("Error fetching links:", error.message);
+                });
+        },
+
+
 
         async deleteRecord(id) {
 
@@ -406,9 +541,13 @@ export default {
             console.log("Searching for files with query:", this.searchQuery);
         },
     },
-    mounted() {
+    async mounted() {
         // Initialize page by fetching data
-        this.fetchFiles();
+        await this.fetchFiles();
+        await this.getUpdatableLink();
+        await this.getDeletableLink();
+        await this.getCategoryAddPerm();
+        console.log("CAN CREATE ? "+this.checkCanCreate());
     },
 };
 </script>
