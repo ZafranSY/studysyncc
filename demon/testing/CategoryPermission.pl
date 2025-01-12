@@ -93,10 +93,13 @@ sub getCategoryPermissionRead {
     $sth->execute($semester_id,$email,$role_name) 
         or die 'execution failed: ' . $dbh->errstr();
     my @categoryPermission;
-    my $seen;
+    my %seen; # Hash to track seen categories
+
     while (my $row = $sth->fetchrow_hashref) {
         my $category = $row->{category};
-        push @categoryPermission, $category unless $seen{$category}++;
+        unless ($seen{$category}++) { # Add category if not seen before
+            push @categoryPermission, $category;
+        }
     }
     # return \@categoryPermission;
     return \@categoryPermission;

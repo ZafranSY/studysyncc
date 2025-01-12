@@ -34,8 +34,8 @@ const b =
 
 const host = 'http://localhost:80'
 let METHOD = 'post'
-const crud = '/update'
-const type = 'LinkPermission'
+const crud = '/get'
+const type = 'Category'
 
 
 // ONLY for GET method, can leave this alone if POST
@@ -45,7 +45,7 @@ const PARAMVALUE = "=2024/2025-1";
 const payload = {
     session_id: '313',
 
-  semester_id: "2024/2025-1",
+  semester_id: "2024/2025-2",
   category_name: "PSM 1",
 
   new_semester_id: "2099/2012-3",
