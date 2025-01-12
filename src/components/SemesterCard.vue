@@ -8,7 +8,7 @@
       <h1 class="title">{{ title }}</h1>
     </div>
     <div class="card-footer">
-      <p class="subtitle">{{ subtitle }}</p>
+      <p class="subtitle">{{ subtitle }} : {{ this.viewableCategoryCount }}</p>
     </div>
 
     <!-- Edit and Delete Buttons (visible on hover for Academic Officer only) -->
@@ -51,9 +51,46 @@ export default {
     return {
       hover: false, // Track hover state to show/hide buttons
       role_desc: null,
+      viewableCategoryCount: null,
     };
   },
   methods: {
+    async fetchViewableCategoryCount() {
+      const session_id = localStorage
+        .getItem("session_id")
+        ?.replace(/['"]+/g, "");
+      // const semester = sessionStorage.getItem("semester");
+
+      console.log("session id ", session_id)?.replace(/['"]+/g, "");
+      console.log("semester ", this.title);
+
+      const payload = {
+        session_id: session_id.trim(),
+        semester_id: this.title,
+      };
+      try {
+        const response = await fetch(
+          "http://localhost/getViewableCategoriesWithinSemesterCount",
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify(payload),
+          }
+        );
+        const result = await response.json();
+        console.log("server response : ", result);
+        this.viewableCategoryCount = result;
+        if (response.ok && result.message) {
+          alert(result.message);
+        } else if (result.error) {
+          alert(result.error);
+        }
+      } catch (error) {
+        console.error("Error creating semester:", error);
+      }
+    },
     editSemester() {
       alert(`Editing semester: ${this.title}`);
       this.$emit("edit-semester", this.title); // Emit event for editing
@@ -77,6 +114,7 @@ export default {
   },
   mounted() {
     this.getRole();
+    this.fetchViewableCategoryCount();
   },
 };
 </script>
