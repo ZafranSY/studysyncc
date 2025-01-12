@@ -589,8 +589,7 @@ post '/deleteCategoryPermission' => sub ($c) {
 #        session_id : ??     ======= get from localStorage
 post '/getAllRoles' => sub ($c) {
     my $payload = $c->req->json;
-    my $session_id   = $payload->{session_id};
-    my $result = User::getAllRoles($dbh,$session_id);
+    my $result = User::getAllRoles($dbh);
     $c->render(json => { result => $result });
 };
 
@@ -600,17 +599,7 @@ post '/getAllRoles' => sub ($c) {
 
 post '/getAllEmails' => sub ($c) {
     my $payload = $c->req->json;
-    my $session_id   = $payload->{session_id};
-
-    # my $required_rolename = 'Academic Officer'; 
-    # my $auth_result = Authorization::check_session_role($dbh, $session_id, $required_rolename);
-
-    # if ($auth_result->{error}) {
-    #     $c->render(json => $auth_result);
-    #     return;
-    # }
-
-    my $result = User::getAllEmails($dbh,$session_id);
+    my $result = User::getAllEmails($dbh);
     $c->render(json => { result => $result });
 };
 

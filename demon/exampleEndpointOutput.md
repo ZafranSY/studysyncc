@@ -482,18 +482,15 @@ http://localhost/createLinkPermission
 
 
 http://localhost/getAllRoles         FOR EVERYONE
-request body =>
-    session_id : 313     ======= get from localStorage
-
 
 OUTPUT
 {"result":["Academic Officer","Everyone","Pelajar FSKSM","Pensyarah"]}
 =================================================================================================================
 
 
-http://localhost/getAvailableUserEmail     
-request body =>
-    session_id : 313     ======= get from localStorage
+http://localhost/getAvailableUserEmail      FOR EVERYONE
 
 OUTPUT
 {"result":["johnAcad@utm.com","johnAcadowo@utm.com","johnOFF@utm.com","johnPen@utm.com","johnLect@utm.com","johnDr@utm.com","johnPeng@utm.com","johnCeg@utm.com","johnStu@utm.com","msmd2@live.utm.my","tonianwar@utm.my"]}
+
+=================================================================================================================
