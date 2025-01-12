@@ -26,9 +26,9 @@ sub getViewableCategoriesWithinSemesterCount {
     my ($dbh,$session_id,$semester_id) = @_;
     my $role_name=Authorization::getRoleName($dbh, $session_id);
     my $email=Authorization::getEmail($dbh, $session_id);
-    my $sth = $dbh->prepare('SELECT COUNT(*) AS category_count FROM categoryPermission where semester_id= ? AND (user_email= ? OR role_name= ? OR role_name=\'Everyone\') AND can_read_category=1  ')
+    my $sth = $dbh->prepare('SELECT COUNT(DISTINCT category) AS category_count FROM categoryPermission where semester_id= ? AND (user_email= ? OR role_name= ? OR role_name=\'Everyone\') AND (can_read_category=1 or \'Academic Officer\'=?)  ')
         or die 'prepare statement failed: ' . $dbh->errstr();
-    $sth->execute($semester_id,$email,$role_name,) or die 'execution failed: ' . $dbh->errstr();
+    $sth->execute($semester_id,$email,$role_name,$role_name) or die 'execution failed: ' . $dbh->errstr();
     my $row = $sth->fetchrow_hashref;
     return $row->{category_count};
 }

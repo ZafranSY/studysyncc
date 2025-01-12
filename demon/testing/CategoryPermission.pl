@@ -88,9 +88,9 @@ sub getCategoryPermissionRead {
                             FROM categoryPermission 
                             WHERE semester_id = ? 
                             AND (user_email = ? OR role_name = ? OR role_name=\'Everyone\') 
-                            AND can_read_category = 1;')
+                            AND (can_read_category = 1 or \'Academic Officer\'=?);')
                             or die 'prepare statement failed: ' . $dbh->errstr();
-    $sth->execute($semester_id,$email,$role_name) 
+    $sth->execute($semester_id,$email,$role_name,$role_name) 
         or die 'execution failed: ' . $dbh->errstr();
     my @categoryPermission;
     my %seen; # Hash to track seen categories

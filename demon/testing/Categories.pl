@@ -28,9 +28,9 @@ sub getViewableLinksWithinCategoryCount {
     my ($dbh,$session_id,$semester_id,$category_name) = @_;
     my $role_name=Authorization::getRoleName($dbh, $session_id);
     my $email=Authorization::getEmail($dbh, $session_id);
-    my $sth = $dbh->prepare('SELECT COUNT(*) AS link_count FROM linkPermission where semester_id= ? AND (user_email= ? OR role_name= ? OR role_name=\'Everyone\') AND can_read=1  ')
+    my $sth = $dbh->prepare('SELECT COUNT(DISTINCT gdlink_id) AS link_count FROM linkPermission where (semester_id= ?  AND category=?) AND (user_email= ? OR role_name= ? OR role_name=\'Everyone\' OR \'Academic Officer\'=?) AND (can_read=1 OR \'Academic Officer\'=?) ')
         or die 'prepare statement failed: ' . $dbh->errstr();
-    $sth->execute($semester_id,$email,$role_name,) or die 'execution failed: ' . $dbh->errstr();
+    $sth->execute($semester_id,$category_name,$email,$role_name,$role_name,$role_name) or die 'execution failed: ' . $dbh->errstr();
     my $row = $sth->fetchrow_hashref;
     return $row->{link_count};
 }
