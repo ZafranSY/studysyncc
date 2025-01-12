@@ -50,13 +50,25 @@
                                     <img :src="require('@/assets/delete.png')" alt="Delete" class="icon" />
                                 </button>
 
+                                <!-- Gear Button -->
+  <button @click="openSettingsModal" class="icon-button">
+    <img :src="require('@/assets/gear.png')" alt="Settings" class="icon" />
+  </button>
+
+  <!-- LinkPermissionPopup Modal -->
+  <LinkPermissionPopup :show="showSettingsModal" @close="closeSettingsModal" />
                                 <button @click="goToFile(file)" class="icon-button">
                                     <img :src="require('@/assets/goto.png')" alt="Go To" class="icon" />
                                 </button>
+
+          
+
                             </td>
                         </tr>
                     </tbody>
                 </table>
+
+<LinkPermissionPopup :show="false" @close="closeSettingsModal" />
 
                 <!-- Edit Modal -->
                 <div v-if="showEditModal" class="modal">
@@ -95,6 +107,8 @@
                 </svg>
             </div>
 
+
+
             <!-- Upload Modal -->
             <UploadModalLink v-if="showModal" :show="showModal" :file="selectedFile" @close="closeModal"
                 @save="addFile" />
@@ -104,12 +118,13 @@
 <script>
 import NavbarView from "@/components/NavBar.vue";
 import UploadModalLink from "@/components/UploadModalLink.vue";
-
+import LinkPermissionPopup from "@/components/LinkPermissionPopup.vue";
 export default {
     name: "CourseDetailsView",
     components: {
         NavbarView,
         UploadModalLink,
+        LinkPermissionPopup, // Import component
     },
     data() {
         return {
@@ -121,6 +136,7 @@ export default {
             categoryTitle: "",
             categoryDescription: "",
             semester_id: null,
+            showSettingsModal: false,
             category_name: null,
             editForm: {
                 id: null,
@@ -146,6 +162,8 @@ export default {
         },
     },
     methods: {
+
+   
         // Fetch data based on category and session
         fetchFiles() {
             const session_id = JSON.parse(localStorage.getItem("session_id"));
@@ -199,6 +217,17 @@ export default {
                     console.error("Error fetching links:", error.message);
                 });
         },
+
+
+        openSettingsModal() {
+  console.log("Settings modal opened!");
+  this.showSettingsModal = true;
+},
+
+
+    closeSettingsModal() {
+      this.showSettingsModal = false;
+    },
 
         openUploadModal() {
             this.showModal = true;
