@@ -18,7 +18,8 @@
                     <!-- Icon -->
                     <span class="search-icon">
                         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
-                            <path d="M11 2a9 9 0 1 0 6.28 15.28l4.41 4.42 1.41-1.41-4.41-4.42A9 9 0 0 0 11 2zm0 16a7 7 0 1 1 7-7 7 7 0 0 1-7 7z" />
+                            <path
+                                d="M11 2a9 9 0 1 0 6.28 15.28l4.41 4.42 1.41-1.41-4.41-4.42A9 9 0 0 0 11 2zm0 16a7 7 0 1 1 7-7 7 7 0 0 1-7 7z" />
                         </svg>
                     </span>
                     <!-- Search Input -->
@@ -29,19 +30,13 @@
             <!-- Category Cards -->
             <div v-if="categories.length === 0">No categories found.</div>
             <div class="card-grid">
-                <CategoryCard
-                    v-for="category in filteredCategories"
-                    :key="category.id"
-                    :title="category.title"
-                    :subtitle="category.subtitle"
-                    :bgColor="category.bgColor"
-                    @manage-permissions="showPermissionModal"
-                    @click="navigateToDetails(category.title)"
-                />
+                <CategoryCard v-for="category in filteredCategories" :key="category.id" :title="category.title"
+                    :subtitle="category.subtitle" :bgColor="category.bgColor" @manage-permissions="showPermissionModal"
+                    @click="navigateToDetails(category.title)" />
             </div>
 
             <!-- Plus Button -->
-            <div class="add-button" @click="openCategoryModal">
+            <div class="add-button" @click="openCategoryModal" v-if="onlyAcademicOfficer">
                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
                     <path d="M13 11h8v2h-8v8h-2v-8H3v-2h8V3h2v8Z" />
                 </svg>
@@ -52,12 +47,8 @@
                 @save="addCategory" />
 
             <!-- Permission Modal -->
-            <CategoryPermission
-                :show="isPermissionModalOpen"
-                :categoryTitle="selectedCategoryTitle"
-                @close="closePermissionModal"
-                @save="handlePermissionSave"
-            />
+            <CategoryPermission :show="isPermissionModalOpen" :categoryTitle="selectedCategoryTitle"
+                @close="closePermissionModal" @save="handlePermissionSave" />
         </div>
     </div>
 </template>
@@ -92,6 +83,9 @@ export default {
                 );
             });
         },
+        onlyAcademicOfficer() {
+            return localStorage.getItem('role') === '"Academic Officer"';
+        }
     },
     mounted() {
         const session_id = JSON.parse(localStorage.getItem("session_id"));
@@ -171,29 +165,49 @@ export default {
             this.categories.push(newCategoryEntry);
             this.showCategoryModal = false;
         },
-        confirmAndRemoveCategory(categoryTitle) {
+        async confirmAndRemoveCategory(categoryTitle) {
             if (window.confirm(`Are you sure you want to delete "${categoryTitle}"?`)) {
+                const sessionId =  sessionStorage.getItem('session_id');
+                const semesterId = sessionStorage.getItem('semester');
+
+                if (!sessionId || !semesterId) {
+                    alert("Missing session or semester data. Please log in again.");
+                    return;
+                }
+
                 const index = this.categories.findIndex((c) => c.title === categoryTitle);
+
                 if (index !== -1) {
-                    this.categories.splice(index, 1);
-                    fetch(`http://localhost/deleteCategory?title=${encodeURIComponent(categoryTitle)}`, {
-                        method: "DELETE",
-                    })
-                        .then((response) => {
-                            if (!response.ok) {
-                                throw new Error("Failed to delete category");
-                            }
-                        })
-                        .catch((error) => {
-                            console.error("Error deleting category:", error);
-                            alert("Deletion failed. Please try again.");
-                            this.categories.splice(index, 0, {
-                                id: index + 1,
-                                title: categoryTitle,
-                                subtitle: categoryTitle,
-                                bgColor: this.getRandomColor(),
-                            });
+                    // Temporarily remove the category from the UI
+                    const removedCategory = this.categories.splice(index, 1);
+
+                    const payload = {
+                        session_id: sessionId.replace(/['"]+/g, ""),
+                        semester_id: semesterId.replace(/['"]+/g, ""),
+                        category_name: categoryTitle,
+                    };
+
+                    try {
+                        const response = await fetch("http://localhost/deleteCategory", {
+                            method: "POST",
+                            headers: {
+                                "Content-Type": "application/json",
+                            },
+                            body: JSON.stringify(payload),
                         });
+
+                        if (!response.ok) {
+                            throw new Error("Failed to delete category.");
+                        }
+
+                        const result = await response.json();
+                        console.log("Category deleted successfully:", result);
+                    } catch (error) {
+                        console.error("Error deleting category:", error);
+                        alert("Deletion failed. Please try again.");
+                        // Revert the category back to the list on error
+                        this.categories.splice(index, 0, ...removedCategory);
+                    }
                 }
             }
         },

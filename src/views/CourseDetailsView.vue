@@ -51,24 +51,24 @@
                                 </button>
 
                                 <!-- Gear Button -->
-  <button @click="openSettingsModal" class="icon-button">
-    <img :src="require('@/assets/gear.png')" alt="Settings" class="icon" />
-  </button>
+                                <button @click="openSettingsModal" class="icon-button">
+                                    <img :src="require('@/assets/gear.png')" alt="Settings" class="icon" />
+                                </button>
 
-  <!-- LinkPermissionPopup Modal -->
-  <LinkPermissionPopup :show="showSettingsModal" @close="closeSettingsModal" />
+                                <!-- LinkPermissionPopup Modal -->
+                                <LinkPermissionPopup :show="showSettingsModal" @close="closeSettingsModal" />
                                 <button @click="goToFile(file)" class="icon-button">
                                     <img :src="require('@/assets/goto.png')" alt="Go To" class="icon" />
                                 </button>
 
-          
+
 
                             </td>
                         </tr>
                     </tbody>
                 </table>
 
-<LinkPermissionPopup :show="false" @close="closeSettingsModal" />
+                <LinkPermissionPopup :show="false" @close="closeSettingsModal" />
 
                 <!-- Edit Modal -->
                 <div v-if="showEditModal" class="modal">
@@ -101,7 +101,7 @@
             </div>
 
             <div v-if="checkCanCreate()" class="add-button" @click="openUploadModal">
-            <!-- <div class="add-button" @click="openUploadModal"> -->
+                <!-- <div class="add-button" @click="openUploadModal"> -->
                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
                     <path d="M13 11h8v2h-8v8h-2v-8H3v-2h8V3h2v8Z" />
                 </svg>
@@ -163,7 +163,7 @@ export default {
     },
     methods: {
 
-   
+
         // Fetch data based on category and session
         fetchFiles() {
             const session_id = JSON.parse(localStorage.getItem("session_id"));
@@ -220,14 +220,14 @@ export default {
 
 
         openSettingsModal() {
-  console.log("Settings modal opened!");
-  this.showSettingsModal = true;
-},
+            console.log("Settings modal opened!");
+            this.showSettingsModal = true;
+        },
 
 
-    closeSettingsModal() {
-      this.showSettingsModal = false;
-    },
+        closeSettingsModal() {
+            this.showSettingsModal = false;
+        },
 
         openUploadModal() {
             this.showModal = true;
@@ -358,11 +358,11 @@ export default {
             let found = false;
             let cat = sessionStorage.getItem('category').replace(/['"]+/g, "");
             let sem = sessionStorage.getItem('semester').replace(/['"]+/g, "");
-            
 
-            for (let i = 0; i < this.createAbleLinkWherearr.length; i+=2) {
-                if(this.createAbleLinkWherearr[i]==cat &&this.createAbleLinkWherearr[i+1]==sem)
-                    found=true
+
+            for (let i = 0; i < this.createAbleLinkWherearr.length; i += 2) {
+                if (this.createAbleLinkWherearr[i] == cat && this.createAbleLinkWherearr[i + 1] == sem)
+                    found = true
             }
 
             return found;
@@ -510,7 +510,11 @@ export default {
                 alert("You do not have permission to delete this link." + userRole + "  ow," + canDelete);
                 return;
             }
-
+            
+            const confirmDelete = confirm("Are you sure you want to delete this link? This action cannot be undone.");
+            if (!confirmDelete) {
+                return; 
+            }
             const requestBody = {
                 session_id: sessionId.replace(/['"]+/g, ""),
                 semester_id: semesterId.replace(/['"]+/g, ""),
