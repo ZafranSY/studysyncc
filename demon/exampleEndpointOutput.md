@@ -253,7 +253,7 @@ request body =>
     semester_id : '2024/2025-1'       ======= get from localStorage  
 
 OUTPUT
-{"updateableLinkId":[84,11228,11229,11230,11231,11232,163,164,165,166]}
+{"deleteableLinkId":[84,11228,11229,11230,11231,11232,163,164,165,166]}
 
 =================================================================================================================
 
@@ -263,7 +263,7 @@ request body =>
     semester_id : '2024/2025-1'       ======= get from localStorage   
 
 OUTPUT
-{"deleteableLinkId":[84,11228,11230,11235,11237,11238,11239,11241,11243,11245,163,164,165,166]}
+{"updateableLinkId":[84,11228,11230,11235,11237,11238,11239,11241,11243,11245,163,164,165,166]}
 
 =================================================================================================================
 
@@ -321,9 +321,12 @@ If link doesnt exist , it will say it delete successfully
 http://localhost/updateLink          ONLY FOR ACADEMIC OFFICER & PEOPLE WITH UPDATE PERM WITHIN CATEGORY & LINK OWNER
 request body =>
     session_id : ??    ======= get from localStorage
-    semester_id : ??   ======= get from localStorage
+    semester_id : ??   ======= get from localStorage  
     category_name : ?? ======= get from localStorage
-    link uh this is hard
+    new_ref_name : ??  ======= get from form
+    new_desc : ??      ======= get from form
+    new_link : ??      ======= get from form
+    gdlink_id : ????   ======= get when u click the delete button
 
 OUTPUT
 {"result":{"message":"gdlink_id 11230 in Meow, 2024/2025-1 edited successfully"}}
@@ -335,7 +338,7 @@ OUTPUT
 
 =================================================================================================================
 =================================================================================================================
-             CATEGORY PERMISSION
+                                                    CATEGORY PERMISSION
 =================================================================================================================
 =================================================================================================================
 
@@ -384,6 +387,12 @@ OUTPUT
 OUTPUT
 {"result":{"error":"Category Permission for email johnStu@utm.com already exists in category PSM 1, 2024/2025-1 . Try editing existing Perm instead"}}
 
+OUTPUT
+{"result":{"error":"Cannot add permission Student for roles that doesnt exist. "}}
+
+OUTPUT
+{"result":{"error":"Cannot add permission johnStu@utm.cm for user that doesnt exist. "}}
+
 =================================================================================================================
 
 http://localhost/updateCategoryPermission
@@ -416,7 +425,13 @@ OUTPUT
 OUTPUT
 {"result":{"message":"Category Permission for user johnStu@utm.com updated successfully"}}
 
+OUTPUT
+{"result":{"error":"Cannot edit permission Student for roles that doesnt exist. "}}
 
+OUTPUT
+{"result":{"error":"Cannot edit permission johnStu@utm.cm for user that doesnt exist. "}}
+
+=================================================================================================================
 
 http://localhost/deleteCategoryPermission
     session_id : 313                ======= get from localStorage
@@ -464,9 +479,18 @@ http://localhost/createLinkPermission
                         EXTRA OPTION MENU
 =================================================================================================================
 =================================================================================================================
-FOR ACADEMIC OFFICER ,, AND OWNER OF A LINK
-
-http://localhost/getAvailableRole
-http://localhost/getAvailableUserEmail
 
 
+http://localhost/getAllRoles         FOR EVERYONE
+
+OUTPUT
+{"result":["Academic Officer","Everyone","Pelajar FSKSM","Pensyarah"]}
+=================================================================================================================
+
+
+http://localhost/getAvailableUserEmail      FOR EVERYONE
+
+OUTPUT
+{"result":["johnAcad@utm.com","johnAcadowo@utm.com","johnOFF@utm.com","johnPen@utm.com","johnLect@utm.com","johnDr@utm.com","johnPeng@utm.com","johnCeg@utm.com","johnStu@utm.com","msmd2@live.utm.my","tonianwar@utm.my"]}
+
+=================================================================================================================

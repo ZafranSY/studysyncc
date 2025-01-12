@@ -125,6 +125,23 @@ sub getCategoryPermissionCreate {
 
 sub CreateCategoryPermissionRole {
     my ($dbh,$session_id, $semester_id,$category_name,$insert_user_role,$can_read_category,$can_create_links) = @_;
+
+    my $check_sth = $dbh->prepare('
+        SELECT COUNT(*) FROM roles 
+        WHERE role_name = ? ;
+    ') or die 'prepare statement failed: ' . $dbh->errstr();
+
+    $check_sth->execute($insert_user_role)
+        or die 'execution failed: ' . $dbh->errstr();
+
+    my ($exists) = $check_sth->fetchrow_array();
+    if (!$exists) {
+        return { error => "Cannot add permission $insert_user_role for roles that doesnt exist. " };
+    }
+
+
+
+
     my $check_sth = $dbh->prepare('
         SELECT COUNT(*) FROM categoryPermission 
         WHERE role_name = ? AND semester_id = ? AND category = ?;
@@ -158,6 +175,20 @@ sub CreateCategoryPermissionRole {
 
 sub CreateCategoryPermissionUser {
     my ($dbh,$session_id, $semester_id,$category_name,$insert_user_email,$can_read_category,$can_create_links) = @_;
+
+    my $check_sth = $dbh->prepare('
+        SELECT COUNT(*) FROM user 
+        WHERE email = ? ;
+    ') or die 'prepare statement failed: ' . $dbh->errstr();
+
+    $check_sth->execute($insert_user_email)
+        or die 'execution failed: ' . $dbh->errstr();
+
+    my ($exists) = $check_sth->fetchrow_array();
+    if (!$exists) {
+        return { error => "Cannot add permission $insert_user_email for user that doesnt exist. " };
+    }
+
     my $check_sth = $dbh->prepare('
         SELECT COUNT(*) FROM categoryPermission 
         WHERE user_email = ? AND semester_id = ? AND category = ?;
@@ -192,6 +223,21 @@ sub CreateCategoryPermissionUser {
 
 sub UpdateCategoryPermissionRole {
     my ($dbh,$session_id, $semester_id,$category_name,$user_role,$can_read_category,$can_create_links) = @_;
+
+    my $check_sth = $dbh->prepare('
+    SELECT COUNT(*) FROM roles 
+    WHERE role_name = ? ;
+    ') or die 'prepare statement failed: ' . $dbh->errstr();
+
+    $check_sth->execute($user_role)
+        or die 'execution failed: ' . $dbh->errstr();
+
+    my ($exists) = $check_sth->fetchrow_array();
+    if (!$exists) {
+        return { error => "Cannot edit permission $user_role for roles that doesnt exist. " };
+    }
+
+
     my $check_sth = $dbh->prepare('
         SELECT COUNT(*) FROM categoryPermission 
         WHERE role_name = ? AND semester_id = ? AND category = ?;
@@ -230,6 +276,21 @@ sub UpdateCategoryPermissionRole {
 
 sub UpdateCategoryPermissionUser {
     my ($dbh,$session_id, $semester_id,$category_name,$user_email,$can_read_category,$can_create_links) = @_;
+
+    my $check_sth = $dbh->prepare('
+    SELECT COUNT(*) FROM user 
+    WHERE email = ? ;
+    ') or die 'prepare statement failed: ' . $dbh->errstr();
+
+    $check_sth->execute($user_email)
+        or die 'execution failed: ' . $dbh->errstr();
+
+    my ($exists) = $check_sth->fetchrow_array();
+    if (!$exists) {
+        return { error => "Cannot edit permission $user_email for user that doesnt exist. " };
+    }
+
+
     my $check_sth = $dbh->prepare('
         SELECT COUNT(*) FROM categoryPermission 
         WHERE user_email = ? AND semester_id = ? AND category = ?;

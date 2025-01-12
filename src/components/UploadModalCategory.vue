@@ -6,19 +6,20 @@
         <button class="close-btn" @click="closeModal">X</button>
       </div>
       <div class="modal-body">
-        <label>
-          <!-- Category Name: -->
+        <label for="categoryName">
+          <span>Category Name:</span>
           <input
             type="text"
             v-model="formData.categoryName"
+            id="categoryName"
             placeholder="Enter Category Name"
+            required
           />
         </label>
       </div>
-
       <div class="modal-footer">
         <button class="cancel-btn" @click="closeModal">Cancel</button>
-        <button class="save-btn" @click="saveData">Save</button>
+        <button class="save-btn" @click="handleSubmit">Save</button>
       </div>
     </div>
   </div>
@@ -36,7 +37,6 @@ export default {
     return {
       formData: {
         categoryName: "",
-        role_desc: null,
       },
     };
   },
@@ -44,16 +44,53 @@ export default {
     closeModal() {
       this.$emit("close");
     },
-    saveData() {
-      if (!this.formData.categoryName.trim()) {
-        alert("Please enter a category name!");
+    async handleSubmit() {
+      const session_id = localStorage
+        .getItem("session_id")
+        ?.replace(/['"]+/g, "");
+      const semester_id = sessionStorage
+        .getItem("semester")
+        ?.replace(/['"]+/g, "");
+
+      if (!session_id || !semester_id) {
+        alert("Missing session or semester data. Please log in again.");
         return;
       }
-      // Emit form data to the parent
-      this.$emit("save", this.formData);
-      // Reset form fields
-      this.formData.categoryName = "";
-      this.closeModal();
+
+      const payload = {
+        session_id: session_id.trim(),
+        semester_id: semester_id.trim(),
+        category_name: this.formData.categoryName.trim(),
+      };
+
+      try {
+        const response = await fetch("http://localhost/createCategory", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(payload),
+        });
+
+        const result = await response.json();
+        console.log("Server Response:", result);
+
+        // if (response.ok && result.message) {
+        //   alert(result.message); // Success
+        //   this.$emit("save", this.formData); // Notify parent
+        //   this.resetForm();
+        // } else {
+        //   alert(result.error || "Failed to create category. Please try again.");
+        // }
+      } catch (error) {
+        console.error("Error creating category:", error);
+        alert("An unexpected error occurred. Please try again.");
+      }
+    },
+    resetForm() {
+      this.formData = {
+        categoryName: "",
+      };
     },
   },
 };

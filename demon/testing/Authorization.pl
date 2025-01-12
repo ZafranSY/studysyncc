@@ -61,6 +61,7 @@ sub getRoleName {
 
 sub getEmail {
     my ($dbh, $session_id) = @_;
+    $logger->info("ssid : $session_id");
     my $sth = $dbh->prepare('SELECT * FROM user WHERE session_id=?')
         or do return { error => 'Failed to prepare statement: ' . $dbh->errstr };
     $sth->execute($session_id)

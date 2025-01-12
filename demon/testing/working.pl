@@ -101,16 +101,22 @@ post '/getViewableCategoriesWithinSemesterCount' => sub ($c) {
 #       semester_id : ?? i.e 2024/2025-1
 post '/createSemester' => sub ($c) {
     my $payload = $c->req->json;
+
     my $session_id = $payload->{session_id};
-    my $required_rolename = 'Academic Officer'; 
+    my $semester_id = $payload->{semesterName};  # Assuming frontend sends semesterName
+    my $required_rolename = 'Academic Officer';
+
+    # Log payload for debugging
+    $logger->info("Payload received: session_id=$session_id, semester_id=$semester_id");
+
+    # Validate session and role
     my $auth_result = Authorization::check_session_role($dbh, $session_id, $required_rolename);
-    
     if ($auth_result->{error}) {
         $c->render(json => $auth_result);
         return;
     }
-    
-    my $semester_id = $payload->{semester_id};
+
+    # Create the semester
     my $result = Semester::CreateSemester($dbh, $semester_id);
     $c->render(json => $result);
 };
@@ -578,7 +584,24 @@ post '/deleteCategoryPermission' => sub ($c) {
 
 
 
+#  http://localhost/getAllRoles         FOR EVERYONE
+#  request body =>
+#        session_id : ??     ======= get from localStorage
+post '/getAllRoles' => sub ($c) {
+    my $payload = $c->req->json;
+    my $result = User::getAllRoles($dbh);
+    $c->render(json => { result => $result });
+};
 
+#  http://localhost/getAllRoles       
+#  request body =>
+#        session_id : ??     ======= get from localStorage
+
+post '/getAllEmails' => sub ($c) {
+    my $payload = $c->req->json;
+    my $result = User::getAllEmails($dbh);
+    $c->render(json => { result => $result });
+};
 
 
 

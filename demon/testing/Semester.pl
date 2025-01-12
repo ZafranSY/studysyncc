@@ -35,8 +35,11 @@ sub getViewableCategoriesWithinSemesterCount {
 
 sub CreateSemester {
     my ($dbh, $semester_id) = @_;
+    $semester_id =~ s/^\s+|\s+$//g;
+    
     if (!$semester_id || length($semester_id) != 11) {
-        return { error => 'Invalid semester_id. It must be 11 characters.' };
+        $len=length($semester_id);
+        return { error => "Invalid semester_id. It must be 11 characters. $semester_id , $len" };
     }
     my $sth_check = $dbh->prepare('SELECT 1 FROM sessionSemester WHERE semester_id = ?')
                 or die 'prepare statement failed: ' . $dbh->errstr();
