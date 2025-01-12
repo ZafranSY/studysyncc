@@ -475,7 +475,7 @@ export default {
 
 
             const userRole = this.getUserRole();
-            const canDelete = this.checkCanDelete();
+            const canDelete = this.checkCanDelete(id);
 
             if (userRole !== '"Academic Officer"' && !canDelete) {
                 alert("You do not have permission to delete this link." + userRole + "  ow," + canDelete);
