@@ -530,14 +530,16 @@ OUTPUT
 OUTPUT
 {"result":"Only one of insert_user_email or insert_user_role can be updated at a time"}
 
-
+OUTPUT
 {"result":{"message":"Link Permission for email johnStu@utm.com updated successfully"}}
 
-
+OUTPUT
 {"result":{"message":"Link Permission for role Academic Officer updated successfully"}}
 
+OUTPUT
 {"result":{"error":"Cannot add permission Academic Oficer for roles that doesnt exist. "}}
 
+OUTPUT
 {"result":{"error":"Cannot add permission johnStu@utm.cm for email that doesnt exist. "}}
 
 http://localhost/deleteLinkPermission
