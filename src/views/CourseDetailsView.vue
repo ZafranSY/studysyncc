@@ -56,7 +56,7 @@
                                 </button>
 
                                 <!-- LinkPermissionPopup Modal -->
-                                <LinkPermissionPopup :show="showSettingsModal" @close="closeSettingsModal"  />
+                                <LinkPermissionPopup :show="showSettingsModal" @close="closeSettingsModal" :gdlink_id="file.id"   />
                                 <button @click="goToFile(file)" class="icon-button">
                                     <img :src="require('@/assets/goto.png')" alt="Go To" class="icon" />
                                 </button>
@@ -166,7 +166,7 @@ export default {
 
         ownerOrAcadOff(a){
             
-            return localStorage.getItem('role')==='Academic Officer' || localStorage.getItem('email').replace(/['"]+/g, "")==a;
+            return localStorage.getItem('role').replace(/['"]+/g, "")==='Academic Officer' || localStorage.getItem('email').replace(/['"]+/g, "")==a;
         },
         // Fetch data based on category and session
         fetchFiles() {
