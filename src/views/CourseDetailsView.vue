@@ -51,11 +51,12 @@
                                 </button>
 
                                 <!-- Gear Button -->
-<button @click="openSettingsModal" class="icon-button">
-  <img :src="require('@/assets/gear.png')" alt="Settings" class="icon" />
-</button>
+  <button @click="openSettingsModal" class="icon-button">
+    <img :src="require('@/assets/gear.png')" alt="Settings" class="icon" />
+  </button>
 
-
+  <!-- LinkPermissionPopup Modal -->
+  <LinkPermissionPopup :show="showSettingsModal" @close="closeSettingsModal" />
                                 <button @click="goToFile(file)" class="icon-button">
                                     <img :src="require('@/assets/goto.png')" alt="Go To" class="icon" />
                                 </button>
