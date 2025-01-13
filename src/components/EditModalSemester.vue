@@ -23,6 +23,7 @@
 <script>
 export default {
     name: 'SemesterEditModal',
+    emits: ['close', 'semester-updated'],
     props: {
         show: {
             type: Boolean,

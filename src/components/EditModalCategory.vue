@@ -23,6 +23,7 @@
 <script>
 export default {
     name: 'categoryEditModal',
+    emits: ['close', 'category-updated'],
     props: {
         show: {
             type: Boolean,
@@ -66,12 +67,12 @@ export default {
 
                 payload = {
                     session_id: sessionId,
-                    semester_id: sessionId.getItem('semester'), 
+                    semester_id: JSON.parse(sessionStorage.getItem('semester')), 
                     category_name: this.categoryData.title,  // old category id
                     new_category_name: newcategoryId
                 };
 
-                console.log("ARTGRD")
+                
                 const response = await fetch('http://localhost/updateCategory', {
                     method: 'POST',
                     headers: {
