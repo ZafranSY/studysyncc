@@ -39,10 +39,12 @@
                                     <td>{{ permission.user_email || "N/A" }}</td>
                                     <td>{{ permission.role_name || "N/A" }}</td>
                                     <td class="centered-column">
-                                        <input type="checkbox" :checked="permission.can_read_category === 1" />
+                                        <input type="checkbox" :checked="permission.can_read_category"
+                                            v-model="permission.can_read_category" />
                                     </td>
                                     <td class="centered-column">
-                                        <input type="checkbox" :checked="permission.can_create_links === 1" />
+                                        <input type="checkbox" :checked="permission.can_create_links"
+                                            v-model="permission.can_create_links" />
                                     </td>
                                     <td class="centered-column">
                                         <button class="update-btn" @click="updatePermission(permission)">Update</button>
@@ -108,6 +110,7 @@
 <script>
 export default {
     name: "CategoryPermission",
+
     props: {
         show: {
             type: Boolean,
@@ -235,7 +238,12 @@ export default {
                 const data = await response.json();
 
                 if (data.categoriesPermission) {
-                    this.permissionList = data.categoriesPermission;
+                    // Convert `1` to `true` and `0` to `false` for boolean fields
+                    this.permissionList = data.categoriesPermission.map(permission => ({
+                        ...permission,
+                        can_read_category: permission.can_read_category === 1,
+                        can_create_links: permission.can_create_links === 1,
+                    }));
                     this.filteredPermissions = [...this.permissionList];
                 } else {
                     this.permissionList = [];
@@ -251,7 +259,9 @@ export default {
 
         filterPermissions() {
             const term = this.searchTerm.trim().toLowerCase();
+
             this.filteredPermissions = this.permissionList.filter((permission) => {
+
                 return (
                     (permission.user_email?.toLowerCase().includes(term) || "N/A".includes(term)) ||
                     (permission.user_role?.toLowerCase().includes(term) || "N/A".includes(term))
@@ -262,51 +272,51 @@ export default {
         async updatePermission(permission) {
             // Implement your update logic here
             try {
-                    const session_id = localStorage.getItem("session_id")?.replace(/['"]+/g, "");
-                    const semester_id = JSON.parse(sessionStorage.getItem("semester")) || this.transformToSemester(this.$route.params.semesterURL);
+                const session_id = localStorage.getItem("session_id")?.replace(/['"]+/g, "");
+                const semester_id = JSON.parse(sessionStorage.getItem("semester")) || this.transformToSemester(this.$route.params.semesterURL);
 
-                    if (!session_id || !semester_id) {
-                        alert("Session or semester information is missing. Please log in again.");
-                        return;
-                    }
-
-                    const payload = {
-                        session_id: session_id.trim(),
-                        semester_id: semester_id.trim(),
-                        category_name: this.categoryTitle,
-                        selected_user_role: permission.role_name,
-                        selected_user_email: permission.user_email,
-                        can_read_category: permission.can_read_category,
-                        can_create_links: permission.can_create_links,
-                    };
-
-                    const response = await fetch("http://localhost/updateCategoryPermission", {
-                        method: "POST",
-                        headers: {
-                            "Content-Type": "application/json",
-                        },
-                        body: JSON.stringify(payload),
-                    });
-
-                    if (!response.ok) {
-                        throw new Error(`Server responded with status ${response.status}`);
-                    }
-
-                    const data = await response.json();
-
-                    // Handle response message
-                    if (data.result.message) {
-
-                        alert(data.result.message);
-                    } else if (data.result.error) {
-                        alert(data.result.error);
-                    }
-                } catch (error) {
-                    console.error("Error deleting permission:", error);
-                    alert("Failed to delete permission. Please try again later.");
-                } finally{
-                    this.fetchPermissions();
+                if (!session_id || !semester_id) {
+                    alert("Session or semester information is missing. Please log in again.");
+                    return;
                 }
+                const payload = {
+                    session_id: session_id.trim(),
+                    semester_id: semester_id.trim(),
+                    category_name: this.categoryTitle,
+                    selected_user_role: permission.role_name,
+                    selected_user_email: permission.user_email,
+                    can_read_category: permission.can_read_category,
+                    can_create_links: permission.can_create_links,
+                };
+
+                console.log(payload)
+                const response = await fetch("http://localhost/updateCategoryPermission", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify(payload),
+                });
+
+                if (!response.ok) {
+                    throw new Error(`Server responded with status ${response.status}`);
+                }
+
+                const data = await response.json();
+
+                // Handle response message
+                if (data.result.message) {
+
+                    alert(data.result.message);
+                } else if (data.result.error) {
+                    alert(data.result.error);
+                }
+            } catch (error) {
+                console.error("Error deleting permission:", error);
+                alert("Failed to delete permission. Please try again later.");
+            } finally {
+                this.fetchPermissions();
+            }
         },
 
         async deletePermission(permission) {
@@ -353,7 +363,7 @@ export default {
                 } catch (error) {
                     console.error("Error deleting permission:", error);
                     alert("Failed to delete permission. Please try again later.");
-                } finally{
+                } finally {
                     this.fetchPermissions();
                 }
             }
@@ -429,6 +439,7 @@ export default {
         this.fetchEmailOptions();
         this.fetcRoleOptions();
     },
+
 };
 </script>
 
