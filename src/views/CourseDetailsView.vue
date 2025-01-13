@@ -55,17 +55,15 @@
                                 </button>
 
                                 <!-- Gear Button -->
-                                <button @click="openSettingsModal" class="icon-button" v-if="ownerOrAcadOff(file.owner)">
+                                <button @click="openSettingsModal(file.id)" class="icon-button" v-if="ownerOrAcadOff(file.owner)">
                                     <img :src="require('@/assets/gear.png')" alt="Settings" class="icon" />
                                 </button>
-
                                 <!-- LinkPermissionPopup Modal -->
-                                <LinkPermissionPopup :show="showSettingsModal" @close="closeSettingsModal" :gdlink_id="file.id"   />
+                                <LinkPermissionPopup :show="showSettingsModal === file.id" @close="closeSettingsModal" :gdlink="file" />
+                                
                                 <button @click="goToFile(file)" class="icon-button">
                                     <img :src="require('@/assets/goto.png')" alt="Go To" class="icon" />
                                 </button>
-
-
 
                             </td>
                         </tr>
@@ -132,6 +130,9 @@ export default {
     },
     data() {
         return {
+            userName:"",
+            userRole:"",
+            semId:"",
             searchQuery: "",
             showModal: false,
             showEditModal: false,
@@ -140,7 +141,7 @@ export default {
             categoryTitle: "",
             categoryDescription: "",
             semester_id: null,
-            showSettingsModal: false,
+            showSettingsModal: null,
             category_name: null,
             editForm: {
                 id: null,
@@ -237,14 +238,14 @@ export default {
         },
 
 
-        openSettingsModal() {
+        openSettingsModal(fileId) {
             console.log("Settings modal opened!");
-            this.showSettingsModal = true;
+            this.showSettingsModal = fileId;
         },
 
 
         closeSettingsModal() {
-            this.showSettingsModal = false;
+            this.showSettingsModal = null;
         },
 
         openUploadModal() {

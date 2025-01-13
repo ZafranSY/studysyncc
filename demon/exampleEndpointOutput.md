@@ -527,8 +527,15 @@ OUTPUT
 
 =================================================================================================================
 
-
 http://localhost/updateLinkPermission
+request body =>
+    session_id : ??     ======= get from localStorage/sessionStorage    
+    gdlink_id : ??    ======= get from click     
+    selected_user_role : ????    ======= get from fill form     
+    selected_user_email : ????   ======= get from fill form     
+    can_read : ????   ======= get from fill form,,, boolean (0/1 true/false)
+    can_update : ????   ======= get from fill form,,, boolean (0/1 true/false)
+    can_delete : ????   ======= get from fill form,,, boolean (0/1 true/false)
 
 OUTPUT
 {"error":"No permission ."}

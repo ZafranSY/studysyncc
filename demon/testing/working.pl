@@ -659,9 +659,7 @@ post '/createLinkPermission' => sub ($c) {
 
 # http://localhost/updateLinkPermission
 # request body =>
-#       session_id : ??     ======= get from localStorage/sessionStorage
-#       semester_id : ??    ======= get from localStorage/sessionStorage       
-#       category_name : ??    ======= get from localStorage/sessionStorage     
+#       session_id : ??     ======= get from localStorage/sessionStorage    
 #       gdlink_id : ??    ======= get from click     
 #       selected_user_role : ????    ======= get from fill form     
 #       selected_user_email : ????   ======= get from fill form     

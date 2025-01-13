@@ -2,7 +2,7 @@
     <div v-if="show" class="modal-overlay">
         <div class="modal-content">
             <div class="modal-header">
-                <h3>Link Permissions Table</h3>
+                <h3>Link Permissions Table for : ({{gdlink.id}}) {{ gdlink.refName }} </h3>
                 <button class="close-btn" @click="close">✖</button>
             </div>
 
@@ -76,8 +76,8 @@ export default {
             default: false,
 
         },
-        gdlink_id: {
-            type: String,
+        gdlink: {
+            type: Object,
             required: true
         },
     },
@@ -93,6 +93,8 @@ export default {
                 can_update: false,
                 can_delete: false,
             },
+            userOptions: [],
+            emailOptions: [],
         };
     },
     methods: {
@@ -105,7 +107,7 @@ export default {
 
             const payload = {
                 session_id: sessionId.replace(/['"]+/g, ""),
-                gdlink_id: this.gdlink_id,
+                gdlink_id: this.gdlink.id,
             };
             try {
                 const response = await fetch("http://localhost/getLinkPermission", {
@@ -138,14 +140,34 @@ export default {
             }
         },
 
-        fetchRoles() {
-            fetch("http://localhost/getAllRoles")
-                .then((response) => response.json())
-                .then((data) => {
-                    this.roles = data.result || [];
+        async fetchEmailOptions() {
+            fetch('http://localhost/getAllEmails', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                }
+            })
+                .then(response => response.json())  // Parse the JSON response
+                .then(data => {
+                    this.emailOptions = data.result;
                 })
-                .catch((error) => {
-                    console.error("Failed to fetch roles:", error);
+                .catch(error => {
+                    console.error("Error fetching email options:", error);
+                });
+        },
+        async fetcRoleOptions() {
+            fetch('http://localhost/getAllRoles', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                }
+            })
+                .then(response => response.json())  // Parse the JSON response
+                .then(data => {
+                    this.userOptions = data.result;
+                })
+                .catch(error => {
+                    console.error("Error fetching email options:", error);
                 });
         },
 
@@ -154,33 +176,40 @@ export default {
         async saveNewPermission() {
 
             const newPermission = {
-            user_email: this.newPermission.user_email || 'No email provided',
-            role_name: this.newPermission.role_name || 'No role provided',
-            can_read: this.newPermission.can_read || false,
-            can_update: this.newPermission.can_update || false,
-            can_delete: this.newPermission.can_delete || false,
-        };
+                insert_user_email: this.newPermission.user_email || 'No email provided',
+                insert_user_role: this.newPermission.role_name || 'No role provided',
+                can_read: this.newPermission.can_read || false,
+                can_update: this.newPermission.can_update || false,
+                can_delete: this.newPermission.can_delete || false,
+                gdlink_id: this.gdlink.id,
+                session_id: JSON.parse(localStorage.getItem('session_id')),
 
-        // Handle submission logic here
-        console.log('New Permission:', newPermission);
+            };
 
-        // Optional: Reset the form fields after submission
-        this.newPermission = {
-            user_email: '',
-            role_name: '',
-            can_read: false,
-            can_update: false,
-            can_delete: false,
-        };
+            let fixedNewPermission = {
+                    insert_user_email: this.newPermission.user_email || 'No email provided',
+                    insert_user_role: this.newPermission.role_name || 'No role provided',
+                    can_read: this.newPermission.can_read || false,
+                    can_update: this.newPermission.can_update || false,
+                    can_delete: this.newPermission.can_delete || false,
+                    gdlink_id: this.gdlink.id,
+                    session_id: JSON.parse(localStorage.getItem('session_id')),
+                };
+
+            // Handle submission logic here
+            console.log('New Permission:', newPermission);
+
+            // Optional: Reset the form fields after submission
+            
             try {
-                
+
                 // Send request to API to add new permission
-                const response = await fetch("http://localhost/addLinkPermission", {
+                const response = await fetch("http://localhost/createLinkPermission", {
                     method: "POST",
                     headers: {
                         "Content-Type": "application/json",
                     },
-                    body: JSON.stringify(this.newPermission),
+                    body: JSON.stringify(fixedNewPermission),
                 });
 
                 // Check for errors in response
@@ -199,7 +228,10 @@ export default {
             } catch (error) {
                 console.error("Error adding permission:", error);
                 alert("Failed to add permission.");
+                this.resetForm();
             }
+
+            
         },
 
         // Optional: Reset the form after submitting the new permission
@@ -215,14 +247,33 @@ export default {
 
         async updatePermission(row) {
             try {
-                await fetch("http://localhost/updateLinkPermissions", {
+
+                const updatedRow = {
+                    ...row,
+                    session_id: JSON.parse(localStorage.getItem('session_id')),
+                    selected_user_email: row.user_email === "-" ? "" : row.user_email,
+                    selected_user_role: row.role_name === "-" ? "" : row.role_name,
+                };
+                const response = await fetch("http://localhost/updateLinkPermission", {
                     method: "POST",
                     headers: {
                         "Content-Type": "application/json",
                     },
-                    body: JSON.stringify(row),
+                    body: JSON.stringify(updatedRow),
                 });
-                alert("Permission updated successfully!");
+                if (!response.ok) {
+                    throw new Error(`Server responded with status ${response.status}`);
+                }
+
+                const data = await response.json();
+
+                // Handle response message
+                if (data.result.message) {
+
+                    alert(data.result.message);
+                } else if (data.result.error) {
+                    alert(data.result.error);
+                }
             } catch (error) {
                 console.error("Error updating permission:", error);
                 alert("Failed to update permission.");
@@ -231,16 +282,36 @@ export default {
 
         async deletePermission(row) {
             try {
-                await fetch(`http://localhost/deleteLinkPermission/${row.link_perm_id}`, {
-                    method: "DELETE",
+
+                const updatedRow = {
+                    ...row,
+                    session_id: JSON.parse(localStorage.getItem('session_id')),
+                    selected_user_email: row.user_email === "-" ? "" : row.user_email,
+                    selected_user_role: row.role_name === "-" ? "" : row.role_name,
+                };
+                const response = await fetch("http://localhost/deleteLinkPermission", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify(updatedRow),
                 });
-                this.permissions = this.permissions.filter(
-                    (perm) => perm.link_perm_id !== row.link_perm_id
-                );
-                alert("Permission deleted successfully!");
+                if (!response.ok) {
+                    throw new Error(`Server responded with status ${response.status}`);
+                }
+
+                const data = await response.json();
+
+                // Handle response message
+                if (data.result.message) {
+
+                    alert(data.result.message);
+                } else if (data.result.error) {
+                    alert(data.result.error);
+                }
             } catch (error) {
-                console.error("Error deleting permission:", error);
-                alert("Failed to delete permission.");
+                console.error("Error updating permission:", error);
+                alert("Failed to update permission.");
             }
         },
 
@@ -251,8 +322,9 @@ export default {
         },
     },
     mounted() {
-        this.fetchPermissions();
-        this.fetchRoles();
+
+        this.fetcRoleOptions();
+        this.fetchEmailOptions();
     },
     watch: {
         show(newVal) {
