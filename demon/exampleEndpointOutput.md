@@ -568,7 +568,7 @@ OUTPUT
 =================================================================================================================
 
 
-http://localhost/getAvailableUserEmail      FOR EVERYONE
+http://localhost/getAllEmails      FOR EVERYONE
 
 OUTPUT
 {"result":["johnAcad@utm.com","johnAcadowo@utm.com","johnOFF@utm.com","johnPen@utm.com","johnLect@utm.com","johnDr@utm.com","johnPeng@utm.com","johnCeg@utm.com","johnStu@utm.com","msmd2@live.utm.my","tonianwar@utm.my"]}
