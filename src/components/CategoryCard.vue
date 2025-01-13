@@ -31,11 +31,24 @@
                 </svg>
             </button>
         </div>
+
+        <CategoryEditModal
+            :show="showEditModal"
+            :category-data="{ title, subtitle, bgColor }"
+            @close="showEditModal = false"
+            @category-updated="handlecategoryUpdated"
+        />
+
+
     </div>
 </template>
 
 <script>
+import CategoryEditModal from './EditModalCategory.vue';
 export default {
+    components: {
+        CategoryEditModal
+    },
     props: {
         title: {
             type: String,
@@ -58,6 +71,7 @@ export default {
         return {
             hover: false,
             viewAbleLinkCount: null,
+            showEditModal: false,
         };
     },
     computed: {
@@ -77,8 +91,14 @@ export default {
             return semester;
         },
         editCategory() {
-            alert(`Editing category: ${this.title}`);
-            this.$emit("edit-category", this.title);
+            this.showEditModal = true;
+        },
+
+        handlecategoryUpdated() {
+            // Emit event to parent to refresh data
+            this.$emit('refresh-data');
+            // You might want to reload the page or update the component data
+            location.reload();
         },
         async deleteCategory() {
             const confirmation = confirm(

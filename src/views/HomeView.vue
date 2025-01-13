@@ -49,7 +49,7 @@
             </div>
 
             <!-- Modal for Adding a New Semester -->
-            <UploadModalSemester v-if="showModal" :show="showModal" @close="closeSemesterModal" @save="saveSemester" />
+            <UploadModalSemester v-if="showUploadModal" :show="showUploadModal" @close="closeSemesterModal" @save="saveSemester" />
         </div>
     </div>
 </template>
@@ -64,10 +64,12 @@ export default {
     components: { NavbarView, SemesterCard, UploadModalSemester },
     data() {
         return {
+            userName:"",
+            userRole:"",
             selectedFilter: "All",
             searchQuery: "",
             semesters: [],
-            showModal: false,
+            showUploadModal: false,
             name: null,
             description: null,
         };
@@ -138,10 +140,10 @@ export default {
             this.$router.push(`/${semesterURL}`);
         },
         openSemesterModal() {
-            this.showModal = true;
+            this.showUploadModal = true;
         },
         closeSemesterModal() {
-            this.showModal = false;
+            this.showUploadModal = false;
         },
         saveSemester(data) {
             this.semesters.push({
@@ -150,7 +152,7 @@ export default {
                 subtitle: `${data.semesterName} `,
                 bgColor: this.getRandomColor(),
             });
-            this.showModal = false;
+            this.showUploadModal = false;
         },
         removeSemester(semesterTitle) {
             const index = this.semesters.findIndex((s) => s.title === semesterTitle);

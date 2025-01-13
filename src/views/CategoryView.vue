@@ -70,6 +70,8 @@ export default {
     components: { NavbarView, CategoryCard, UploadModalCategory, CategoryPermission },
     data() {
         return {
+            userName:"",
+            userRole:"",
             searchQuery: "",
             categories: [],
             showCategoryModal: false,

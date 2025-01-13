@@ -24,11 +24,22 @@
                 </svg>
             </button>
         </div>
+
+        <SemesterEditModal
+            :show="showEditModal"
+            :semester-data="{ title, subtitle, bgColor }"
+            @close="showEditModal = false"
+            @semester-updated="handleSemesterUpdated"
+        />
     </div>
 </template>
 
 <script>
+import SemesterEditModal from './EditModalSemester.vue';
 export default {
+    components: {
+        SemesterEditModal
+    },
     props: {
         title: {
             type: String,
@@ -48,6 +59,7 @@ export default {
             hover: false, // Track hover state to show/hide buttons
             role_desc: null,
             viewableCategoryCount: null,
+            showEditModal: false,
         };
     },
     methods: {
@@ -88,8 +100,14 @@ export default {
             }
         },
         editSemester() {
-            alert(`Editing semester: ${this.title}`);
-            this.$emit("edit-semester", this.title); // Emit event for editing
+            this.showEditModal = true;
+        },
+
+        handleSemesterUpdated() {
+            // Emit event to parent to refresh data
+            this.$emit('refresh-data');
+            // You might want to reload the page or update the component data
+            location.reload();
         },
         async deleteSemester() {
             const confirmation = confirm(

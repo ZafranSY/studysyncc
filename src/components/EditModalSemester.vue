@@ -1,0 +1,193 @@
+<!-- SemesterEditModal.vue -->
+<template>
+    <teleport to="body">
+        <div v-if="show" class="modal-overlay">
+            <div class="modal-content">
+                <h2>Editing {{ semesterData.title }}</h2>
+                <form @submit.prevent="handleSubmit">
+                    <div class="form-group">
+                        <label for="newSemesterId">New Semester ID:</label>
+                        <input type="text" id="newSemesterId" v-model="formData.newSemesterId" class="form-input"
+                            required placeholder="Enter new semester ID" />
+                    </div>
+                    <div class="button-group">
+                        <button type="submit" class="save-button">Save</button>
+                        <button type="button" @click="closeModal" class="cancel-button">Cancel</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </teleport>
+</template>
+
+<script>
+export default {
+    name: 'SemesterEditModal',
+    props: {
+        show: {
+            type: Boolean,
+            required: true
+        },
+        semesterData: {
+            type: Object,
+            required: true
+        }
+    },
+    data() {
+        return {
+            formData: {
+                newSemesterId: ''
+            }
+        }
+    },
+    watch: {
+        show(newVal) {
+            if (newVal) {
+                this.formData.newSemesterId = this.semesterData.title
+                document.body.style.overflow = 'hidden'
+            } else {
+                document.body.style.overflow = 'auto'
+            }
+        }
+    },
+    methods: {
+        async handleSubmit() {
+            try {
+                // Get session_id from localStorage
+                const sessionId = JSON.parse(localStorage.getItem('session_id'));
+
+                if (!sessionId) {
+                    alert('Session ID not found. Please log in again.');
+                    return;
+                }
+
+                let payload;
+                const newSemesterId = this.formData.newSemesterId;
+
+                payload = {
+                    session_id: sessionId,
+                    semester_id: this.semesterData.title,  // old semester id
+                    new_semester_id: newSemesterId
+                };
+
+
+                const response = await fetch('http://localhost/updateSemester', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(payload)
+                });
+
+                const result = await response.json();
+
+                if (result.message) {
+                    alert(result.message);
+                    this.$emit('semester-updated');
+                    this.closeModal();
+                    location.reload();
+                } else if (result.error) {
+                    alert(result.error);
+                }
+            } catch (error) {
+                alert('Failed to connect to server');
+            }
+
+        },
+        closeModal() {
+            this.$emit('close');
+        }
+    }
+}
+</script>
+
+<style scoped>
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 9999;
+}
+
+.modal-content {
+    background-color: white;
+    padding: 2rem;
+    border-radius: 8px;
+    width: 90%;
+    max-width: 500px;
+    position: relative;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.form-group {
+    margin-bottom: 1.5rem;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-weight: 500;
+}
+
+.form-input {
+    width: 100%;
+    padding: 0.75rem;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 1rem;
+}
+
+.form-input:focus {
+    outline: none;
+    border-color: #007bff;
+    box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25);
+}
+
+.button-group {
+    display: flex;
+    gap: 1rem;
+    justify-content: flex-end;
+    margin-top: 2rem;
+}
+
+.save-button,
+.cancel-button {
+    padding: 0.75rem 1.5rem;
+    border-radius: 4px;
+    border: none;
+    cursor: pointer;
+    font-size: 1rem;
+    transition: background-color 0.2s;
+}
+
+.save-button {
+    background-color: #007bff;
+    color: white;
+}
+
+.save-button:hover {
+    background-color: #0056b3;
+}
+
+.cancel-button {
+    background-color: #6c757d;
+    color: white;
+}
+
+.cancel-button:hover {
+    background-color: #5a6268;
+}
+
+h2 {
+    margin-top: 0;
+    margin-bottom: 1.5rem;
+    font-size: 1.5rem;
+    color: #333;
+}
+</style>

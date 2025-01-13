@@ -82,6 +82,10 @@ OUTPUT
 OUTPUT
 {"error":"Insufficient role privileges"}
 
+OUTPUT
+{"error":"Invalid semester_id. It must be 11 characters. 2099/2012 , 9"} 
+
+
 =================================================================================================================
 
 http://localhost/updateSemester              ACADEMIC OFFICER ONLY
@@ -100,6 +104,8 @@ OUTPUT
 OUTPUT
 {"error":"Insufficient role privileges"}
 
+OUTPUT
+{"error":"Invalid semester_id. It must be 11 characters. 2099/2012 , 9"} 
 
 =================================================================================================================
 =================================================================================================================
