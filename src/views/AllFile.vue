@@ -14,8 +14,7 @@
                         <option value="owner">Owner</option>
                     </select>
                     <i class="search-icon">&#128269;</i>
-                    <input type="text" v-model="searchTerm" class="search-input" placeholder="Search..."
-                        @input="filterFiles" />
+                    <input type="text" v-model="searchTerm" class="search-input" placeholder="Search..." @input="filterFiles" />
                 </div>
             </div>
             <div class="table-container">
@@ -32,8 +31,8 @@
                         </tr>
                     </thead>
                     <tbody>
-                        <tr v-for="(file, index) in filteredFiles" :key="file.id">
-                            <td>{{ index + 1 }}</td>
+                        <tr v-for="(file, index) in paginatedFiles" :key="file.id">
+                            <td>{{ (currentPage - 1) * itemsPerPage + index + 1 }}</td>
                             <td>{{ file.category || "N/A" }}</td>
                             <td class="session-column">{{ file.linkPosted || "N/A" }}</td>
                             <td>{{ file.refName || "No Name" }}</td>
@@ -52,6 +51,12 @@
                     </tbody>
                 </table>
             </div>
+            <!-- Pagination Controls -->
+            <div class="pagination-controls">
+                <button :disabled="currentPage === 1" @click="prevPage">Previous</button>
+                <span>Page {{ currentPage }} of {{ totalPages }}</span>
+                <button :disabled="currentPage === totalPages" @click="nextPage">Next</button>
+            </div>
         </div>
     </div>
 </template>
@@ -69,7 +74,19 @@ export default {
             filteredFiles: [],
             searchTerm: "",
             selectedFilter: "all",
+            currentPage: 1, // Pagination state
+            itemsPerPage: 50, // Number of items to show per page
         };
+    },
+    computed: {
+        totalPages() {
+            return Math.ceil(this.filteredFiles.length / this.itemsPerPage);
+        },
+        paginatedFiles() {
+            const start = (this.currentPage - 1) * this.itemsPerPage;
+            const end = start + this.itemsPerPage;
+            return this.filteredFiles.slice(start, end);
+        },
     },
     methods: {
         async fetchAllFiles() {
@@ -129,6 +146,7 @@ export default {
 
                 return fieldsToCheck[this.selectedFilter]?.toLowerCase().includes(term);
             });
+            this.currentPage = 1; // Reset to first page after filtering
         },
 
         goToFile(file) {
@@ -139,6 +157,18 @@ export default {
 
             const validUrl = /^https?:\/\//i.test(file.url) ? file.url : `http://${file.url}`;
             window.open(validUrl, "_blank");
+        },
+
+        nextPage() {
+            if (this.currentPage < this.totalPages) {
+                this.currentPage++;
+            }
+        },
+
+        prevPage() {
+            if (this.currentPage > 1) {
+                this.currentPage--;
+            }
         },
     },
     mounted() {
@@ -256,5 +286,27 @@ export default {
     display: inline-flex;
     align-items: center;
     justify-content: center;
+}
+
+.pagination-controls {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-top: 20px;
+}
+
+.pagination-controls button {
+    padding: 8px 16px;
+    margin: 0 10px;
+    border: none;
+    border-radius: 4px;
+    background-color: #007bff;
+    color: white;
+    cursor: pointer;
+}
+
+.pagination-controls button:disabled {
+    background-color: #ccc;
+    cursor: not-allowed;
 }
 </style>
