@@ -34,7 +34,7 @@ const b =
 
 const host = 'http://localhost:80'
 let METHOD = 'post'
-const crud = '/get'
+const crud = '/update'
 const type = 'Category'
 
 

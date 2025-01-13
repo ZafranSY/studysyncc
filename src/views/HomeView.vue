@@ -7,7 +7,7 @@
         <div class="main-content">
             <!-- Header Section -->
             <div class="header">
-                <h1 class="page-title">Home</h1>
+                <h1 class="page-title">Semesters</h1>
                 <div class="user-info">
                     <div>
                         <span class="user-name">{{ userName }}</span>
@@ -15,7 +15,7 @@
                     </div>
                 </div>
 
-                <h2 class="section-title">Semester</h2>
+                <h2 class="section-title">/</h2>
             </div>
 
             <!-- Filter Section -->
@@ -60,6 +60,7 @@ import SemesterCard from "@/components/SemesterCard.vue";
 import UploadModalSemester from "@/components/UploadModalSemester.vue";
 
 export default {
+    props: ['semesterURL'],
     components: { NavbarView, SemesterCard, UploadModalSemester },
     data() {
         return {
@@ -119,9 +120,22 @@ export default {
             }
             return color;
         },
+        transformSemester(semester) {
+            // Split the semester string into parts
+            const [part1, part2] = semester.split('/'); // "xxyy" and "aabb-1"
+
+            // Extract the relevant substrings
+            const yy = part1.slice(2);   // Take the last two characters of "xxyy"
+            const bb = part2.slice(2);   // Take the last two characters of "xxyy"
+            const bb1 = bb.replace('-', ''); // Remove the dash from "aabb-1"
+
+            // Concatenate the parts to form "yybb1"
+            return yy + bb1;
+        },
         setSemester(semester) {
             sessionStorage.setItem("semester", JSON.stringify(semester));
-            this.$router.push("/homeview/category");
+            const semesterURL=this.transformSemester(semester);
+            this.$router.push(`/${semesterURL}`);
         },
         openSemesterModal() {
             this.showModal = true;

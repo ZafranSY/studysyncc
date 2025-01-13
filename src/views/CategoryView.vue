@@ -7,9 +7,15 @@
         <div class="main-content">
             <!-- Header Section -->
             <div class="header">
-                <h1 class="page-title">Home</h1>
-                <h1>{{ semester_id }}</h1>
-                <h2 class="section-title">Category</h2>
+                <h1 class="page-title">Categories</h1>
+                <div class="user-info">
+                    <div>
+                        <span class="user-name">{{ this.userName }}</span>
+                        <span class="user-role">({{ this.userRole }})</span>
+                    </div>
+                </div>
+
+                <h2 class="section-title">/ {{ this.semester_id }} </h2>
             </div>
 
             <!-- Filter Section -->
@@ -60,6 +66,7 @@ import CategoryCard from "@/components/CategoryCard.vue";
 import CategoryPermission from "@/components/CategoryPermission.vue"; // Import the permission modal
 
 export default {
+    props: ['categoryURL'],
     components: { NavbarView, CategoryCard, UploadModalCategory, CategoryPermission },
     data() {
         return {
@@ -89,9 +96,12 @@ export default {
     },
     mounted() {
         const session_id = JSON.parse(localStorage.getItem("session_id"));
-        this.semester_id = JSON.parse(sessionStorage.getItem("semester"));
+        this.semester_id = JSON.parse(sessionStorage.getItem("semester")) || this.transformToSemester(this.$route.params.semesterURL);
         console.log("Session ID:", session_id);
         console.log("Semester ID:", this.semester_id);
+        const userDat = JSON.parse(localStorage.getItem("utmwebfc_session"));
+        this.userName = userDat.full_name;
+        this.userRole = userDat.description;
         sessionStorage.removeItem("category");
 
         fetch("http://localhost/getCategory", {
@@ -134,8 +144,18 @@ export default {
 
     methods: {
         navigateToDetails(id) {
-            this.$router.push(`/category/${id}`);
+            this.$router.push(`/${this.$route.params.semesterURL}/${encodeURIComponent(id)}`);
             this.setCategory(id);
+        },
+        transformToSemester(input) {
+            // Extract the components
+            const aa = input.slice(0, 2); // First two characters: "aa"
+            const bb = input.slice(2, 4); // Next two characters: "bb"
+            const y = input.slice(4);     // Last character: "y"
+
+            // Format the result
+            const semester = `20${aa}/20${bb}-${y}`;
+            return semester;
         },
         getRandomColor() {
             const letters = "0123456789ABCDEF";
@@ -167,7 +187,7 @@ export default {
         },
         async confirmAndRemoveCategory(categoryTitle) {
             if (window.confirm(`Are you sure you want to delete "${categoryTitle}"?`)) {
-                const sessionId =  sessionStorage.getItem('session_id');
+                const sessionId = sessionStorage.getItem('session_id');
                 const semesterId = sessionStorage.getItem('semester');
 
                 if (!sessionId || !semesterId) {
@@ -246,6 +266,7 @@ export default {
     overflow-y: auto;
     display: flex;
     flex-direction: column;
+    position: relative;
 }
 
 .header {
@@ -260,8 +281,28 @@ export default {
 .page-title {
     font-size: 28px;
     font-weight: 500;
-    margin: 0 0 4px 0;
     color: #000;
+}
+
+.user-info {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    margin-top: 10px;
+    margin-bottom: 10px;
+}
+
+.user-name {
+    font-size: 18px;
+    font-weight: 500;
+    color: #333;
+}
+
+.user-role {
+    font-size: 16px;
+    font-weight: 400;
+    color: #666;
+    margin-left: 5px;
 }
 
 .section-title {

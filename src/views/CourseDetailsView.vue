@@ -2,12 +2,16 @@
     <div class="page-container">
         <NavbarView class="navbar" />
         <div class="content-container">
-            <div class="header-container">
-                <div class="header-left">
-                    <h1>Course File</h1>
-
-                    <h2>{{ semester_id }}: {{ category_name }}</h2>
+            <div class="header">
+                <h1 class="page-title">Links</h1>
+                <div class="user-info">
+                    <div>
+                        <span class="user-name">{{ userName }}</span>
+                        <span class="user-role">({{ userRole }})</span>
+                    </div>
                 </div>
+
+                <h2 class="section-title">/ {{semId}} / {{categoryTitle }}</h2>
             </div>
 
             <div class="details-container">
@@ -163,7 +167,16 @@ export default {
         
     },
     methods: {
+        transformToSemester(input) {
+            // Extract the components
+            const aa = input.slice(0, 2); // First two characters: "aa"
+            const bb = input.slice(2, 4); // Next two characters: "bb"
+            const y = input.slice(4);     // Last character: "y"
 
+            // Format the result
+            const semester = `20${aa}/20${bb}-${y}`;
+            return semester;
+        },
         ownerOrAcadOff(a){
             
             return localStorage.getItem('role').replace(/['"]+/g, "")==='Academic Officer' || localStorage.getItem('email').replace(/['"]+/g, "")==a;
@@ -171,8 +184,9 @@ export default {
         // Fetch data based on category and session
         fetchFiles() {
             const session_id = JSON.parse(localStorage.getItem("session_id"));
-            this.semester_id = JSON.parse(sessionStorage.getItem("semester"));
-            this.category_name = JSON.parse(sessionStorage.getItem("category"));
+            
+            this.semester_id = JSON.parse(sessionStorage.getItem("semester")) || this.transformToSemester(this.$route.params.semesterURL);
+            this.category_name = JSON.parse(sessionStorage.getItem("category")) || decodeURIComponent(this.$route.params.categoryURL);
 
             if (!session_id || !this.semester_id || !this.category_name) {
                 console.error("Missing session, semester, or category information.");
@@ -272,8 +286,8 @@ export default {
         async updateRecord() {
             // Get necessary values from localStorage
             const sessionId = localStorage.getItem('session_id');
-            const semesterId = sessionStorage.getItem('semester');
-            const categoryName = sessionStorage.getItem('category');
+            const semesterId = JSON.parse(sessionStorage.getItem("semester")) || this.transformToSemester(this.$route.params.semesterURL);
+            const categoryName = JSON.parse(sessionStorage.getItem("category")) || decodeURIComponent(this.$route.params.categoryURL);
 
             // Check if any of the required values are missing
             if (!sessionId || !semesterId || !categoryName) {
@@ -292,8 +306,8 @@ export default {
 
             const requestBody = {
                 session_id: sessionId.replace(/['"]+/g, ""),
-                semester_id: semesterId.replace(/['"]+/g, ""),
-                category_name: categoryName.replace(/['"]+/g, ""),
+                semester_id: semesterId,
+                category_name: categoryName,
                 new_ref_name: this.editForm.refName,
                 new_desc: this.editForm.linkDescription,
                 new_link: this.editForm.url,
@@ -360,8 +374,8 @@ export default {
             }
 
             let found = false;
-            let cat = sessionStorage.getItem('category').replace(/['"]+/g, "");
-            let sem = sessionStorage.getItem('semester').replace(/['"]+/g, "");
+            let cat = JSON.parse(sessionStorage.getItem("category")) || decodeURIComponent(this.$route.params.categoryURL);
+            let sem = JSON.parse(sessionStorage.getItem("semester")) || this.transformToSemester(this.$route.params.semesterURL);
 
 
             for (let i = 0; i < this.createAbleLinkWherearr.length; i += 2) {
@@ -374,7 +388,7 @@ export default {
 
         async getUpdatableLink() {
             const session_id = JSON.parse(localStorage.getItem("session_id"));
-            this.semester_id = JSON.parse(sessionStorage.getItem("semester"));
+            this.semester_id = JSON.parse(sessionStorage.getItem("semester")) || this.transformToSemester(this.$route.params.semesterURL);
 
             if (!session_id || !this.semester_id || !this.category_name) {
                 console.error("Missing session, semester, or category information.");
@@ -414,7 +428,7 @@ export default {
 
         async getDeletableLink() {
             const session_id = JSON.parse(localStorage.getItem("session_id"));
-            this.semester_id = JSON.parse(sessionStorage.getItem("semester"));
+            this.semester_id = JSON.parse(sessionStorage.getItem("semester")) || this.transformToSemester(this.$route.params.semesterURL);
 
             if (!session_id || !this.semester_id || !this.category_name) {
                 console.error("Missing session, semester, or category information.");
@@ -454,7 +468,7 @@ export default {
 
         async getCategoryAddPerm() {
             const session_id = JSON.parse(localStorage.getItem("session_id"));
-            this.semester_id = JSON.parse(sessionStorage.getItem("semester"));
+            this.semester_id = JSON.parse(sessionStorage.getItem("semester")) || this.transformToSemester(this.$route.params.semesterURL);
 
             if (!session_id || !this.semester_id || !this.category_name) {
                 console.error("Missing session, semester, or category information.");
@@ -497,8 +511,8 @@ export default {
         async deleteRecord(id) {
 
             const sessionId = localStorage.getItem('session_id');
-            const semesterId = sessionStorage.getItem('semester');
-            const categoryName = sessionStorage.getItem('category');
+            const semesterId = JSON.parse(sessionStorage.getItem("semester")) || this.transformToSemester(this.$route.params.semesterURL);
+            const categoryName = JSON.parse(sessionStorage.getItem("category")) || decodeURIComponent(this.$route.params.categoryURL);
 
 
             if (!sessionId || !semesterId || !categoryName) {
@@ -567,6 +581,16 @@ export default {
     },
     async mounted() {
         // Initialize page by fetching data
+        const sessionData = JSON.parse(localStorage.getItem("utmwebfc_session"));
+        
+
+        if (sessionData) {
+            this.userName = sessionData.full_name;
+            this.userRole = sessionData.description;
+            this.semId= JSON.parse(sessionStorage.getItem("semester")) || this.transformToSemester(this.$route.params.semesterURL);
+            this.categoryTitle= JSON.parse(sessionStorage.getItem("category")) || decodeURIComponent(this.$route.params.categoryURL);
+        }
+
         await this.fetchFiles();
         await this.getCategoryAddPerm();
         await this.getUpdatableLink();
@@ -583,47 +607,76 @@ export default {
 }
 
 .content-container {
-    flex: 1;
+    flex-grow: 1;
     padding: 20px;
-    margin-left: 230px;
-    /* Ensure content does not overlap with sidebar */
-    overflow: auto;
+    margin-left: 260px;
+    background-color: #f9f9f9;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    position: relative;
 }
 
 .navbar {
     flex-shrink: 0;
 }
 
-.header-container {
+
+.header {
     display: flex;
-    justify-content: space-between;
-    /* Align left and right sections */
-    align-items: flex-end;
-    /* Align bottom edges of h1 and h2 */
+    flex-direction: column;
+    align-items: flex-start;
+    border-bottom: 2px solid #ddd;
+    padding-bottom: 10px;
     margin-bottom: 20px;
-    margin-left: 20px;
 }
 
-.header-left {
-    text-align: left;
-    /* Align both headers to the left */
+.page-title {
+    font-size: 28px;
+    font-weight: 500;
+    color: #000;
 }
 
-.header-left h1 {
+.user-info {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    margin-top: 10px;
+    margin-bottom: 10px;
+}
+
+.user-name {
+    font-size: 18px;
+    font-weight: 500;
+    color: #333;
+}
+
+.user-role {
+    font-size: 16px;
+    font-weight: 400;
+    color: #666;
+    margin-left: 5px;
+}
+
+.section-title {
+    font-size: 18px;
+    font-weight: bold;
+    margin: 0;
+    color: #333;
+}
+
+ h1 {
     font-size: 32px;
-    margin-bottom: 5px;
     /* Adjust space between h1 and h2 */
 }
 
-.header-left h2 {
+ h2 {
     font-size: 24px;
     margin-top: 0;
     /* Remove extra margin at the top of h2 */
 }
 
-.header-right {
-    font-size: 16px;
-}
+
 
 .details-container {
     background: #f9f9f9;
@@ -979,3 +1032,4 @@ input::placeholder {
     margin-bottom: 0;
 }
 </style>
+

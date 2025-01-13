@@ -66,6 +66,16 @@ export default {
         },
     },
     methods: {
+        transformToSemester(input) {
+            // Extract the components
+            const aa = input.slice(0, 2); // First two characters: "aa"
+            const bb = input.slice(2, 4); // Next two characters: "bb"
+            const y = input.slice(4);     // Last character: "y"
+
+            // Format the result
+            const semester = `20${aa}/20${bb}-${y}`;
+            return semester;
+        },
         editCategory() {
             alert(`Editing category: ${this.title}`);
             this.$emit("edit-category", this.title);
@@ -76,7 +86,7 @@ export default {
             );
             if (confirmation) {
                 const sessionId = localStorage.getItem('session_id') || sessionStorage.getItem('session_id');
-                const semesterId = localStorage.getItem('semester') || sessionStorage.getItem('semester');
+                const semesterId = JSON.parse(sessionStorage.getItem("semester")) || this.transformToSemester(this.$route.params.semesterURL);
 
                 if (!sessionId || !semesterId) {
                     alert("Missing session or semester data. Please log in again.");
@@ -125,9 +135,7 @@ export default {
                 .getItem("session_id")
                 ?.replace(/['"]+/g, "");
 
-            const semester = sessionStorage
-                .getItem("semester")
-                ?.replace(/['"]+/g, "");
+            const semester = JSON.parse(sessionStorage.getItem("semester")) || this.transformToSemester(this.$route.params.semesterURL);
 
             const payload = {
                 session_id: session_id?.trim(),
