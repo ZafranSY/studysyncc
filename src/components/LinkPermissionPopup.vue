@@ -40,8 +40,21 @@
 
                         <!-- New Row for Adding Permissions -->
                         <tr>
-                            <td><input v-model="newPermission.user_email" placeholder="User email" /></td>
-                            <td><input v-model="newPermission.role_name" placeholder="Role name" /></td>
+                            <td>
+                                        <select v-model="newPermission.user_email"
+                                            >
+                                            <option value=""  >Select email</option>
+                                            <option v-for="email in emailOptions" :key="email" :value="email">{{ email}}</option>
+                                        </select>
+                                    </td>
+
+                                    <td>
+                                        <select v-model="newPermission.role_name"
+                                            >
+                                            <option value=""  >Select role</option>
+                                            <option v-for="user in userOptions" :key="user" :value="user">{{ user }}</option>
+                                        </select>
+                                    </td>
                             <td>
                                 <input type="checkbox" v-model="newPermission.can_read" />
                             </td>
@@ -98,6 +111,16 @@ export default {
         };
     },
     methods: {
+        transformToSemester(input) {
+            // Extract the components
+            const aa = input.slice(0, 2); // First two characters: "aa"
+            const bb = input.slice(2, 4); // Next two characters: "bb"
+            const y = input.slice(4);     // Last character: "y"
+
+            // Format the result
+            const semester = `20${aa}/20${bb}-${y}`;
+            return semester;
+        },
         async fetchPermissions() {
             const sessionId = localStorage.getItem('session_id');
             if (!sessionId) {
@@ -176,30 +199,18 @@ export default {
         async saveNewPermission() {
 
             const newPermission = {
-                insert_user_email: this.newPermission.user_email || 'No email provided',
-                insert_user_role: this.newPermission.role_name || 'No role provided',
+                session_id: JSON.parse(localStorage.getItem('session_id')),
+                semester_id: JSON.parse(sessionStorage.getItem("semester")) || this.transformToSemester(this.$route.params.semesterURL),
+                category_name: JSON.parse(sessionStorage.getItem("category")) || decodeURIComponent(this.$route.params.categoryURL),
+                gdlink_id: this.gdlink.id,
+
+                insert_user_email: this.newPermission.user_email || '',
+                insert_user_role: this.newPermission.role_name || '',
+
                 can_read: this.newPermission.can_read || false,
                 can_update: this.newPermission.can_update || false,
                 can_delete: this.newPermission.can_delete || false,
-                gdlink_id: this.gdlink.id,
-                session_id: JSON.parse(localStorage.getItem('session_id')),
-
             };
-
-            let fixedNewPermission = {
-                    insert_user_email: this.newPermission.user_email || 'No email provided',
-                    insert_user_role: this.newPermission.role_name || 'No role provided',
-                    can_read: this.newPermission.can_read || false,
-                    can_update: this.newPermission.can_update || false,
-                    can_delete: this.newPermission.can_delete || false,
-                    gdlink_id: this.gdlink.id,
-                    session_id: JSON.parse(localStorage.getItem('session_id')),
-                };
-
-            // Handle submission logic here
-            console.log('New Permission:', newPermission);
-
-            // Optional: Reset the form fields after submission
             
             try {
 
@@ -209,7 +220,7 @@ export default {
                     headers: {
                         "Content-Type": "application/json",
                     },
-                    body: JSON.stringify(fixedNewPermission),
+                    body: JSON.stringify(newPermission),
                 });
 
                 // Check for errors in response
@@ -217,19 +228,25 @@ export default {
                     throw new Error(`HTTP ${response.status}: ${response.statusText}`);
                 }
 
-                const result = await response.json();
 
-                // Alert success message and add the new permission to the list
-                alert(result.message || "Permission added successfully!");
+                const data = await response.json();
 
-                this.permissions.push({ ...this.newPermission }); // Add new permission to the list
+                // Handle response message
+                if (data.result.message) {
+
+                    alert(data.result.message);
+                } else if (data.result.error) {
+                    alert(data.result.error);
+                }
+                
 
                 this.resetForm(); // Reset form inputs after adding permission
             } catch (error) {
                 console.error("Error adding permission:", error);
-                alert("Failed to add permission.");
+                alert(`${error}`);
                 this.resetForm();
             }
+            this.fetchPermissions();
 
             
         },
