@@ -1,8 +1,11 @@
 
 # StudySync Project
+<p>Go to <a href ="http://107.175.189.118:8080/login">StudySync Live</a>
+</p>
+<br/>
+[StudySync Live](http://107.175.189.118:8080/login) is hosted using linux VPS by racknerd
+StudySync is an integrated platform that combines a Perl-based backend (using Mojolicious) with a Vue.js front end. It provides robust academic data management, real-time communication, and a clean user interface.
 
-This repository contains the full StudySync project, including both the Perl backend (built with Mojolicious) and the Vue.js front end.
-<a href="http://107.175.189.118:8080/login"> StudySync.com</a>
 ---
 
 ## Table of Contents
@@ -28,39 +31,39 @@ This repository contains the full StudySync project, including both the Perl bac
 
 ## Overview
 
-**StudySync** is a platform designed to manage academic data and enable real-time communication between students and lecturers. The project is split into two parts:
+StudySync is designed to streamline academic processes and enhance communication between students and lecturers. The project is split into two major parts:
 
-- **Perl Backend:** Provides RESTful APIs, integrates with a MariaDB database, and handles real-time notifications.
-- **Vue.js Frontend:** Offers a responsive user interface to interact with the backend services.
+- **Perl Backend:** Provides RESTful APIs, integrates with a MariaDB database, and supports real-time notifications.
+- **Vue.js Frontend:** Delivers a responsive, modern user interface for interacting with the backend services.
 
 ---
 
 ## Goals
 
-1. **Reliability:** Robust server-side logic for handling API requests and data transfer.
-2. **Integration:** Seamless interaction with the MariaDB database.
-3. **Scalability:** Supports a growing user base and evolving feature set.
-4. **User-Friendly:** Clean and intuitive front-end built with Vue.js.
+1. **Reliability:** Ensure robust handling of API requests and data management.
+2. **Integration:** Seamlessly interact with the MariaDB database.
+3. **Scalability:** Support a growing user base and feature set.
+4. **User Experience:** Provide an intuitive and responsive front end.
 
 ---
 
 ## Features
 
-- **RESTful APIs:** Endpoints for user authentication, data management, and notifications.
+- **RESTful APIs:** Manage user authentication, data operations, and notifications.
 - **Database Integration:** Efficient CRUD operations with MariaDB.
 - **Real-Time Communication:** WebSocket support for live updates.
-- **Secure Data Handling:** Best practices in user management and access control.
-- **Modern Frontend:** Vue.js-based interface for a smooth user experience.
+- **Secure Data Handling:** Implement best practices for user management and data security.
+- **Modern Frontend:** Built with Vue.js for a smooth, responsive experience.
 
 ---
 
 ## Prerequisites
 
-- **Operating System:** Linux, macOS, or Windows (with WSL recommended for Linux commands)
-- **Docker:** Installed and running (for MariaDB and optionally for backend)
-- **Perl (v5.10 or later):** Including [Mojolicious](https://mojolicious.org/)
-- **Node.js & npm:** For the Vue.js front end
-- **Vue CLI (optional):** If you plan to run and build the Vue app locally
+- **Operating System:** Linux, macOS, or Windows (WSL recommended for Linux commands)
+- **Docker:** Installed and running (used for MariaDB and optionally for backend)
+- **Perl (v5.10+):** With [Mojolicious](https://mojolicious.org/)
+- **Node.js & npm:** Required for the Vue.js front end
+- **Vue CLI (Optional):** For local development and build tasks
 
 ---
 
@@ -75,7 +78,7 @@ This repository contains the full StudySync project, including both the Perl bac
    ```
 
 2. **Set Up MariaDB Using Docker:**
-   Run the following command to start a MariaDB container:
+   Start a MariaDB container with the following command:
    ```bash
    docker run --name studysync-mariadb \
      -e MYSQL_ROOT_PASSWORD=yourpassword \
@@ -83,20 +86,20 @@ This repository contains the full StudySync project, including both the Perl bac
      -p 3306:3306 \
      -d mariadb:latest
    ```
-   Alternatively, if you have a `docker-compose.yml` file, run:
+   If using Docker Compose:
    ```bash
    docker-compose up --build
    ```
 
 3. **Install Perl Dependencies:**
-   Use CPAN (or cpanminus) to install the required Perl modules:
+   Install the required modules using CPAN (or cpanminus):
    ```bash
    cpan Mojolicious DBI DBD::mysql
    ```
-   *Tip:* If you encounter permission issues, consider running as a user with proper privileges or use `sudo` if needed.
+   *Tip:* Use `sudo` if you encounter permission issues.
 
 4. **Configure the Database Connection:**
-   Edit `config/database.conf` with your database settings:
+   Edit the file `config/database.conf` with your database settings:
    ```ini
    [database]
    host = 127.0.0.1
@@ -118,12 +121,12 @@ This repository contains the full StudySync project, including both the Perl bac
    npm install
    ```
 
-3. **Check the Available Scripts:**
-   To see what scripts are available, run:
+3. **Verify Available Scripts:**
+   Check which npm scripts are available:
    ```bash
    npm run
    ```
-   Typically, the Vue.js project will have a script such as `"serve"` or `"start"` for development. If you need a `dev` script and it’s missing, update your `package.json` under the `"scripts"` section. For example:
+   Typically, you should see a `"serve"` (or `"start"`) script for development. If you prefer a `dev` script, add it to your `package.json`:
    ```json
    "scripts": {
      "serve": "vue-cli-service serve",
@@ -137,15 +140,15 @@ This repository contains the full StudySync project, including both the Perl bac
 
 ### Starting the Backend
 
-- **Directly (without Docker Compose):**
+- **Direct Execution:**
   From the `backend` directory:
   ```bash
   perl working.pl daemon -l http://*:80
   ```
-  The backend server will run and be accessible at [http://localhost:80](http://localhost:80).
+  Access the backend at [http://localhost:80](http://localhost:80).
 
 - **Using Docker Compose:**
-  If you have configured `docker-compose.yml` for both backend and database:
+  If your `docker-compose.yml` sets up both the backend and database:
   ```bash
   docker-compose up --build
   ```
@@ -153,101 +156,105 @@ This repository contains the full StudySync project, including both the Perl bac
 ### Starting the Frontend
 
 - **Development Mode:**
-  In the `frontend` directory, start the development server (using the correct npm script):
+  In the `frontend` directory, run:
   ```bash
   npm run serve
   ```
-  The Vue.js app will typically run on [http://localhost:8080](http://localhost:8080) (or another port as specified).
+  The Vue.js app typically runs at [http://localhost:8080](http://localhost:8080) (or another port as specified).
 
 - **Production Build:**
-  To build the frontend for production:
+  Build the static files:
   ```bash
   npm run build
   ```
-  Then, you can serve the static files with a web server of your choice.
+  Serve the files with your preferred web server.
 
 ---
 
 ## Folder Structure
 
 ### Root Directory
-- **.dockerignore:** Files and directories ignored during Docker builds.
-- **.gitattributes:** Repository file handling settings.
-- **.github/**: GitHub workflows and configuration for CI/CD.
-- **Dockerfile:** Defines how to build the backend Docker image.
-- **docker-compose.yml:** Orchestrates multi-container setups (backend and MariaDB).
-- **README.md:** This file.
+- **.dockerignore:** Lists files/directories to ignore in Docker builds.
+- **.gitattributes:** Configures repository file handling.
+- **.github/**: Contains GitHub workflows and CI/CD configurations.
+- **Dockerfile:** Builds the backend Docker image.
+- **docker-compose.yml:** Manages multi-container setups (backend and MariaDB).
+- **README.md:** This documentation file.
 
 ### Backend Specific
 - **/lib:** Mojolicious controllers and helper modules.
-- **/public:** Static assets (images, JS, CSS).
-- **/templates:** Embedded Perl templates for rendering views.
+- **/public:** Static assets (images, JavaScript, CSS).
+- **/templates:** Embedded Perl templates for views.
 - **/config:** Configuration files (including database settings).
-- **working.pl / server.pl:** Main server script(s) to launch the backend.
+- **working.pl / server.pl:** Main scripts to launch the backend.
 
 ### Frontend Specific
-- **/src:** Source code for the Vue.js application.
+- **/src:** Vue.js application source code.
 - **/public:** Public static files for the Vue.js app.
-- **package.json:** Contains the scripts and dependencies for the Vue.js project.
+- **package.json:** Contains dependencies and npm scripts.
 
 ### SQL Files
-- **createtable.sql:** SQL script to create necessary tables.
-- **droptable.sql:** SQL script to drop tables (useful for resets).
-- **dummydata.sql:** Dummy data for testing.
+- **createtable.sql:** Script to create necessary tables.
+- **droptable.sql:** Script to drop tables (for resets).
+- **dummydata.sql:** Sample data for testing.
 
 ### Other Files
-- **postTest.js:** Script to test API endpoints.
-- **exampleEndpointOutput.md:** Sample output documentation from various endpoints.
+- **postTest.js:** Script for API endpoint testing.
+- **exampleEndpointOutput.md:** Sample output documentation.
 
 ---
 
 ## Testing
 
 ### API Testing (Backend)
-1. **Using postTest.js:**
-   ```bash
-   node postTest.js
-   ```
-2. **Using curl:**
-   ```bash
-   curl -X POST http://localhost:80/api/exampleEndpoint \
-        -d '{"key":"value"}' \
-        -H "Content-Type: application/json"
-   ```
-3. **Using Postman:**
-   Import the API endpoints and test interactively.
+- **Using postTest.js:**
+  ```bash
+  node postTest.js
+  ```
+- **Using curl:**
+  ```bash
+  curl -X POST http://localhost:80/api/exampleEndpoint \
+       -d '{"key":"value"}' \
+       -H "Content-Type: application/json"
+  ```
+- **Using Postman:** Import and test API endpoints interactively.
 
 ### Frontend Testing
-- Use the browser (or tools like Vue DevTools) to interact with the running Vue.js app.
-- Ensure API calls are properly routed to the backend.
+- Open the Vue.js application in your browser.
+- Use Vue DevTools or similar tools to debug and inspect API calls.
 
 ---
 
 ## Contribution Guide
 
-1. **Fork and Clone:**
+1. **Fork and Clone the Repository:**
    ```bash
    git clone https://github.com/yourusername/studysync.git
    cd studysync
    ```
+
 2. **Create a New Branch:**
    ```bash
    git checkout -b feature-name
    ```
+
 3. **Make Changes and Test:**
-   Use `postTest.js`, `curl`, or Postman for backend testing and run the frontend locally for UI changes.
+   - Use `postTest.js`, `curl`, or Postman for backend changes.
+   - Run the frontend locally to test UI updates.
+
 4. **Commit and Push:**
    ```bash
    git commit -m "Add feature-name"
    git push origin feature-name
    ```
+
 5. **Submit a Pull Request** for review.
 
 ---
 
 ## License
 
-This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
+This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for more details.
 
 ---
 
@@ -260,10 +267,10 @@ For further inquiries, please contact us at [zafranzafran0234@gmail.com](mailto:
 ## Acknowledgments
 
 - **University of Technology Malaysia (UTM):** For inspiration and support.
-- **Perl Community:** For the Mojolicious framework and related documentation.
-- **Vue.js Community:** For continuous improvements to the frontend ecosystem.
+- **Perl Community:** For the Mojolicious framework and robust documentation.
+- **Vue.js Community:** For continuous improvements in the frontend ecosystem.
 ```
 
 ---
 
-This README now provides clear instructions for setting up both the backend and front end, including Docker-based MariaDB configuration, Perl dependency installation, and Vue.js development steps. You can adjust paths and commands as needed for your environment.
+This version uses a cleaner layout, precise instructions, and improved wording so that anyone can easily set up and run the project without confusion. Adjust any paths or configuration details as needed for your specific environment.
