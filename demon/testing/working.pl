@@ -21,6 +21,32 @@ Log::Log4perl->init(\ q(
 ));
 my $logger = Log::Log4perl->get_logger();
 
+
+hook before_dispatch => sub ($c) {
+    my $ip_address = $c->tx->remote_address;
+    $logger->info("Incoming request from IP: $ip_address");
+
+    unless ($dbh && eval { $dbh->do("SELECT 1") }) {
+        $logger->warn("Database connection lost. Attempting to reconnect...");
+
+        eval {
+            $dbh = DBI->connect(
+                $dsn, $user, $pass,
+                { RaiseError => 1, PrintError => 0, AutoCommit => 1 }
+            );
+        };
+
+        if ($@ || !$dbh) {
+            $logger->error("Database reconnection failed: $DBI::errstr");
+        } else {
+            $logger->info("Reconnected to the database.");
+        }
+    }
+
+    # Store DB handle for route usage
+    $c->stash(dbh => $dbh);
+};
+
 # Global CORS headers
 hook after_dispatch => sub ($c) {
      # Set CORS headers
