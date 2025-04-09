@@ -21,6 +21,20 @@ Log::Log4perl->init(\ q(
 ));
 my $logger = Log::Log4perl->get_logger();
 
+# Handle preflight OPTIONS request
+options '*' => sub ($c) {
+    $c->res->code(204);  # No Content
+    $c->render(text => '');  # Empty response for OPTIONS request
+};
+# Connect to the database.
+my $database = 'testing';
+my $user     = 'adj2425';
+my $pass     = 'adj2425';
+my $dbh      = DBI->connect(
+                "DBI:MariaDB:database=$database;host=localhost",
+                $user, $pass,
+                { RaiseError => 1, PrintError => 0 }
+                );
 
 hook before_dispatch => sub ($c) {
     my $ip_address = $c->tx->remote_address;
@@ -30,10 +44,11 @@ hook before_dispatch => sub ($c) {
         $logger->warn("Database connection lost. Attempting to reconnect...");
 
         eval {
-            $dbh = DBI->connect(
-                $dsn, $user, $pass,
-                { RaiseError => 1, PrintError => 0, AutoCommit => 1 }
-            );
+            $dbh  = DBI->connect(
+                "DBI:MariaDB:database=$database;host=localhost",
+                $user, $pass,
+                { RaiseError => 1, PrintError => 0 }
+                );
         };
 
         if ($@ || !$dbh) {
@@ -56,20 +71,7 @@ hook after_dispatch => sub ($c) {
 };
 
 
-# Handle preflight OPTIONS request
-options '*' => sub ($c) {
-    $c->res->code(204);  # No Content
-    $c->render(text => '');  # Empty response for OPTIONS request
-};
-# Connect to the database.
-my $database = 'testing';
-my $user     = 'adj2425';
-my $pass     = 'adj2425';
-my $dbh      = DBI->connect(
-                "DBI:MariaDB:database=$database;host=localhost",
-                $user, $pass,
-                { RaiseError => 1, PrintError => 0 }
-                );
+
 
 get '/' => { text => 'GD Links AJAX/JSON Service' };
 
